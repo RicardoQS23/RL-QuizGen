@@ -18,7 +18,9 @@ def setup_directories(test_num):
         f'../jsons/{test_num}/actions',
         f'../jsons/{test_num}/loss',
         f'../jsons/{test_num}/exploration_ratio',
-        f'../jsons/{test_num}/universes'
+        f'../jsons/{test_num}/universes',
+        f'../jsons/{test_num}/agent_inference',
+        f'../jsons/{test_num}/baseline_inference'
     ]
     
     for directory in directories:

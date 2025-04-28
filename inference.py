@@ -43,16 +43,6 @@ def parse_args():
     
     return parser.parse_args()
 
-def setup_directories(test_num):
-    """Create necessary directories for saving results"""
-    directories = [
-        f'../jsons/{test_num}/agent_inference',
-        f'../jsons/{test_num}/baseline_inference'
-    ]
-    
-    for directory in directories:
-        os.makedirs(directory, exist_ok=True)
-
 def agent_inference(env, agent, test_num, start_state):
     steps = 0
     done = False
@@ -74,7 +64,6 @@ def agent_inference(env, agent, test_num, start_state):
 def main():
     args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    setup_directories(args.test_num)
     # Load data
     all_best_states = []
     universe, targets = load_data(args.test_num)
