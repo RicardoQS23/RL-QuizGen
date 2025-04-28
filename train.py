@@ -49,6 +49,8 @@ def parse_args():
     # Data generation parameters
     parser.add_argument('--data_source', type=int, default=1, choices=[0, 1, 2],
                        help='Data source: 0=load existing, 1=generate from real data, 2=generate synthetic')
+    parser.add_argument('--dataset', type=str, default='medical', choices=['math', 'medical'],
+                       help='Dataset to use when generating from real data: math or medical')
     parser.add_argument('--num_topics', type=int, default=10, help='Number of topics for universe generation')
     parser.add_argument('--universe_size', type=int, default=10000, help='Size of the universe')
     parser.add_argument('--quiz_size', type=int, default=10, help='Number of MCQs per quiz')
@@ -135,42 +137,38 @@ def main():
     if args.data_source == 0:  # Load existing data
         try:
             universe, targets = load_universe(args.test_num)
+            num_topics = args.num_topics
             save_to_log("Loaded existing data", f'../logs/{args.test_num}/training')
         except (FileNotFoundError, json.JSONDecodeError) as e:
             save_to_log(f"Error loading existing data: {e}", f'../logs/{args.test_num}/training')
             save_to_log("Falling back to generating from real data", f'../logs/{args.test_num}/training')
-            universe, targets = generate_universe_from_real_data(
+            universe, targets, num_topics = generate_universe_from_real_data(
                 test_num=args.test_num,
                 num_topics=args.num_topics,
                 universe_size=args.universe_size,
-                quiz_size=args.quiz_size
+                quiz_size=args.quiz_size,
+                dataset=args.dataset
             )
-            save_universe(universe, targets, args.test_num)
     elif args.data_source == 1:  # Generate from real data
         save_to_log("Generating universe from real data", f'../logs/{args.test_num}/training')
-        universe, targets = generate_universe_from_real_data(
+        universe, targets, num_topics = generate_universe_from_real_data(
             test_num=args.test_num,
             num_topics=args.num_topics,
             universe_size=args.universe_size,
-            quiz_size=args.quiz_size
+            quiz_size=args.quiz_size,
+            dataset=args.dataset
         )
-        save_universe(universe, targets, args.test_num)
     else:  # Generate synthetic data
         save_to_log("Generating synthetic universe", f'../logs/{args.test_num}/training')
-        universe = generate_synthetic_universe(
-            num_states=args.universe_size,
+        universe, targets = generate_synthetic_universe(
+            test_num=args.test_num,
             num_topics=args.num_topics,
+            universe_size=args.universe_size,
             num_difficulties=5,
-            generator_type=args.generator_type
+            universe_distribution=args.generator_type,
+            target_distribution=args.target_distribution
         )
-        # Generate targets based on specified distribution
-        targets = generate_targets_with_distribution(
-            args.target_distribution,
-            args.num_topics,
-            5  # Fixed number of difficulties
-        )
-        save_universe(universe, targets, args.test_num)
-    
+        num_topics = args.num_topics
     # Log initial information
     save_to_log(f"Starting {args.test_num} ... using device: {device}", f'../logs/{args.test_num}/training', mode='w')
     save_to_log(f"Universe has shape: {universe.shape}", f'../logs/{args.test_num}/training')
@@ -183,14 +181,14 @@ def main():
         save_to_log(f"Computing the Baseline solution for alfa = {alfa} ...", f'../logs/{args.test_num}/training')
         
         # Find baseline solution
-        best_state, best_reward = get_best_state(universe, targets, alfa)
+        best_state, best_reward = get_best_state(universe, targets, alfa, num_topics)
         save_to_log(f"Baseline for alfa = {alfa} -> State: {best_state}, Reward: {best_reward}\n"
                    f"Training agent with alfa = {alfa} and max episodes of {args.max_episodes}",
                    f'../logs/{args.test_num}/training')
         
         # Create environment and agent
         env = CustomEnv(universe=universe, target_dim1=targets[0], target_dim2=targets[1], 
-                       alfa=alfa, reward_threshold=args.reward_threshold)
+                       num_topics=num_topics, alfa=alfa, reward_threshold=args.reward_threshold)
         
         # Create agent based on specified type
         if args.agent_type == 'dqn':

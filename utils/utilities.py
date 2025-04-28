@@ -35,14 +35,14 @@ def compute_reward(alfa, state, targets, universe_shape):
     reward = alfa * first_dim_metric + (1 - alfa) * second_dim_metric
     return reward
 
-def get_best_state(universe, targets, alfa):
+def get_best_state(universe, targets, alfa, num_topics):
     """Find the best state in the universe based on the reward value"""
     rewards = []
     target_dim1 = targets[0]
     target_dim2 = targets[1]
     
     for state in universe:
-        vec1, vec2 = state[:universe.shape[1]-5], state[universe.shape[1]-5:] 
+        vec1, vec2 = state[:num_topics], state[num_topics:] 
         
         first_dim_metric = cosine_similarity(vec1.reshape(1, -1), target_dim1.reshape(1, -1))[0][0]
         second_dim_metric = cosine_similarity(vec2.reshape(1, -1), target_dim2.reshape(1, -1))[0][0]

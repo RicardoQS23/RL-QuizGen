@@ -123,7 +123,7 @@ def get_labels(test_num):
         return 'Real Data Distribution'
 
 def main():
-    test_nums = ["test1", "test2", "test3", "test4", "test5", "test6", "test7", "test8", "test9", "test10", "test11"]
+    test_nums = ["test12"]
     # Generate and plot real data universe
     for test_num in test_nums:
         try:

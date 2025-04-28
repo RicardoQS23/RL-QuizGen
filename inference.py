@@ -1,3 +1,4 @@
+import os
 import torch
 import argparse
 import numpy as np
@@ -42,6 +43,16 @@ def parse_args():
     
     return parser.parse_args()
 
+def setup_directories(test_num):
+    """Create necessary directories for saving results"""
+    directories = [
+        f'../jsons/{test_num}/agent_inference',
+        f'../jsons/{test_num}/baseline_inference'
+    ]
+    
+    for directory in directories:
+        os.makedirs(directory, exist_ok=True)
+
 def agent_inference(env, agent, test_num, start_state):
     steps = 0
     done = False
@@ -63,7 +74,7 @@ def agent_inference(env, agent, test_num, start_state):
 def main():
     args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
+    setup_directories(args.test_num)
     # Load data
     all_best_states = []
     universe, targets = load_data(args.test_num)
@@ -76,7 +87,7 @@ def main():
         save_to_log(f"Starting inference for alfa = {alfa}...", 
                     f'../logs/{args.test_num}/inference')
         # Find baseline solution
-        best_state, best_reward = get_best_state(universe, targets, alfa)
+        best_state, best_reward = get_best_state(universe, targets, alfa, num_topics=args.num_topics)
         all_best_states.append(best_state)
         
         save_to_log(f"Baseline for alfa = {alfa} -> State: {best_state}, Reward: {best_reward}",
@@ -84,7 +95,7 @@ def main():
         
         # Create environment and agent
         env = CustomEnv(universe=universe, target_dim1=targets[0], target_dim2=targets[1], 
-                       alfa=alfa, reward_threshold=args.reward_threshold, state=start_state)
+                       num_topics=args.num_topics, alfa=alfa, reward_threshold=args.reward_threshold, state=start_state)
         
         # Create agent based on specified type
         if args.agent_type == 'dqn':
