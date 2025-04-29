@@ -51,16 +51,18 @@ class CustomEnv(gym.Env):
             row = self.topic_similarities_matrix[self.state]
         elif mode == 1:
             row = self.difficulty_similarities_matrix[self.state]
-
+        flag = True
+        mask_threshold = 0.95
         # Mask out overly similar states (similarity > 0.95)
-        mask = row <= 0.95
-        # Apply mask and get top 25 most similar (highest similarity among acceptable ones)
-        filtered = row[mask]
-
-        num_valid_states = len(filtered)
-        num_candidates = min(num_valid_states, 25)
+        while flag:
+            mask = row <= mask_threshold
+            # Apply mask and get top N most different (lowest similarity)
+            filtered = row[mask]
+            num_valid_states = len(filtered)
+            num_candidates = min(num_valid_states, 25)
+            flag = num_candidates == 0
+            mask_threshold += 0.01
         candidate_indices = np.argsort(filtered)[-num_candidates:]
-
         return np.flatnonzero(mask)[candidate_indices[np.random.randint(num_candidates)]]
 
     def choose_different(self, mode):
@@ -71,7 +73,6 @@ class CustomEnv(gym.Env):
         flag = True
         mask_threshold = 0.95
         # Mask out overly similar states (similarity > 0.95)
-        #print the min and max of the similarities matrix
         while flag:
             mask = row <= mask_threshold
             # Apply mask and get top N most different (lowest similarity)
