@@ -6,102 +6,6 @@ import pandas as pd
 from abc import ABC, abstractmethod
 from utils.logging import save_to_log
 
-def flatten_inhomogeneous_array(inhomogeneous_array):
-    """Flatten an inhomogeneous array into a 1D numpy array."""
-    inhomogeneous_array = np.array([np.array(x, dtype=object) for x in inhomogeneous_array], dtype=object)
-    homogeneous_array = [x.reshape(1) if x.ndim == 0 else x for x in inhomogeneous_array]
-    flattened_array = np.concatenate(homogeneous_array)
-    return np.array(flattened_array, dtype=np.float32)
-
-def generate_targets(quizzes_df):
-    """Generate target vectors for topic and difficulty coverage."""
-    dummy_topic_coverage = quizzes_df['topic_coverage'].values[0]
-    dummy_diff_coverage = quizzes_df['difficulty_coverage'].values[0]
-    
-    target1 = np.random.uniform(0, 1, size=dummy_topic_coverage.shape)
-    target1 = target1 / np.sum(target1)  # Normalize to sum to 1
-    target1 = np.clip(target1, 0, 1)  # Ensure values are between 0 and 1    
-    target2 = np.random.uniform(0, 1, size=dummy_diff_coverage.shape) 
-    target2 = target2 / np.sum(target2)  # Normalize to sum to 1
-    target2 = np.clip(target2, 0, 1)  # Ensure values are between 0 and 1    
-    
-    return target1, target2
-
-def generate_quizzes(mcqs_df, output_name, universe_size=10000, quiz_size=10):
-    """
-    Generate quizzes from MCQs.
-    
-    Args:
-        mcqs_df (pd.DataFrame): DataFrame containing MCQs
-        output_name (str): Output file name
-        universe_size (int): Size of the universe
-        quiz_size (int): Number of MCQs per quiz
-    
-    Returns:
-        pd.DataFrame: DataFrame containing generated quizzes
-    """
-    # Compute the difficulty distribution for each set
-    def compute_difficulty_distribution(quiz_mcqs):
-        difficulties = mcqs_df.loc[mcqs_df['id'].isin(quiz_mcqs), 'difficulty']
-        difficulty_vector = np.zeros(5)  # Initialize a zero vector of size 5
-        for diff in difficulties:
-            difficulty_vector[np.argmax(diff)] += 1  # Increment the count for the corresponding difficulty
-        return difficulty_vector / len(difficulties)  # Normalize to get the distribution
-    
-    # Function to calculate topic distribution for each set
-    def compute_topic_coverage(quiz_mcqs):
-        topic_vector = np.zeros(len(unique_topics))  # Initialize zero vector
-        topics = mcqs_df.loc[mcqs_df['id'].isin(quiz_mcqs), 'topic']
-        topic_counts = topics.value_counts(normalize=True).to_dict()  # Normalize to percentage
-        
-        # Fill the vector
-        for topic, freq in topic_counts.items():
-            topic_vector[topic_index[topic]] = freq
-        return topic_vector
-    
-    N = universe_size
-    # Total MCQs
-    mcqs = mcqs_df['id'].tolist()
-    random.shuffle(mcqs)
-    
-    # Step 1: Ensure each MCQ appears at least once
-    sets = set()  # Use a set to ensure uniqueness
-    for i in range(0, len(mcqs), quiz_size):
-        subset = tuple(mcqs[i:i+quiz_size])
-        if len(subset) == quiz_size:  # Ensure we always have full sets
-            sets.add(subset)
-    
-    # Step 2: Generate more unique sets until reaching N
-    while len(sets) < N:
-        new_set = tuple(sorted(random.sample(mcqs, quiz_size)))  # Sorting helps prevent ordering issues
-        sets.add(new_set)  # Add only if unique
-    
-    # Convert back to list of sets
-    sets = list(sets)
-    
-    # Debugging: Check for NA values
-    for s in sets:
-        if any(v is None for v in s):  # Detect NA values
-            save_to_log(f"Warning: Found NA value in set: {s}", 'training')
-    
-    save_to_log(f"Generated {len(sets)} unique sets.", 'training')
-    
-    # Create a DataFrame from the quizzes generated
-    quizzes_df = pd.DataFrame(sets, columns=[f'MCQ_{i+1}' for i in range(quiz_size)])
-    # Change type of columns to int
-    for i in range(quiz_size):
-        quizzes_df[f'MCQ_{i+1}'] = quizzes_df[f'MCQ_{i+1}'].astype(int)
-    
-    # Get sorted unique topics for a fixed-size vector
-    unique_topics = sorted(mcqs_df['topic'].unique())
-    topic_index = {topic: i for i, topic in enumerate(unique_topics)}  # Map topic to index
-    
-    # Compute topic coverage for each row in quizzes_df
-    quizzes_df['topic_coverage'] = quizzes_df.apply(lambda row: compute_topic_coverage(row.tolist()), axis=1)
-    quizzes_df['difficulty_coverage'] = quizzes_df.apply(lambda row: compute_difficulty_distribution(row.tolist()), axis=1)
-    quizzes_df.to_csv(f"{output_name}.csv", index=False)
-    return quizzes_df
-
 def generate_mcqs(test_num, csv_file, num_topics, topic_column='topic', difficulty_column='difficulty', file_separator=','):
     """
     Generate MCQs from a CSV file.
@@ -158,13 +62,13 @@ def generate_mcqs(test_num, csv_file, num_topics, topic_column='topic', difficul
         num_topics = len(unique_topics)
     
     selected_topics = np.random.choice(unique_topics, num_topics, replace=False)
-    save_to_log(f"Selected topics: {selected_topics}", 'training')
+    save_to_log(f"Selected topics: {selected_topics}", f'../logs/{test_num}/training')
     
     # Filter MCQs by selected topics
     mcqs = df[df['topic'].isin(selected_topics)]
     mcqs.to_csv(f"../data/{test_num}/mcqs_{csv_file.split('/')[-1]}", index=False)
 
-    save_to_log(f"Generated {len(mcqs)} unique MCQs", 'training')
+    save_to_log(f"Generated {len(mcqs)} unique MCQs", f'../logs/{test_num}/training')
     # Convert to list of dictionaries in the format required by RealDataGenerator
     mcqs_list = []
     for _, row in mcqs.iterrows():
@@ -201,12 +105,6 @@ class UniformDataGenerator(BaseDataGenerator):
         universe = np.concatenate([topic_distributions, difficulty_distributions], axis=1)
         return universe
     
-    def generate_targets(self, num_topics, num_difficulties):
-        """Generate synthetic targets using Dirichlet distribution."""
-        target1 = np.random.dirichlet(np.ones(num_topics))
-        target2 = np.random.dirichlet(np.ones(num_difficulties))
-        return [target1, target2]
-
 class TopicFocusedGenerator(BaseDataGenerator):
     """Generator where topic distributions are very similar to each other."""
     
@@ -230,11 +128,6 @@ class TopicFocusedGenerator(BaseDataGenerator):
         universe = np.concatenate([topic_distributions, difficulty_distributions], axis=1)
         return universe
     
-    def generate_targets(self, num_topics, num_difficulties):
-        """Generate targets close to the base topic distribution."""
-        target1 = np.random.dirichlet(np.ones(num_topics))  # Similar to universe topics
-        target2 = np.random.dirichlet(np.ones(num_difficulties))
-        return [target1, target2]
 
 class DifficultyFocusedGenerator(BaseDataGenerator):
     """Generator where difficulty distributions are very similar to each other."""
@@ -259,11 +152,6 @@ class DifficultyFocusedGenerator(BaseDataGenerator):
         universe = np.concatenate([topic_distributions, difficulty_distributions], axis=1)
         return universe
     
-    def generate_targets(self, num_topics, num_difficulties):
-        """Generate targets close to the base difficulty distribution."""
-        target1 = np.random.dirichlet(np.ones(num_topics))
-        target2 = np.random.dirichlet(np.ones(num_difficulties))  # Similar to universe difficulties
-        return [target1, target2]
 
 class TopicDiverseGenerator(BaseDataGenerator):
     """Generator where topic distributions are very different from each other."""
@@ -296,15 +184,6 @@ class TopicDiverseGenerator(BaseDataGenerator):
         universe = np.concatenate([topic_distributions, difficulty_distributions], axis=1)
         return universe
     
-    def generate_targets(self, num_topics, num_difficulties):
-        """Generate targets that match one of the diverse patterns."""
-        target1 = np.random.dirichlet(np.ones(num_topics) * 0.5)
-        if np.random.random() > 0.5:
-            target1 = np.sort(target1)
-        else:
-            target1 = -np.sort(-target1)
-        target2 = np.random.dirichlet(np.ones(num_difficulties))
-        return [target1, target2]
 
 class TopicDifficultyCorrelatedGenerator(BaseDataGenerator):
     """Generator where topic and difficulty distributions are correlated."""
@@ -327,19 +206,6 @@ class TopicDifficultyCorrelatedGenerator(BaseDataGenerator):
         
         universe = np.concatenate([topic_distributions, difficulty_distributions], axis=1)
         return universe
-    
-    def generate_targets(self, num_topics, num_difficulties):
-        """Generate correlated targets."""
-        target1 = np.random.dirichlet(np.ones(num_topics))
-        target2 = target1[:num_difficulties] + np.random.normal(0, 0.1, num_difficulties)
-        target2 = np.clip(target2, 0.01, 1)  # Ensure no zeros
-        target2 /= target2.sum()
-        
-        # Handle any remaining NaN values
-        if np.any(np.isnan(target2)):
-            target2 = np.ones(num_difficulties) / num_difficulties
-            
-        return [target1, target2]
 
 class DifficultyDiverseGenerator(BaseDataGenerator):
     """Generator where difficulty distributions are very different from each other."""
@@ -379,23 +245,6 @@ class DifficultyDiverseGenerator(BaseDataGenerator):
         universe = np.concatenate([topic_distributions, difficulty_distributions], axis=1)
         return universe
     
-    def generate_targets(self, num_topics, num_difficulties):
-        """Generate targets that match one of the diverse difficulty patterns."""
-        target1 = np.random.dirichlet(np.ones(num_topics))
-        target2 = np.random.dirichlet(np.ones(num_difficulties) * 0.5)
-        if np.random.random() > 0.5:
-            target2 = np.sort(target2)
-        else:
-            target2 = -np.sort(-target2)
-        
-        # Ensure no zeros and handle NaN values
-        target2 = np.clip(target2, 0.01, 1)
-        target2 /= target2.sum()
-        if np.any(np.isnan(target2)):
-            target2 = np.ones(num_difficulties) / num_difficulties
-            
-        return [target1, target2]
-
 class RealDataGenerator(BaseDataGenerator):
     """
     Generator for real MCQ data.
@@ -427,7 +276,7 @@ class RealDataGenerator(BaseDataGenerator):
                 self.mcqs_by_topic_diff[topic][difficulty] = []
             self.mcqs_by_topic_diff[topic][difficulty].append(mcq)
     
-    def generate_universe(self, size):
+    def generate_universe(self, size, test_num):
         """
         Generate a universe of quizzes.
         
@@ -456,7 +305,7 @@ class RealDataGenerator(BaseDataGenerator):
                 attempts += 1
         
         if len(universe) < size:
-            save_to_log(f"Warning: Could only generate {len(universe)} unique quizzes out of requested {size}", 'training')
+            save_to_log(f"Warning: Could only generate {len(universe)} unique quizzes out of requested {size}", f'../logs/{test_num}/training')
         
         return universe
     
@@ -562,13 +411,33 @@ class SparseDifficultyTargetGenerator:
         target2[selected_difficulties] = 1
         target2 = target2 / np.sum(target2)  # Normalize
         return [target1, target2]
+    
+class SparseTopicDifficultyTargetGenerator:
+    """Generator for sparse topic and sparse difficulty distributions."""
+    
+    @staticmethod
+    def generate_targets(num_topics, num_difficulties):
+        """Generate sparse topic and sparse difficulty distributions."""
+        # Create sparse topic distribution (most weight on a few topics)
+        target1 = np.zeros(num_topics)
+        selected_topics = np.random.choice(num_topics, size=max(2, num_topics // 4), replace=False)
+        target1[selected_topics] = 1
+        target1 = target1 / np.sum(target1)  # Normalize
+        
+        # Create sparse difficulty distribution (most weight on a few difficulties)
+        target2 = np.zeros(num_difficulties)
+        selected_difficulties = np.random.choice(num_difficulties, size=max(1, num_difficulties // 2), replace=False)
+        target2[selected_difficulties] = 1
+        target2 = target2 / np.sum(target2)  # Normalize
+        return [target1, target2]
 
 def generate_targets_with_distribution(distribution_type, num_topics, num_difficulties):
     """Generate targets based on the specified distribution type."""
     generators = {
         'uniform': UniformTargetGenerator,
         'sparse_topic': SparseTopicTargetGenerator,
-        'sparse_difficulty': SparseDifficultyTargetGenerator
+        'sparse_difficulty': SparseDifficultyTargetGenerator,
+        'sparse_topic_difficulty': SparseTopicDifficultyTargetGenerator
     }
     
     generator = generators.get(distribution_type)
@@ -626,7 +495,7 @@ def generate_universe_from_real_data(test_num, num_topics, universe_size, quiz_s
     universe_generator = RealDataGenerator(mcqs, num_topics, num_difficulties, quiz_size)
     
     # Generate universe
-    universe = universe_generator.generate_universe(universe_size)
+    universe = universe_generator.generate_universe(universe_size, test_num)
     
     # Convert universe to array of arrays with size (num_topics + num_difficulties)
     universe_array = []
@@ -653,7 +522,6 @@ def generate_universe_from_real_data(test_num, num_topics, universe_size, quiz_s
     
     # Generate targets using the specified distribution
     targets = generate_targets_with_distribution(target_distribution, num_topics, num_difficulties)
-    print(universe_array[:3])
     # Save universe and targets
     save_universe(universe_array, targets, test_num)
     

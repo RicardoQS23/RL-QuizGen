@@ -28,8 +28,9 @@ def parse_args():
     
     # Target distribution parameter
     parser.add_argument('--target_distribution', type=str, default='uniform',
-                       choices=['uniform', 'sparse_topic', 'sparse_difficulty'],
-                       help='Type of target distribution to use: uniform (both uniform), sparse_topic (sparse topics, uniform difficulty), or sparse_difficulty (uniform topics, sparse difficulty)')
+                       choices=['uniform', 'sparse_topic', 'sparse_difficulty', 'sparse_topic_difficulty'], 
+                       help='Type of target distribution to use: uniform (both uniform), sparse_topic (sparse topics,\
+                          uniform difficulty), sparse_difficulty (uniform topics, sparse difficulty), or sparse_topic_difficulty (sparse topics, sparse difficulty)')
     
     # Environment parameters
     parser.add_argument('--test_num', type=str, default="test1", help='Test number for saving results')
@@ -156,7 +157,8 @@ def main():
             num_topics=args.num_topics,
             universe_size=args.universe_size,
             quiz_size=args.quiz_size,
-            dataset=args.dataset
+            dataset=args.dataset,
+            target_distribution=args.target_distribution
         )
     else:  # Generate synthetic data
         save_to_log("Generating synthetic universe", f'../logs/{args.test_num}/training')
