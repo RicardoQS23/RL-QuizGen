@@ -469,6 +469,64 @@ def generate_synthetic_universe(test_num, num_topics, universe_size, num_difficu
     
     return universe, targets
 
+#def generate_universe_from_real_data(test_num, num_topics, universe_size, quiz_size, dataset='medical', target_distribution='uniform'):
+#    """
+#    Generate a universe from real MCQ data.
+#    
+#    Args:
+#        test_num (str): Test number for saving results
+#        num_topics (int): Number of topics to use
+#        universe_size (int): Size of the universe
+#        quiz_size (int): Number of MCQs per quiz
+#        dataset (str): Dataset to use ('medical' or 'math')
+#        target_distribution (str): Type of target distribution to use ('uniform', 'sparse_topic', 'sparse_difficulty')
+#    
+#    Returns:
+#        tuple: (universe, targets)
+#    """
+#    # Set parameters based on dataset
+#    num_difficulties = 6 if dataset == 'math' else 5
+#    sep = ';' if dataset == 'math' else ','
+#    topic_column = 'topic_id' if dataset == 'math' else 'topic'
+#    difficulty_column = 'Level' if dataset == 'math' else 'difficulty'
+#
+#    mcqs, num_topics = generate_mcqs(test_num, f'../data/{dataset}.csv', num_topics, topic_column, difficulty_column, sep)
+#    # Create universe generator
+#    universe_generator = RealDataGenerator(mcqs, num_topics, num_difficulties, quiz_size)
+#    
+#    # Generate universe
+#    universe = universe_generator.generate_universe(universe_size, test_num)
+    
+#    # Convert universe to array of arrays with size (num_topics + num_difficulties)
+#    universe_array = []
+#    for quiz in universe:
+#        # Calculate topic distribution
+#        topic_dist = np.zeros(num_topics)
+#        difficulty_dist = np.zeros(num_difficulties)
+#        
+#        for mcq in quiz:
+#            topic = mcq['topic']
+#            difficulty = mcq['difficulty'] - 1  # Convert to 0-based
+#            topic_dist[universe_generator.topic_to_idx[topic]] += 1
+#            difficulty_dist[difficulty] += 1
+#        
+#        # Normalize distributions
+#        topic_dist = topic_dist / len(quiz)
+#        difficulty_dist = difficulty_dist / len(quiz)
+#        
+#        # Combine into single array
+#        combined_dist = np.concatenate([topic_dist, difficulty_dist])
+#        universe_array.append(combined_dist)
+#    
+#    universe_array = np.array(universe_array)
+    
+#    # Generate targets using the specified distribution
+#    targets = generate_targets_with_distribution(target_distribution, num_topics, num_difficulties)
+#    # Save universe and targets
+#    save_universe(universe_array, targets, test_num)
+    
+#    return universe_array, targets, num_topics
+
 def generate_universe_from_real_data(test_num, num_topics, universe_size, quiz_size, dataset='medical', target_distribution='uniform'):
     """
     Generate a universe from real MCQ data.
@@ -497,13 +555,17 @@ def generate_universe_from_real_data(test_num, num_topics, universe_size, quiz_s
     # Generate universe
     universe = universe_generator.generate_universe(universe_size, test_num)
     
-    # Convert universe to array of arrays with size (num_topics + num_difficulties)
+    # Create lists to store data for DataFrame
+    quiz_data = []
     universe_array = []
-    for quiz in universe:
-        # Calculate topic distribution
+    
+    for quiz_idx, quiz in enumerate(universe):
+        # Calculate topic and difficulty distributions
         topic_dist = np.zeros(num_topics)
         difficulty_dist = np.zeros(num_difficulties)
         
+        # Get MCQ IDs and calculate distributions
+        mcq_ids = [mcq['id'] for mcq in quiz]
         for mcq in quiz:
             topic = mcq['topic']
             difficulty = mcq['difficulty'] - 1  # Convert to 0-based
@@ -514,9 +576,22 @@ def generate_universe_from_real_data(test_num, num_topics, universe_size, quiz_s
         topic_dist = topic_dist / len(quiz)
         difficulty_dist = difficulty_dist / len(quiz)
         
-        # Combine into single array
+        # Create row data for DataFrame
+        row_data = {
+            'quiz_id': quiz_idx,
+            **{f'mcq_{i+1}': mcq_id for i, mcq_id in enumerate(mcq_ids)},
+            **{f'topic_coverage_{i}': cov for i, cov in enumerate(topic_dist)},
+            **{f'difficulty_coverage_{i}': cov for i, cov in enumerate(difficulty_dist)}
+        }
+        quiz_data.append(row_data)
+        
+        # Add to universe array
         combined_dist = np.concatenate([topic_dist, difficulty_dist])
         universe_array.append(combined_dist)
+    
+    # Create and save DataFrame
+    quizzes_df = pd.DataFrame(quiz_data)
+    quizzes_df.to_csv(f'../data/{test_num}/quizzes_{dataset}.csv', index=False)
     
     universe_array = np.array(universe_array)
     
