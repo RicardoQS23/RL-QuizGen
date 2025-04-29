@@ -10,7 +10,7 @@ class BaseAgent(ABC):
             "episode_rewards_dim1": [],
             "episode_rewards_dim2": [],
             "episode_actions": [],
-            "episode_avg_q_values": [],
+            "episode_avg_qvalues": [],
             "episode_losses": [],
             "exploration_counts": [],
             "exploitation_counts": [],
@@ -45,7 +45,7 @@ class BaseAgent(ABC):
 
     def update_episode_data(self, total_reward, total_reward_dim1, total_reward_dim2, 
                           exploration_count, exploitation_count, success, 
-                          episode_actions, episode_avg_q_values, num_iterations):
+                          episode_actions, episode_avg_qvalues, num_iterations):
         """Update training data after an episode"""
         self.training_data['episode_rewards'].append(total_reward/num_iterations)
         self.training_data['episode_rewards_dim1'].append(total_reward_dim1/num_iterations)
@@ -54,4 +54,4 @@ class BaseAgent(ABC):
         self.training_data['exploitation_counts'].append(exploitation_count)
         self.training_data['success_episodes'].append(success)
         self.training_data['episode_actions'].append(episode_actions)
-        self.training_data['episode_avg_q_values'].append(episode_avg_q_values) 
+        self.training_data['episode_avg_qvalues'].append(episode_avg_qvalues) 

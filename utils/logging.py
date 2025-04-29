@@ -34,7 +34,7 @@ def save_data(training_data, alfa, test_num):
     save_to_json(training_data['episode_rewards'], f'../jsons/{test_num}/reward/all_rewards_alfa_{alfa}')
     save_to_json(training_data['episode_rewards_dim1'], f'../jsons/{test_num}/reward_dim1/all_rewards_dim1_alfa_{alfa}')
     save_to_json(training_data['episode_rewards_dim2'], f'../jsons/{test_num}/reward_dim2/all_rewards_dim2_alfa_{alfa}')
-    save_to_json(training_data['episode_avg_q_values'], f'../jsons/{test_num}/qvalues/all_qvalues_alfa_{alfa}')
+    save_to_json(training_data['episode_avg_qvalues'], f'../jsons/{test_num}/qvalues/all_qvalues_alfa_{alfa}')
     save_to_json(training_data['episode_actions'], f'../jsons/{test_num}/actions/all_actions_alfa_{alfa}')
     save_to_json(training_data['episode_losses'], f'../jsons/{test_num}/loss/all_losses_alfa_{alfa}')
     

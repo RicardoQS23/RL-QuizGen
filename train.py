@@ -77,7 +77,7 @@ def train_agent(env, agent, max_episodes, test_num, args):
         exploration_count = exploitation_count = 0
         num_iterations = 0
         episode_actions = []
-        episode_avg_q_values = []
+        episode_avg_qvalues = []
         
         state = env.reset()
         save_to_log(f"Episode {ep + 1} started on state {state}...", f'../logs/{test_num}/training')
@@ -104,7 +104,7 @@ def train_agent(env, agent, max_episodes, test_num, args):
                 exploitation_count += 1
             
             episode_actions.append(action)
-            episode_avg_q_values.append(mean_q_value)
+            episode_avg_qvalues.append(mean_q_value)
             save_to_log(f'Iteration {num_iterations + 1} State={state} Action={action} Reward={reward}', 
                        f'../logs/{test_num}/training', flag=False)
             num_iterations += 1
@@ -117,7 +117,7 @@ def train_agent(env, agent, max_episodes, test_num, args):
         
         agent.update_episode_data(total_reward, total_reward_dim1, total_reward_dim2, 
                                 exploration_count, exploitation_count, success,
-                                episode_actions, episode_avg_q_values, num_iterations)
+                                episode_actions, episode_avg_qvalues, num_iterations)
     
     save_to_log(f'Train complete! Total Visited States: {len(all_visited_states)}', f'../logs/{test_num}/training')
 
