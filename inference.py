@@ -1,4 +1,3 @@
-import os
 import torch
 import argparse
 import numpy as np
@@ -64,6 +63,9 @@ def agent_inference(env, agent, test_num, start_state):
 def main():
     args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Set random seed for reproducibility
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
     # Load data
     all_best_states = []
     universe, targets = load_data(args.test_num)

@@ -1,10 +1,18 @@
 import os
+import argparse
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from utils.utilities import load_data
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Visualize universes of selected tests')
+    parser.add_argument('--num_topics', type=int, default=10, help='Number of topics')
+    parser.add_argument('--test_numbers', type=str, nargs='+', default=['test1'],
+                       help='List of tests to visualize')
+    return parser.parse_args()
 
 def plot_universe(universe, targets, title, save_path=None):
     """Plot universe using both PCA and t-SNE."""
@@ -48,11 +56,9 @@ def plot_universe(universe, targets, title, save_path=None):
         plt.savefig(save_path)
     #plt.show()
 
-def plot_universe_distributions(universe, title, save_path=None):
+def plot_universe_distributions(universe, title, num_topics=10, save_path=None):
     """Plot distributions of topic and difficulty coverage."""
     # Split universe into topics and difficulties
-    num_topics = 10  # Assuming 10 topics
-    num_difficulties = 5  # Assuming 5 difficulty levels
     topic_dist = universe[:, :num_topics]
     difficulty_dist = universe[:, num_topics:]
     
@@ -72,33 +78,31 @@ def plot_universe_distributions(universe, title, save_path=None):
     # Plot difficulty distribution
     difficulty_means = np.mean(difficulty_dist, axis=0)
     difficulty_stds = np.std(difficulty_dist, axis=0)
-    ax2.bar(range(num_difficulties), difficulty_means, yerr=difficulty_stds, capsize=5)
+    ax2.bar(range(universe.shape[1] - num_topics), difficulty_means, yerr=difficulty_stds, capsize=5)
     ax2.set_title('Difficulty Distribution')
     ax2.set_xlabel('Difficulty Level')
     ax2.set_ylabel('Mean Coverage')
-    ax2.set_xticks(range(num_difficulties))
+    ax2.set_xticks(range(universe.shape[1] - num_topics))
     
     if save_path:
         plt.savefig(save_path)
     #plt.show()
 
-def plot_correlation(universe, title, save_path=None):
+def plot_correlation(universe, title, num_topics=10, save_path=None):
     """Plot correlation between topics and difficulties."""
-    num_topics = 10
-    num_difficulties = 5
     topic_dist = universe[:, :num_topics]
     difficulty_dist = universe[:, num_topics:]
     
     # Calculate correlation matrix
-    correlation = np.zeros((num_topics, num_difficulties))
+    correlation = np.zeros((num_topics, universe.shape[1] - num_topics))
     for i in range(num_topics):
-        for j in range(num_difficulties):
+        for j in range(universe.shape[1] - num_topics):
             correlation[i, j] = np.corrcoef(topic_dist[:, i], difficulty_dist[:, j])[0, 1]
     
     # Plot correlation heatmap
     plt.figure(figsize=(10, 8))
     sns.heatmap(correlation, annot=True, cmap='coolwarm', center=0,
-                xticklabels=[f'Diff {i+1}' for i in range(num_difficulties)],
+                xticklabels=[f'Diff {i+1}' for i in range(universe.shape[1] - num_topics)],
                 yticklabels=[f'Topic {i+1}' for i in range(num_topics)])
     plt.title(f'Topic-Difficulty Correlation\n{title}')
     
@@ -123,7 +127,8 @@ def get_labels(test_num):
         return 'Real Data Distribution'
 
 def main():
-    test_nums = ["test12"]
+    args = parse_args()
+    test_nums = args.test_numbers
     # Generate and plot real data universe
     for test_num in test_nums:
         try:
@@ -137,23 +142,25 @@ def main():
             # Plot visualizations
             plot_universe(
                 universe, targets,
-                f'{get_labels(test_num)}',
-                f'{output_dir}/universe.png'
+                title=f'{get_labels(test_num)}',
+                save_path=f'{output_dir}/universe.png'
             )
             
             plot_universe_distributions(
                 universe,
-                f'{get_labels(test_num)}',
-                f'{output_dir}/distributions.png'
+                title=f'{get_labels(test_num)}',
+                num_topics=args.num_topics,
+                save_path=f'{output_dir}/distributions.png'
             )
             
             plot_correlation(
                 universe,
-                f'{get_labels(test_num)}',
-                f'{output_dir}/correlation.png'
+                title=f'{get_labels(test_num)}',
+                num_topics=args.num_topics,
+                save_path=f'{output_dir}/correlation.png'
             )
         except Exception as e:
             print(f"Could not load universe data: {e}")
-
+        print(f"Finished plotting {test_num}")
 if __name__ == "__main__":
     main() 
