@@ -173,6 +173,7 @@ def main():
         num_topics = args.num_topics
     # Log initial information
     save_to_log(f"Starting {args.test_num} ... using device: {device}", f'../logs/{args.test_num}/training', mode='w')
+    save_to_log(f"Parameters used: {args}", f'../logs/{args.test_num}/training')
     save_to_log(f"Universe has shape: {universe.shape}", f'../logs/{args.test_num}/training')
     save_to_log(f"Training agent with target1 = {targets[0]} and target2 = {targets[1]}", 
                 f'../logs/{args.test_num}/training')
