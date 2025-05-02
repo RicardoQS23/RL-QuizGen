@@ -1,10 +1,10 @@
 import json
 import numpy as np
-import matplotlib.pyplot as plt
 import seaborn as sns
-from utils.utilities import load_data
+import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import cosine_similarity
+from utils.utilities import load_baseline_data, load_agent_data, get_inference_data
 
 def get_labels(test_num):
     if test_num == "test1":
@@ -22,130 +22,19 @@ def get_labels(test_num):
     else:
         return 'Real Data Distribution'
 
-def plot_reward_landscape(test_num, alfa_values, save=True, show=False):
-    """Plot the reward landscape for different alfa values.
-    
-    Args:
-        test_num (int): The test number
-        alfa_values (list): List of alfa values to plot
-        save (bool): Whether to save the plot
-        show (bool): Whether to show the plot
-    """
-    # Load data
-    universe, targets = load_data(f"test{test_num}")
-    D = universe.shape[1]
-    D1 = D - 5
-    D2 = 5
-    
-    # Compute rewards for all universe states
-    vec1s = universe[:, :D1]
-    vec2s = universe[:, D1:D1+D2]
-    
-    sim1 = cosine_similarity(vec1s, targets[0].reshape(1, -1)).flatten()
-    sim2 = cosine_similarity(vec2s, targets[1].reshape(1, -1)).flatten()
-    
-    # Set up the figure
-    n_plots = len(alfa_values)
-    n_cols = 2
-    n_rows = (n_plots + 1) // 2
-    fig = plt.figure(figsize=(15, 5*n_rows))
-    gs = plt.GridSpec(n_rows, n_cols, figure=fig)
-    
-    # Initialize PCA
-    pca = PCA(n_components=2)
-    X_2d = pca.fit_transform(universe)
-    
-    # Load baseline data
-    with open(f"../jsons/test{test_num}/baseline_inference/baseline_states.json", "r") as f:
-        baseline_states = json.load(f)
-        baseline_states = np.array(baseline_states, dtype=np.int32)
-    
-    # Define colors for special points
-    colors = ['#2077B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD']
-    norm = plt.Normalize(0, 1)  # Normalize rewards to [0,1] range
-    
-    for j, alfa in enumerate(alfa_values):
-        # Create subplot
-        ax = fig.add_subplot(gs[j // n_cols, j % n_cols])
-        
-        # Compute rewards for current alfa
-        rewards = alfa * sim1 + (1 - alfa) * sim2
-        
-        # Plot universe points with reward-based coloring
-        scatter = ax.scatter(X_2d[:, 0], X_2d[:, 1], 
-                           c=rewards, 
-                           cmap='viridis',
-                           norm=norm,
-                           s=5,
-                           alpha=0.8)
-        
-        # Plot baseline point
-        baseline_state = baseline_states[j]
-        baseline_coords = X_2d[baseline_state]
-        ax.scatter(baseline_coords[0], baseline_coords[1], 
-                  color=colors[3], 
-                  marker="*", 
-                  label='Baseline', 
-                  s=150,
-                  edgecolor='black',
-                  linewidth=0.5)
-        
-        # Customize subplot
-        ax.set_title(f"α = {alfa}", pad=10, fontsize=12)
-        ax.set_xlabel("Topic Dimension", fontsize=10)
-        ax.set_ylabel("Difficulty Dimension", fontsize=10)
-        ax.grid(True, linestyle='--', alpha=0.5)
-        
-        # Add legend
-        ax.legend(loc="upper right", 
-                 frameon=True,
-                 fancybox=True,
-                 framealpha=0.8,
-                 fontsize=9)
-        # Add a single colorbar for all plots
-        cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])  # [left, bottom, width, height]
-        cbar = plt.colorbar(scatter, cax=cbar_ax)
-        cbar.set_label("Reward", fontsize=10)
-        
-    
-    # Add main title
-    plt.suptitle(f"Reward Landscape - {get_labels(f'test{test_num}')}", 
-                y=1.02, 
-                fontsize=14)
-    
-    # Adjust layout
-    plt.tight_layout(rect=[0, 0, 0.9, 1])  # Make room for the colorbar
-    
-    # Save or show
-    if save:
-        plt.savefig(f"../images/test{test_num}/universe.png", 
-                   dpi=300, 
-                   bbox_inches='tight',
-                   facecolor='white')
-    if show:
-        plt.show()
-    plt.close() 
-
-def project_to_1d(data, pca):
-    """Project data to 1D using PCA."""
-    return pca.transform(data.reshape(1, -1)).flatten()[0]
-
 def plot_agent_comparison(universe, targets, alfa, alfa_values, test_number, output_name, save=True, show=False):
     """Create a single plot for a specific agent and alfa value."""
     # Parameters
-    D = universe.shape[1]
-    D1 = D - 5
-    D2 = 5
-    
+    D = targets[0].shape[0]
     # Compute rewards for all universe states
-    vec1s = universe[:, :D1]
-    vec2s = universe[:, D1:D1+D2]
+    vec1s = universe[:, :D]
+    vec2s = universe[:, D:]
     
     sim1 = cosine_similarity(vec1s, targets[0].reshape(1, -1)).flatten()
     sim2 = cosine_similarity(vec2s, targets[1].reshape(1, -1)).flatten()
     
     # Set up the figure
-    fig, ax = plt.subplots(figsize=(10, 8))
+    _, ax = plt.subplots(figsize=(10, 8))
     
     # Define colors for special points
     colors = ["#0d6be3", "#d7129b", "#581845", "#d62728", "#9467bd", 
@@ -161,29 +50,23 @@ def plot_agent_comparison(universe, targets, alfa, alfa_values, test_number, out
     # Plot universe points with reward-based coloring
     scatter = ax.scatter(X_2d[:, 0], X_2d[:, 1], c=rewards, cmap='viridis', s=5)
     
-    # Load and process agent data
-    with open(f"../jsons/{test_number}/agent_inference/inference_states_alfa_{alfa}.json", "r") as f:
-        visited_states = json.load(f)
-        visited_states = np.array(visited_states, dtype=np.int32)
+    # Load and process inference data
+    visited_states, baseline_states = get_inference_data(test_number, alfa, universe, targets)
     visited_coords = X_2d[visited_states]
-    
-    # Load baseline data
-    with open(f"../jsons/{test_number}/baseline_inference/baseline_states.json", "r") as f:
-        baseline_states = json.load(f)
-        baseline_states = np.array(baseline_states, dtype=np.int32)
+
     baseline_state = baseline_states[alfa_values.index(alfa)]
     baseline_coords = X_2d[baseline_state]
     
     # Plot baseline point
     ax.scatter(baseline_coords[0], baseline_coords[1], color=colors[2], 
-              marker="*", label='Baseline', s=150)
+              marker="*", label='BRUTEFORCE', s=150)
     
     # Plot the agent's path with increasing intensity
     for idx in range(len(visited_coords) - 1):
         ax.plot(
             visited_coords[idx:idx+2, 0], 
             visited_coords[idx:idx+2, 1], 
-            color=plt.cm.Reds(idx / len(visited_coords)), 
+            color=plt.cm.Reds(idx / len(visited_coords)+0.1), 
             linewidth=2, 
             alpha=0.8
         )
@@ -197,19 +80,15 @@ def plot_agent_comparison(universe, targets, alfa, alfa_values, test_number, out
     # Add grid and labels
     ax.grid(True, alpha=0.3)
     ax.set_title(f"Alfa = {alfa}", pad=10)
-    ax.set_ylabel("Difficulty Dim")
-    ax.set_xlabel("Topic Dim")
-    
+    ax.set_ylabel("Difficulty Level")
+    ax.set_xlabel("Topic Coverage")
     # Add legend
     ax.legend(loc="upper right", framealpha=0.8)
-    
     # Add colorbar
     cbar = plt.colorbar(scatter, ax=ax)
     cbar.set_label("Reward")
-    
     # Adjust layout
     plt.tight_layout()
-    
     # Save or show the figure
     if save:
         plt.savefig(f"../images/{output_name}_alfa_{alfa}.png", dpi=300, bbox_inches='tight')

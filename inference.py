@@ -1,3 +1,4 @@
+import time
 import torch
 import argparse
 import numpy as np
@@ -50,10 +51,10 @@ def agent_inference(env, agent, test_num, start_state):
     
     save_to_log(f"Starting inference from state {env.state}...", f'../logs/{test_num}/inference')
     while not done:
+        steps += 1
         action, _, _ = agent.get_action(env.universe[env.state], epsilon=0.0)  # Use greedy policy
         next_state, reward, done, _, _, _ = env.step(action, steps)
         env.state = next_state
-        steps += 1
         save_to_log(f"Step {steps}: State = {env.state} Action={action}, Reward={reward}",
                         f'../logs/{test_num}/inference')
         all_states.append(env.state)
@@ -69,46 +70,55 @@ def main():
     # Load data
     all_best_states = []
     universe, targets = load_data(args.test_num)
-
+    num_iterations = 0
+    total_time = 0
     # Train agents for each alfa value
-    start_state = np.random.choice(args.universe_size, 1)[0]
-    save_to_log(f"Starting inference for {args.test_num}...", 
-                f'../logs/{args.test_num}/inference', mode='w')
     for alfa in args.alfa_values:
         save_to_log(f"Starting inference for alfa = {alfa}...", 
-                    f'../logs/{args.test_num}/inference')
+                    f'../logs/{args.test_num}/inference', mode='w')
         # Find baseline solution
         best_state, best_reward = get_best_state(universe, targets, alfa, num_topics=args.num_topics)
         all_best_states.append(best_state)
         
         save_to_log(f"Baseline for alfa = {alfa} -> State: {best_state}, Reward: {best_reward}",
                    f'../logs/{args.test_num}/training')
-        
-        # Create environment and agent
-        env = CustomEnv(universe=universe, target_dim1=targets[0], target_dim2=targets[1], 
-                       num_topics=args.num_topics, alfa=alfa, reward_threshold=args.reward_threshold, state=start_state)
-        
-        # Create agent based on specified type
-        if args.agent_type == 'dqn':
-            agent = DQNAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
-                            lr=args.lr, gamma=args.gamma, target_sync_freq=args.target_sync_freq,
-                            batch_size=args.batch_size)
-        elif args.agent_type == 'a3c':
-            agent = A3CAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
-                           lr=args.lr, gamma=args.gamma)
-        elif args.agent_type == 'sarsa':
-            agent = SARSAAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
-                             lr=args.lr, gamma=args.gamma, eps=args.eps, eps_decay=args.eps_decay,
-                             eps_min=args.eps_min)
-        else:
-            raise ValueError(f"Unknown agent type: {args.agent_type}")
-        
-        agent.load(f"../saved_agents/{args.test_num}/agent_alfa_{alfa}_bias.pth")
-        agent.model.eval()
-        # Train agent
-        inference_states = agent_inference(env, agent, args.test_num, start_state)
-        save_to_json(inference_states, f'../jsons/{args.test_num}/agent_inference/inference_states_alfa_{alfa}')
+        # Run inference 10 times
+        agent_inference_states = []
+        for _ in range(10):
+            start_state = np.random.choice(args.universe_size, 1)[0]
+            save_to_log(f"Starting inference for {args.test_num}...", 
+                        f'../logs/{args.test_num}/inference')
+            # Create environment and agent
+            env = CustomEnv(universe=universe, target_dim1=targets[0], target_dim2=targets[1], 
+                        num_topics=args.num_topics, alfa=alfa, reward_threshold=args.reward_threshold, state=start_state)
+            
+            # Create agent based on specified type
+            if args.agent_type == 'dqn':
+                agent = DQNAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
+                                lr=args.lr, gamma=args.gamma, target_sync_freq=args.target_sync_freq,
+                                batch_size=args.batch_size)
+            elif args.agent_type == 'a3c':
+                agent = A3CAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
+                            lr=args.lr, gamma=args.gamma)
+            elif args.agent_type == 'sarsa':
+                agent = SARSAAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
+                                lr=args.lr, gamma=args.gamma, eps=args.eps, eps_decay=args.eps_decay,
+                                eps_min=args.eps_min)
+            else:
+                raise ValueError(f"Unknown agent type: {args.agent_type}")
+            
+            agent.load(f"../saved_agents/{args.test_num}/agent_alfa_{alfa}_bias.pth")
+            agent.model.eval()
+            # Train agent
+            start_time = time.time()
+            inference_states = agent_inference(env, agent, args.test_num, start_state)
+            end_time = time.time()
+            total_time += end_time - start_time
+            num_iterations += len(inference_states)
+            agent_inference_states.append(inference_states)
+        save_to_json(agent_inference_states, f'../jsons/{args.test_num}/agent_inference/inference_states_alfa_{alfa}')
     save_to_json(all_best_states, f'../jsons/{args.test_num}/baseline_inference/baseline_states')
-        
+    save_to_log(f"Avg number of iterations: {round(num_iterations/(len(args.alfa_values)*10))}", f'../logs/{args.test_num}/inference')
+    save_to_log(f"Avg time per inference: {total_time/(len(args.alfa_values)*10):.2f}", f'../logs/{args.test_num}/inference')
 if __name__ == "__main__":
     main() 

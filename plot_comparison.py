@@ -1,5 +1,6 @@
-from utils.plotting import load_data, plot_comparison
 import argparse
+from utils.utilities import load_data
+from utils.plotting import plot_comparison
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Plot comparison of RL agent and baseline')
