@@ -71,7 +71,7 @@ class ActorCritic(nn.Module):
         
         return total_loss, policy_loss.item(), value_loss.item(), entropy.item()
 
-class A2CAgent(BaseAgent):
+class A3CAgent(BaseAgent):
     def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95):
         super().__init__(state_dim, action_dim, device)
         self.lr = lr
