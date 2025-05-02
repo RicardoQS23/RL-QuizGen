@@ -14,6 +14,7 @@ from environments.custom_env import CustomEnv
 from utils.logging import save_to_log, save_data, save_agent
 from utils.utilities import setup_directories, get_best_state
 from universe_generator import generate_universe_from_real_data, generate_synthetic_universe, load_universe, save_universe
+import matplotlib.pyplot as plt
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train RL agent with different configurations')
@@ -120,6 +121,100 @@ def train_agent(env, agent, max_episodes, test_num, args):
                                 episode_actions, episode_avg_qvalues, num_iterations)
     
     save_to_log(f'Train complete! Total Visited States: {len(all_visited_states)}', f'../logs/{test_num}/training')
+
+def plot_training_results(agent, save_path=None):
+    """Plot training results for the agent"""
+    plt.figure(figsize=(15, 10))
+    
+    # Plot rewards
+    plt.subplot(2, 2, 1)
+    plt.plot(agent.training_data['episode_rewards'])
+    plt.title('Episode Rewards')
+    plt.xlabel('Episode')
+    plt.ylabel('Reward')
+    
+    # Plot losses
+    plt.subplot(2, 2, 2)
+    plt.plot(agent.training_data['episode_losses'])
+    plt.title('Training Losses')
+    plt.xlabel('Step')
+    plt.ylabel('Loss')
+    
+    # Plot exploration vs exploitation
+    plt.subplot(2, 2, 3)
+    plt.plot(agent.training_data['exploration_counts'], label='Exploration')
+    plt.plot(agent.training_data['exploitation_counts'], label='Exploitation')
+    plt.title('Exploration vs Exploitation')
+    plt.xlabel('Episode')
+    plt.ylabel('Count')
+    plt.legend()
+    
+    # Plot success rate
+    plt.subplot(2, 2, 4)
+    success_rate = np.array(agent.training_data['success_episodes']).astype(float)
+    plt.plot(success_rate)
+    plt.title('Success Rate')
+    plt.xlabel('Episode')
+    plt.ylabel('Success Rate')
+    
+    plt.tight_layout()
+    if save_path:
+        plt.savefig(save_path)
+    plt.close()
+
+def train_a3c(env, num_episodes=1000, save_dir='models'):
+    """Train A3C agent"""
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+    
+    # Create save directory if it doesn't exist
+    os.makedirs(save_dir, exist_ok=True)
+    
+    # Initialize A3C agent
+    agent = A3CAgent(
+        state_dim=env.observation_space.shape[0],
+        action_dim=env.action_space.n,
+        device=device,
+        lr=0.0005,
+        gamma=0.95,
+        update_interval=5,
+        num_workers=4  # Adjust based on your system
+    )
+    
+    # Training loop
+    for episode in range(num_episodes):
+        state = env.reset()
+        episode_reward = 0
+        done = False
+        
+        while not done:
+            # Get action from agent
+            action, value, explore = agent.get_action(state, epsilon=0.1)
+            
+            # Take action in environment
+            next_state, reward, done, success, reward_dim1, reward_dim2 = env.step(action)
+            
+            # Train agent
+            agent.train_step(state, action, reward, next_state, done)
+            
+            # Update state and reward
+            state = next_state
+            episode_reward += reward
+            
+            # Print progress
+            if done:
+                print(f"Episode {episode + 1}/{num_episodes}, Reward: {episode_reward:.2f}, Success: {success}")
+        
+        # Save model periodically
+        if (episode + 1) % 100 == 0:
+            agent.save(os.path.join(save_dir, f'a3c_model_episode_{episode + 1}.pth'))
+            plot_training_results(agent, os.path.join(save_dir, f'a3c_training_plot_{episode + 1}.png'))
+    
+    # Save final model and plot
+    agent.save(os.path.join(save_dir, 'a3c_model_final.pth'))
+    plot_training_results(agent, os.path.join(save_dir, 'a3c_training_plot_final.png'))
+    
+    return agent
 
 def main():
     program_start_time = time.time()

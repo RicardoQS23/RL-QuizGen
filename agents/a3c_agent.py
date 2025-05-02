@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from threading import Thread, Lock
+from multiprocessing import cpu_count
 from .base_agent import BaseAgent
 
 class ActorCritic(nn.Module):
@@ -33,54 +35,194 @@ class ActorCritic(nn.Module):
         
         return action_probs, value
 
-    def compute_loss(self, states, actions, rewards, next_states, dones, gamma):
-        # Convert to tensors
+class A3CWorker(Thread):
+    def __init__(self, worker_id, env, global_actor_critic, device, gamma=0.95, update_interval=5):
+        Thread.__init__(self)
+        self.worker_id = worker_id
+        self.env = env
+        self.device = device
+        self.gamma = gamma
+        self.update_interval = update_interval
+        
+        # Global network
+        self.global_actor_critic = global_actor_critic
+        
+        # Local network
+        self.local_actor_critic = ActorCritic(
+            env.observation_space.shape[0],
+            env.action_space.n
+        ).to(device)
+        
+        # Synchronize with global network
+        self.sync_networks()
+        
+        # Training data for this worker
+        self.training_data = {
+            "episode_rewards": [],
+            "episode_rewards_dim1": [],
+            "episode_rewards_dim2": [],
+            "episode_actions": [],
+            "episode_avg_qvalues": [],
+            "episode_losses": [],
+            "exploration_counts": [],
+            "exploitation_counts": [],
+            "success_episodes": [],
+            "step_count": 0,
+            "replay_count": 0,
+            "total_losses": [],
+            "policy_losses": [],
+            "value_losses": [],
+            "entropies": [],
+            "steps_per_update": []
+        }
+        
+        # Lock for thread synchronization
+        self.lock = Lock()
+
+    def sync_networks(self):
+        """Synchronize local network with global network"""
+        self.local_actor_critic.load_state_dict(self.global_actor_critic.state_dict())
+
+    def compute_advantages(self, rewards, values, next_value, dones):
+        """Compute advantages using n-step returns"""
+        advantages = []
+        returns = []
+        R = next_value
+        
+        for r, v, done in zip(reversed(rewards), reversed(values), reversed(dones)):
+            R = r + self.gamma * R * (1 - done)
+            advantage = R - v
+            returns.insert(0, R)
+            advantages.insert(0, advantage)
+            
+        return torch.tensor(advantages, device=self.device), torch.tensor(returns, device=self.device)
+
+    def train(self, states, actions, rewards, next_states, dones):
+        """Train the local network and update global network"""
         states = torch.FloatTensor(states).to(self.device)
         actions = torch.LongTensor(actions).to(self.device)
         rewards = torch.FloatTensor(rewards).to(self.device)
         next_states = torch.FloatTensor(next_states).to(self.device)
         dones = torch.FloatTensor(dones).to(self.device)
         
-        # Get current action probabilities and values
-        action_probs, values = self(states)
-        
-        # Get next state values
-        _, next_values = self(next_states)
+        # Get predictions
+        action_probs, values = self.local_actor_critic(states)
+        _, next_values = self.local_actor_critic(next_states)
         next_values = next_values.detach()
         
-        # Compute TD targets
-        td_targets = rewards + (1 - dones) * gamma * next_values
-        
-        # Compute advantages
-        advantages = td_targets - values.detach()
+        # Compute advantages and returns
+        advantages, returns = self.compute_advantages(
+            rewards, values, next_values[-1], dones)
         
         # Normalize advantages
         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
         
-        # Compute policy loss
+        # Compute losses
         policy_loss = -(action_probs.gather(1, actions.unsqueeze(1)) * advantages.unsqueeze(1)).mean()
-        
-        # Compute entropy for exploration
+        value_loss = F.mse_loss(values, returns.unsqueeze(1))
         entropy = -(action_probs * torch.log(action_probs + 1e-10)).sum(1).mean()
         
-        # Compute value loss
-        value_loss = F.mse_loss(values, td_targets)
+        # Total loss
+        total_loss = policy_loss + 0.5 * value_loss - self.local_actor_critic.entropy_beta * entropy
         
-        # Total loss combines policy loss, value loss, and entropy regularization
-        total_loss = policy_loss + 0.5 * value_loss - self.entropy_beta * entropy
+        # Update local network
+        self.local_actor_critic.zero_grad()
+        total_loss.backward()
         
-        return total_loss, policy_loss.item(), value_loss.item(), entropy.item()
+        # Update global network
+        with self.lock:
+            for local_param, global_param in zip(self.local_actor_critic.parameters(), 
+                                               self.global_actor_critic.parameters()):
+                if global_param.grad is not None:
+                    global_param.grad = local_param.grad
+        
+        # Synchronize local network with global network
+        self.sync_networks()
+        
+        # Log metrics
+        self.training_data['total_losses'].append(total_loss.item())
+        self.training_data['policy_losses'].append(policy_loss.item())
+        self.training_data['value_losses'].append(value_loss.item())
+        self.training_data['entropies'].append(entropy.item())
+        self.training_data['steps_per_update'].append(len(states))
+        
+        return total_loss.item(), policy_loss.item(), value_loss.item(), entropy.item()
+
+    def run(self):
+        """Main training loop for the worker"""
+        while True:
+            state = self.env.reset()
+            episode_reward = 0
+            episode_reward_dim1 = 0
+            episode_reward_dim2 = 0
+            exploration_count = 0
+            exploitation_count = 0
+            states, actions, rewards, next_states, dones = [], [], [], [], []
+            
+            while True:
+                # Get action
+                state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
+                with torch.no_grad():
+                    action_probs, value = self.local_actor_critic(state_tensor)
+                
+                # Epsilon-greedy action selection
+                if np.random.random() < 0.1:  # 10% exploration
+                    action = np.random.randint(self.env.action_space.n)
+                    explore = True
+                else:
+                    action = torch.multinomial(action_probs, 1).item()
+                    explore = False
+                
+                # Take action
+                next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action)
+                
+                # Store transition
+                states.append(state)
+                actions.append(action)
+                rewards.append(reward)
+                next_states.append(next_state)
+                dones.append(done)
+                
+                # Update episode statistics
+                episode_reward += reward
+                episode_reward_dim1 += reward_dim1
+                episode_reward_dim2 += reward_dim2
+                if explore:
+                    exploration_count += 1
+                else:
+                    exploitation_count += 1
+                
+                state = next_state
+                
+                # Update if enough transitions or episode is done
+                if len(states) >= self.update_interval or done:
+                    self.train(states, actions, rewards, next_states, dones)
+                    states, actions, rewards, next_states, dones = [], [], [], [], []
+                
+                if done:
+                    # Update training data
+                    self.training_data['episode_rewards'].append(episode_reward)
+                    self.training_data['episode_rewards_dim1'].append(episode_reward_dim1)
+                    self.training_data['episode_rewards_dim2'].append(episode_reward_dim2)
+                    self.training_data['exploration_counts'].append(exploration_count)
+                    self.training_data['exploitation_counts'].append(exploitation_count)
+                    self.training_data['success_episodes'].append(success)
+                    break
 
 class A3CAgent(BaseAgent):
-    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95):
+    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, update_interval=5, num_workers=2):
         super().__init__(state_dim, action_dim, device)
         self.lr = lr
         self.gamma = gamma
+        self.update_interval = update_interval
         self.device = device
         
-        # Initialize actor-critic network
-        self.actor_critic = ActorCritic(state_dim, action_dim).to(device)
-        self.optimizer = torch.optim.Adam(self.actor_critic.parameters(), lr=lr)
+        # Set number of workers based on available GPUs
+        self.num_workers = num_workers if num_workers is not None else (torch.cuda.device_count() if torch.cuda.is_available() else 1)
+        
+        # Initialize global actor-critic network
+        self.global_actor_critic = ActorCritic(state_dim, action_dim).to(device)
+        self.optimizer = torch.optim.Adam(self.global_actor_critic.parameters(), lr=lr)
         
         # Initialize training data
         self.training_data = {
@@ -93,19 +235,20 @@ class A3CAgent(BaseAgent):
             "exploration_counts": [],
             "exploitation_counts": [],
             "success_episodes": [],
-            "epsilon": 1.0,
-            "episode_count": 0,
             "step_count": 0,
             "replay_count": 0,
-            "beta_start": 0.4,
-            "beta_increment_per_episode": 0.0
+            "total_losses": [],
+            "policy_losses": [],
+            "value_losses": [],
+            "entropies": [],
+            "steps_per_update": []
         }
 
     def get_action(self, state, epsilon):
         """Get action from the agent given a state"""
         state = torch.FloatTensor(state).unsqueeze(0).to(self.device)
         with torch.no_grad():
-            action_probs, value = self.actor_critic(state)
+            action_probs, value = self.global_actor_critic(state)
             
         # Epsilon-greedy action selection
         if np.random.random() < epsilon:
@@ -127,10 +270,10 @@ class A3CAgent(BaseAgent):
         next_state = torch.FloatTensor(next_state).unsqueeze(0).to(self.device)
         
         # Get current action probabilities and values
-        action_probs, value = self.actor_critic(state)
+        action_probs, value = self.global_actor_critic(state)
         
         # Get next state value
-        _, next_value = self.actor_critic(next_state)
+        _, next_value = self.global_actor_critic(next_state)
         
         # Compute TD target
         td_target = reward + (1 - done) * self.gamma * next_value.detach()
@@ -152,22 +295,26 @@ class A3CAgent(BaseAgent):
         value_loss = F.mse_loss(value, td_target)
         
         # Total loss
-        total_loss = policy_loss + 0.5 * value_loss - self.actor_critic.entropy_beta * entropy
+        total_loss = policy_loss + 0.5 * value_loss - self.global_actor_critic.entropy_beta * entropy
         
         # Update network
         self.optimizer.zero_grad()
         total_loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.actor_critic.parameters(), 0.5)
+        torch.nn.utils.clip_grad_norm_(self.global_actor_critic.parameters(), 0.5)
         self.optimizer.step()
         
-        # Track loss
+        # Track metrics
         self.training_data['episode_losses'].append(total_loss.item())
+        self.training_data['total_losses'].append(total_loss.item())
+        self.training_data['policy_losses'].append(policy_loss.item())
+        self.training_data['value_losses'].append(value_loss.item())
+        self.training_data['entropies'].append(entropy.item())
         self.training_data['replay_count'] += 1
 
     def save(self, path):
         """Save the agent's model"""
         state_dict = {
-            'actor_critic_state_dict': self.actor_critic.state_dict(),
+            'global_actor_critic_state_dict': self.global_actor_critic.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
             'training_data': self.training_data
         }
@@ -176,6 +323,6 @@ class A3CAgent(BaseAgent):
     def load(self, path):
         """Load the agent's model"""
         checkpoint = torch.load(path)
-        self.actor_critic.load_state_dict(checkpoint['actor_critic_state_dict'])
+        self.global_actor_critic.load_state_dict(checkpoint['global_actor_critic_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         self.training_data = checkpoint['training_data'] 
