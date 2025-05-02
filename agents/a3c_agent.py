@@ -76,7 +76,7 @@ class A3CAgent(BaseAgent):
         super().__init__(state_dim, action_dim, device)
         self.lr = lr
         self.gamma = gamma
-        self.device = device  # Add device attribute
+        self.device = device
         
         # Initialize actor-critic network
         self.actor_critic = ActorCritic(state_dim, action_dim).to(device)
@@ -88,7 +88,7 @@ class A3CAgent(BaseAgent):
             "episode_rewards_dim1": [],
             "episode_rewards_dim2": [],
             "episode_actions": [],
-            "episode_avg_q_values": [],
+            "episode_avg_qvalues": [],
             "episode_losses": [],
             "exploration_counts": [],
             "exploitation_counts": [],
@@ -138,8 +138,9 @@ class A3CAgent(BaseAgent):
         # Compute advantage
         advantage = td_target - value.detach()
         
-        # Normalize advantage
-        advantage = (advantage - advantage.mean()) / (advantage.std() + 1e-8)
+        # Normalize advantage (handle single value case)
+        if advantage.numel() > 1:
+            advantage = (advantage - advantage.mean()) / (advantage.std() + 1e-8)
         
         # Compute policy loss
         policy_loss = -(action_probs[0, action] * advantage).mean()
