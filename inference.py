@@ -73,9 +73,10 @@ def main():
     num_iterations = 0
     total_time = 0
     # Train agents for each alfa value
+    save_to_log(f"Starting inference for {args.test_num}...", f'../logs/{args.test_num}/inference')
     for alfa in args.alfa_values:
-        save_to_log(f"Starting inference for alfa = {alfa}...", 
-                    f'../logs/{args.test_num}/inference', mode='w')
+        save_to_log(f"Inference for alfa = {alfa}...", 
+                    f'../logs/{args.test_num}/inference')
         # Find baseline solution
         best_state, best_reward = get_best_state(universe, targets, alfa, num_topics=args.num_topics)
         all_best_states.append(best_state)
@@ -120,5 +121,6 @@ def main():
     save_to_json(all_best_states, f'../jsons/{args.test_num}/baseline_inference/baseline_states')
     save_to_log(f"Avg number of iterations: {round(num_iterations/(len(args.alfa_values)*10))}", f'../logs/{args.test_num}/inference')
     save_to_log(f"Avg time per inference: {total_time/(len(args.alfa_values)*10):.2f}", f'../logs/{args.test_num}/inference')
+    save_to_log(f"Inference complete!", f'../logs/{args.test_num}/inference')
 if __name__ == "__main__":
     main() 
