@@ -210,12 +210,16 @@ class A3CWorker(Thread):
                     break
 
 class A3CAgent(BaseAgent):
-    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, update_interval=5, num_workers=2):
+    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, update_interval=5, num_workers=2,
+                 eps=1.0, eps_decay=0.997, eps_min=0.05):
         super().__init__(state_dim, action_dim, device)
         self.lr = lr
         self.gamma = gamma
         self.update_interval = update_interval
         self.device = device
+        self.eps = eps
+        self.eps_decay = eps_decay
+        self.eps_min = eps_min
         
         # Set number of workers based on available GPUs
         self.num_workers = num_workers if num_workers is not None else (torch.cuda.device_count() if torch.cuda.is_available() else 1)
@@ -241,7 +245,9 @@ class A3CAgent(BaseAgent):
             "policy_losses": [],
             "value_losses": [],
             "entropies": [],
-            "steps_per_update": []
+            "steps_per_update": [],
+            "epsilon": self.eps,  # Initialize epsilon
+            "episode_count": 0    # Initialize episode count
         }
 
     def get_action(self, state, epsilon):
@@ -325,4 +331,22 @@ class A3CAgent(BaseAgent):
         checkpoint = torch.load(path)
         self.global_actor_critic.load_state_dict(checkpoint['global_actor_critic_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        self.training_data = checkpoint['training_data'] 
+        self.training_data = checkpoint['training_data']
+
+    def update_episode_data(self, total_reward, total_reward_dim1, total_reward_dim2, 
+                          exploration_count, exploitation_count, success,
+                          episode_actions, episode_avg_qvalues, num_iterations):
+        """Update training data after each episode"""
+        self.training_data['episode_rewards'].append(total_reward)
+        self.training_data['episode_rewards_dim1'].append(total_reward_dim1)
+        self.training_data['episode_rewards_dim2'].append(total_reward_dim2)
+        self.training_data['exploration_counts'].append(exploration_count)
+        self.training_data['exploitation_counts'].append(exploitation_count)
+        self.training_data['success_episodes'].append(success)
+        self.training_data['episode_actions'].append(episode_actions)
+        self.training_data['episode_avg_qvalues'].append(episode_avg_qvalues)
+        
+        # Update epsilon
+        self.training_data['epsilon'] = max(self.eps_min, 
+                                          self.training_data['epsilon'] * self.eps_decay)
+        self.training_data['episode_count'] += 1 
