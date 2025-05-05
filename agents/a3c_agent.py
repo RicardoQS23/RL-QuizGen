@@ -175,6 +175,8 @@ class A3CWorker(Thread):
 
                 print(action_probs[0])
                 print(action_probs.shape)
+                for i in range(1000):
+                    print('lol')
                 sys.exit()
                 action = np.random.choice(self.env.action_space.n, p=action_probs[0])
                 
