@@ -21,6 +21,7 @@ class ActorCritic(nn.Module):
         
         # Entropy coefficient for exploration
         self.entropy_beta = entropy_beta
+        self.action_dim = action_dim  # Add action_dim attribute
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
@@ -206,6 +207,7 @@ class A3CAgent:
         self.gamma = gamma
         self.update_interval = update_interval
         self.num_workers = num_workers
+        self.action_dim = action_dim  # Add action_dim attribute
         
         # Global network
         self.global_actor_critic = ActorCritic(state_dim, action_dim).to(device)
@@ -269,7 +271,7 @@ class A3CAgent:
         
         # Epsilon-greedy action selection
         if np.random.random() < epsilon:
-            action = np.random.randint(self.global_actor_critic.action_dim)
+            action = np.random.randint(self.action_dim)  # Use self.action_dim instead
             explore = True
         else:
             action = torch.multinomial(action_probs, 1).item()
