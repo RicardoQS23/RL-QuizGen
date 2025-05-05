@@ -57,8 +57,8 @@ class WorkerAgent(Thread):
         
         # Local network
         self.local_actor_critic = ActorCritic(
-            env.observation_space.shape[0],
-            env.action_space.n
+            env.state_dim,  # Use state_dim instead of observation_space
+            env.action_space.n  # Use action_space.n for action dimension
         ).to(device)
         self.local_actor_critic.load_state_dict(self.global_actor_critic.state_dict())
         
@@ -79,15 +79,16 @@ class WorkerAgent(Thread):
             state_batch, action_batch, reward_batch = [], [], []
             episode_reward = 0
             done = False
+            num_iterations = 0
             
             while not done:
-                state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
+                state_tensor = torch.FloatTensor(self.env.universe[state]).unsqueeze(0).to(self.device)
                 action_probs, _ = self.local_actor_critic(state_tensor)
                 action = torch.multinomial(action_probs, 1).item()
                 
-                next_state, reward, done, _ = self.env.step(action)
+                next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action, num_iterations)
                 
-                state_batch.append(state)
+                state_batch.append(self.env.universe[state])
                 action_batch.append([action])
                 reward_batch.append([reward])
                 
@@ -96,7 +97,7 @@ class WorkerAgent(Thread):
                     actions = torch.LongTensor(np.array(action_batch)).to(self.device)
                     rewards = np.array(reward_batch)
                     
-                    next_state_tensor = torch.FloatTensor(next_state).unsqueeze(0).to(self.device)
+                    next_state_tensor = torch.FloatTensor(self.env.universe[next_state]).unsqueeze(0).to(self.device)
                     _, next_value = self.local_actor_critic(next_state_tensor)
                     td_targets = self.n_step_td_target(rewards, next_value.item(), done)
                     td_targets = torch.FloatTensor(td_targets).to(self.device).view(-1, 1)
@@ -134,8 +135,9 @@ class WorkerAgent(Thread):
                 
                 episode_reward += reward
                 state = next_state
+                num_iterations += 1
             
-            print(f"[Worker {self.name}] Episode {episode + 1} Reward: {episode_reward}")
+            print(f"[Worker {self.name}] Episode {episode + 1} Reward: {episode_reward/num_iterations}")
 
 
 class A3CAgent(BaseAgent):
