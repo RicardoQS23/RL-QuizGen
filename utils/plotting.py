@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import cosine_similarity
 from utils.utilities import load_baseline_data, load_agent_data, get_inference_data
+import os
 
 def get_labels(test_num):
     if test_num == "test1":
@@ -278,39 +279,44 @@ def flatten_nested_array(nested_array):
     recurse(nested_array)
     return np.array(flat_list, dtype=np.float32)
 
-def plot_all_results(test_num, alfa_values, save=True, show=False, window_size=64):
-    """Plot all results for a given test number and alfa values.
-    
-    Args:
-        test_num (str): The test number identifier
-        alfa_values (list): List of alfa values to plot
-    """
-    # Plot success rates
-    plot_agent_data(f'../jsons/{test_num}/success/all_success', alfa_values, 'Success', 
-                    f'Episode Success', f'{test_num}/all_success', window_size=window_size, save=save, show=show)
-    
+def plot_all_results(test_num, alfa_values):
+    """Plot all results for the given test number and alfa values."""
     # Plot rewards
-    plot_agent_data(f'../jsons/{test_num}/reward/all_rewards', alfa_values, 'Reward', 
-                   f'Episode Total Rewards', f'{test_num}/all_rewards', window_size=window_size, save=save, show=show)
+    plot_agent_data(f'../jsons/{test_num}/reward/all_rewards', alfa_values,
+                   'Episode Rewards', 'Reward', test_num)
     
-    # Plot dimension-specific rewards
-    plot_agent_data(f'../jsons/{test_num}/reward_dim1/all_rewards_dim1', alfa_values, 'Reward topic component', 
-                   f'Episode Rewards for Dimension 1', f'{test_num}/all_rewards_dim1', window_size=window_size, save=save, show=show)
-    plot_agent_data(f'../jsons/{test_num}/reward_dim2/all_rewards_dim2', alfa_values, 'Reward difficulty component', 
-                   f'Episode Rewards for Dimension 2', f'{test_num}/all_rewards_dim2', window_size=window_size, save=save, show=show)
+    # Plot rewards dimension 1
+    plot_agent_data(f'../jsons/{test_num}/reward_dim1/all_rewards_dim1', alfa_values,
+                   'Episode Rewards (Dimension 1)', 'Reward', test_num)
+    
+    # Plot rewards dimension 2
+    plot_agent_data(f'../jsons/{test_num}/reward_dim2/all_rewards_dim2', alfa_values,
+                   'Episode Rewards (Dimension 2)', 'Reward', test_num)
     
     # Plot Q-values
-    plot_agent_data(f'../jsons/{test_num}/qvalues/all_qvalues', alfa_values, 'Q_value', 
-                   f'Q-Values', f'{test_num}/all_qvalues', window_size=window_size, flag=True, save=save, show=show)
+    plot_agent_data(f'../jsons/{test_num}/qvalues/all_qvalues', alfa_values,
+                   'Average Q-Values', 'Q-Value', test_num)
+    
+    # Plot actions
+    plot_agent_data(f'../jsons/{test_num}/actions/all_actions', alfa_values,
+                   'Actions Taken', 'Action', test_num)
     
     # Plot losses
-    plot_agent_data(f'../jsons/{test_num}/loss/all_losses', alfa_values, 'Loss', 
-                   f'Losses', f'{test_num}/all_losses', window_size=window_size, save=save, show=show)
+    plot_agent_data(f'../jsons/{test_num}/loss/all_losses', alfa_values,
+                   'Training Loss', 'Loss', test_num)
     
-    # Plot exploration ratio
-    plot_agent_data(f'../jsons/{test_num}/exploration_ratio/all_exploration_ratio', alfa_values, 
-                   'Exploration Ratio', f'Exploration Ratio', f'{test_num}/all_exploration_ratio', window_size=window_size, save=save, show=show)
+    # Plot success rate
+    plot_agent_data(f'../jsons/{test_num}/success/all_success', alfa_values,
+                   'Success Rate', 'Success Rate', test_num)
     
-    # Plot action distribution
-    plot_action_distribution(f'../jsons/{test_num}/actions/all_actions', alfa_values, 
-                           f'Action Distribution', f'{test_num}/all_actions', window_size=int(window_size/4), save=save, show=show) 
+    # Only plot exploration ratio if the file exists and is not empty
+    exploration_file = f'../jsons/{test_num}/exploration_ratio/all_exploration_ratio'
+    if os.path.exists(f"{exploration_file}.json"):
+        try:
+            with open(f"{exploration_file}.json", 'r') as f:
+                data = json.load(f)
+                if data and len(data) > 0:
+                    plot_agent_data(exploration_file, alfa_values,
+                                  'Exploration Ratio', 'Ratio', test_num)
+        except (json.JSONDecodeError, ValueError):
+            pass  # Skip if file is empty or invalid 
