@@ -101,6 +101,58 @@ class A3CWorker(Thread):
             
         return torch.tensor(advantages, device=self.device), torch.tensor(returns, device=self.device)
 
+    def run(self):
+        """Main training loop for the worker"""
+        while True:
+            state = self.env.reset()
+            episode_reward = 0
+            episode_reward_dim1 = 0
+            episode_reward_dim2 = 0
+            exploration_count = 0
+            exploitation_count = 0
+            states, actions, rewards, next_states, dones = [], [], [], [], []
+            
+            while True:
+                # Get action
+                state_tensor = torch.FloatTensor(self.env.universe[state]).to(self.device)  # Use universe[state] to get the actual state vector
+                with torch.no_grad():
+                    action_probs, value = self.local_actor_critic(state_tensor)
+
+                # Sample action from policy
+                action = torch.multinomial(action_probs, 1).item()
+                
+                # Take action
+                next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action)
+
+                # Store transition
+                states.append(self.env.universe[state])  # Store the actual state vector
+                actions.append(action)
+                rewards.append(reward)
+                next_states.append(self.env.universe[next_state])  # Store the actual next state vector
+                dones.append(done)
+                
+                # Update episode statistics
+                episode_reward += reward
+                episode_reward_dim1 += reward_dim1
+                episode_reward_dim2 += reward_dim2
+                
+                state = next_state
+                
+                # Update if enough transitions or episode is done
+                if len(states) >= self.update_interval or done:
+                    self.train(states, actions, rewards, next_states, dones)
+                    states, actions, rewards, next_states, dones = [], [], [], [], []
+                
+                if done:
+                    # Update training data
+                    self.training_data['episode_rewards'].append(episode_reward)
+                    self.training_data['episode_rewards_dim1'].append(episode_reward_dim1)
+                    self.training_data['episode_rewards_dim2'].append(episode_reward_dim2)
+                    self.training_data['exploration_counts'].append(exploration_count)
+                    self.training_data['exploitation_counts'].append(exploitation_count)
+                    self.training_data['success_episodes'].append(success)
+                    break
+
     def train(self, states, actions, rewards, next_states, dones):
         """Train the local network and update global network"""
         states = torch.FloatTensor(states).to(self.device)
@@ -151,58 +203,6 @@ class A3CWorker(Thread):
         self.training_data['steps_per_update'].append(len(states))
         
         return total_loss.item(), policy_loss.item(), value_loss.item(), entropy.item()
-
-    def run(self):
-        """Main training loop for the worker"""
-        while True:
-            state = self.env.reset()
-            episode_reward = 0
-            episode_reward_dim1 = 0
-            episode_reward_dim2 = 0
-            exploration_count = 0
-            exploitation_count = 0
-            states, actions, rewards, next_states, dones = [], [], [], [], []
-            
-            while True:
-                # Get action
-                state_tensor = torch.FloatTensor(state).to(self.device)
-                with torch.no_grad():
-                    action_probs, value = self.local_actor_critic(state_tensor)
-
-                # Sample action from policy
-                action = torch.multinomial(action_probs, 1).item()
-                
-                # Take action
-                next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action)
-
-                # Store transition
-                states.append(state)
-                actions.append(action)
-                rewards.append(reward)
-                next_states.append(next_state)
-                dones.append(done)
-                
-                # Update episode statistics
-                episode_reward += reward
-                episode_reward_dim1 += reward_dim1
-                episode_reward_dim2 += reward_dim2
-                
-                state = next_state
-                
-                # Update if enough transitions or episode is done
-                if len(states) >= self.update_interval or done:
-                    self.train(states, actions, rewards, next_states, dones)
-                    states, actions, rewards, next_states, dones = [], [], [], [], []
-                
-                if done:
-                    # Update training data
-                    self.training_data['episode_rewards'].append(episode_reward)
-                    self.training_data['episode_rewards_dim1'].append(episode_reward_dim1)
-                    self.training_data['episode_rewards_dim2'].append(episode_reward_dim2)
-                    self.training_data['exploration_counts'].append(exploration_count)
-                    self.training_data['exploitation_counts'].append(exploitation_count)
-                    self.training_data['success_episodes'].append(success)
-                    break
 
 class A3CAgent:
     def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, update_interval=5, num_workers=4):
