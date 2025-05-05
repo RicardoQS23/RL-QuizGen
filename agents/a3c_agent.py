@@ -234,13 +234,38 @@ class A3CAgent(BaseAgent):
     
     def save(self, path):
         """Save the agent's model"""
-        torch.save({
+        # Create a dictionary of only the necessary components
+        save_dict = {
             'model_state_dict': self.actor_critic.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict()
-        }, path)
+            'optimizer_state_dict': self.optimizer.state_dict(),
+            'training_data': {
+                'episode_rewards': self.training_data['episode_rewards'],
+                'episode_rewards_dim1': self.training_data['episode_rewards_dim1'],
+                'episode_rewards_dim2': self.training_data['episode_rewards_dim2'],
+                'episode_actions': self.training_data['episode_actions'],
+                'episode_avg_qvalues': self.training_data['episode_avg_qvalues'],
+                'episode_losses': self.training_data['episode_losses'],
+                'exploration_counts': self.training_data['exploration_counts'],
+                'exploitation_counts': self.training_data['exploitation_counts'],
+                'success_episodes': self.training_data['success_episodes'],
+                'episode_count': self.training_data['episode_count'],
+                'step_count': self.training_data['step_count'],
+                'replay_count': self.training_data['replay_count']
+            }
+        }
+        torch.save(save_dict, path)
     
     def load(self, path):
         """Load the agent's model"""
         checkpoint = torch.load(path, map_location=self.device)
         self.actor_critic.load_state_dict(checkpoint['model_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        
+        # Restore training data if available
+        if 'training_data' in checkpoint:
+            for key, value in checkpoint['training_data'].items():
+                self.training_data[key] = value
+    
+    def get_training_data(self):
+        """Get the agent's training data"""
+        return self.training_data

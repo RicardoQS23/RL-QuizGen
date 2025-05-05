@@ -73,9 +73,10 @@ def save_agent(save_path, agent):
             # For DQN agent
             torch.save(agent.model.state_dict(), save_path)
             print(f"Model saved at {save_path}")
-        elif hasattr(agent, 'global_actor') and hasattr(agent, 'global_critic'):
+        elif hasattr(agent, 'actor_critic'):
             # For A3C agent
             agent.save(save_path)
+            print(f"A3C model saved at {save_path}")
             # Save training data separately
             training_data = agent.get_training_data()
             save_data(training_data, agent.training_data.get('alfa', 0), agent.training_data.get('test_num', 'default'))
