@@ -62,7 +62,7 @@ class WorkerAgent(Thread):
         self.local_actor_critic = ActorCritic(
             env.state_dim,
             env.action_space.n,
-            global_agent.entropy_beta if global_agent else 0.01
+            0.01  # Fixed small entropy coefficient
         ).to(device)
         self.local_actor_critic.load_state_dict(self.global_actor_critic.state_dict())
         
