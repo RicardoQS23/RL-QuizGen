@@ -7,7 +7,7 @@ from multiprocessing import cpu_count
 from .base_agent import BaseAgent
 import os
 import copy
-
+import pickle
 
 class Actor(nn.Module):
     def __init__(self, state_dim, action_dim, lr=0.0005):
@@ -406,25 +406,29 @@ class A3CAgent(BaseAgent):
         pass
 
     def save(self, path):
-        """Save the agent's model"""
+        """Save the agent's model safely without serializing threads or locks"""
         try:
             print(f"Saving model")
 
-            # Extract only serializable training data
-            serializable_data = {
-                k: v for k, v in self.training_data.items()
-                if k in [
-                    'episode_rewards', 'episode_rewards_dim1', 'episode_rewards_dim2',
-                    'exploration_counts', 'exploitation_counts', 'success_episodes',
-                    'episode_losses', 'replay_count', 'epsilon', 'episode_count'
-                ]
-            }
+            # Debug: Check which training_data items are unpicklable
+            for key, val in self.training_data.items():
+                try:
+                    pickle.dumps(val)
+                except Exception as e:
+                    print(f"❌ Cannot pickle training_data['{key}']: {e}")
 
-            # Assemble the dictionary to save
+            # Only copy primitives and safe types from training_data
+            safe_keys = [
+                "episode_rewards", "episode_rewards_dim1", "episode_rewards_dim2",
+                "exploration_counts", "exploitation_counts", "success_episodes",
+                "episode_losses", "replay_count", "epsilon", "episode_count"
+            ]
+            safe_training_data = {k: copy.deepcopy(self.training_data[k]) for k in safe_keys}
+
             save_data = {
                 'global_actor_state_dict': self.global_actor.state_dict(),
                 'global_critic_state_dict': self.global_critic.state_dict(),
-                'training_data': serializable_data,
+                'training_data': safe_training_data,
                 'gamma': self.gamma,
                 'lr': self.lr,
                 'update_interval': self.update_interval,
