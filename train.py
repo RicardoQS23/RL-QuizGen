@@ -233,8 +233,13 @@ def main():
         
         end_time = time.time()
         elapsed_time = end_time - start_time
-        save_to_log(f"Number of Replay counts: {agent.training_data['replay_count']}\n"
-                   f"Time elapsed for agent with alfa = {alfa}: {elapsed_time:.4f} seconds\n{50 * '-'}",
+        
+        # Only show replay counts for agents that use replay buffers
+        replay_count_msg = ""
+        if hasattr(agent, 'replay_buffer'):
+            replay_count_msg = f"Number of Replay counts: {agent.training_data['replay_count']}\n"
+            
+        save_to_log(f"{replay_count_msg}Time elapsed for agent with alfa = {alfa}: {elapsed_time:.4f} seconds\n{50 * '-'}",
                    f'../logs/{args.test_num}/training')
     
     # Plot all results

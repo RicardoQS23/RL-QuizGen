@@ -160,9 +160,17 @@ class WorkerAgent(Thread):
                         
                         # Update global agent's training data
                         if self.global_agent is not None:
-                            self.global_agent.training_data['episode_rewards'].append(episode_reward/num_iterations)
-                            self.global_agent.training_data['episode_rewards_dim1'].append(total_reward_dim1/num_iterations)
-                            self.global_agent.training_data['episode_rewards_dim2'].append(total_reward_dim2/num_iterations)
+                            # Ensure we don't divide by zero
+                            if num_iterations > 0:
+                                self.global_agent.training_data['episode_rewards'].append(episode_reward/num_iterations)
+                                self.global_agent.training_data['episode_rewards_dim1'].append(total_reward_dim1/num_iterations)
+                                self.global_agent.training_data['episode_rewards_dim2'].append(total_reward_dim2/num_iterations)
+                            else:
+                                # If no iterations occurred, append the raw rewards
+                                self.global_agent.training_data['episode_rewards'].append(episode_reward)
+                                self.global_agent.training_data['episode_rewards_dim1'].append(total_reward_dim1)
+                                self.global_agent.training_data['episode_rewards_dim2'].append(total_reward_dim2)
+                                
                             self.global_agent.training_data['episode_actions'].append(episode_actions)
                             self.global_agent.training_data['episode_avg_qvalues'].append(episode_avg_qvalues)
                             self.global_agent.training_data['episode_losses'].append(loss.item())
@@ -181,7 +189,7 @@ class WorkerAgent(Thread):
                 state = next_state
                 num_iterations += 1
             
-            print(f"[Worker {self.name}] Episode {episode + 1} Reward: {episode_reward/num_iterations}")
+            print(f"[Worker {self.name}] Episode {episode + 1} Reward: {episode_reward/num_iterations if num_iterations > 0 else episode_reward}")
 
 
 class A3CAgent(BaseAgent):
