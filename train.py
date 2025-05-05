@@ -163,10 +163,10 @@ def plot_training_results(agent, save_path=None):
         plt.savefig(save_path)
     plt.close()
 
-def train_a3c(env, num_episodes=1000, save_dir='models'):
+def train_a3c(env, num_episodes=1000, save_dir='models', test_num='test1'):
     """Train A3C agent"""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using device: {device}")
+    save_to_log(f"Using device: {device}", f'../logs/{test_num}/training')
     
     # Create save directory if it doesn't exist
     os.makedirs(save_dir, exist_ok=True)
@@ -183,41 +183,43 @@ def train_a3c(env, num_episodes=1000, save_dir='models'):
     )
     
     # Start worker threads
+    save_to_log("Starting worker threads", f'../logs/{test_num}/training')
     agent.start_workers(env)
     
     try:
         # Training loop
         for episode in range(num_episodes):
-            print(f"Episode {episode + 1}/{num_episodes} started")
+            save_to_log(f"Episode {episode + 1}/{num_episodes} started", f'../logs/{test_num}/training')
             
             # Workers are running in parallel, we just need to wait for episodes to complete
             time.sleep(0.1)  # Small delay to prevent CPU overload
             
             # Print progress periodically
             if (episode + 1) % 10 == 0:
-                print(f"Completed {episode + 1} episodes")
+                save_to_log(f"Completed {episode + 1} episodes", f'../logs/{test_num}/training')
                 # Print some statistics from the workers
                 for i, worker in enumerate(agent.workers):
                     if worker.training_data['episode_rewards']:
                         avg_reward = np.mean(worker.training_data['episode_rewards'][-10:])
-                        print(f"Worker {i} average reward (last 10 episodes): {avg_reward:.2f}")
+                        save_to_log(f"Worker {i} average reward (last 10 episodes): {avg_reward:.2f}", 
+                                  f'../logs/{test_num}/training', flag=False)
             
             # Save model periodically
             if (episode + 1) % 100 == 0:
-                print(f"Saving model at episode {episode + 1}")
+                save_to_log(f"Saving model at episode {episode + 1}", f'../logs/{test_num}/training')
                 agent.save(os.path.join(save_dir, f'a3c_model_episode_{episode + 1}.pth'))
                 plot_training_results(agent, os.path.join(save_dir, f'a3c_training_plot_{episode + 1}.png'))
     
     except KeyboardInterrupt:
-        print("Training interrupted by user")
+        save_to_log("Training interrupted by user", f'../logs/{test_num}/training')
     
     finally:
         # Stop worker threads
-        print("Stopping worker threads")
+        save_to_log("Stopping worker threads", f'../logs/{test_num}/training')
         agent.stop_workers()
         
         # Save final model and plot
-        print("Saving final model and plot")
+        save_to_log("Saving final model and plot", f'../logs/{test_num}/training')
         agent.save(os.path.join(save_dir, 'a3c_model_final.pth'))
         plot_training_results(agent, os.path.join(save_dir, 'a3c_training_plot_final.png'))
     
@@ -307,15 +309,7 @@ def main():
             agent = A3CAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
                            lr=args.lr, gamma=args.gamma, update_interval=5, num_workers=4)
             # Start worker threads for A3C
-            agent.start_workers(env)
-            try:
-                # Wait for training to complete
-                time.sleep(args.max_episodes * 0.1)  # Rough estimate of training time
-            except KeyboardInterrupt:
-                print("Training interrupted by user")
-            finally:
-                # Stop worker threads
-                agent.stop_workers()
+            train_a3c(env, num_episodes=args.max_episodes, save_dir=f"../saved_agents/{args.test_num}", test_num=args.test_num)
         elif args.agent_type == 'sarsa':
             agent = SARSAAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
                              lr=args.lr, gamma=args.gamma, eps=args.eps, eps_decay=args.eps_decay,
