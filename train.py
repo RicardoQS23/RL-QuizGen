@@ -292,8 +292,7 @@ def main():
         elif args.agent_type == 'a3c':
             print('A3C A3C A3C A3C A3C')
             agent = A3CAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
-                           lr=args.lr, gamma=args.gamma, update_interval=5, num_workers=4,
-                           eps=args.eps, eps_decay=args.eps_decay, eps_min=args.eps_min)
+                           lr=args.lr, gamma=args.gamma, update_interval=5, num_workers=4)
         elif args.agent_type == 'sarsa':
             agent = SARSAAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
                              lr=args.lr, gamma=args.gamma, eps=args.eps, eps_decay=args.eps_decay,
