@@ -97,6 +97,10 @@ class A3CWorker(Thread):
         self.episode_count = 0
         self.running = True
         self.error = None
+        # Pre-allocate tensors for efficiency
+        self.state_batch = []
+        self.action_batch = []
+        self.reward_batch = []
 
     def get_epsilon(self):
         """Get epsilon value from agent"""
@@ -138,7 +142,9 @@ class A3CWorker(Thread):
                 try:
                     print(f"Resetting environment")
                     state = self.env.reset()
-                    state_batch, action_batch, reward_batch = [], [], []
+                    self.state_batch.clear()
+                    self.action_batch.clear()
+                    self.reward_batch.clear()
                     episode_reward = 0
                     episode_reward_dim1 = 0
                     episode_reward_dim2 = 0
@@ -146,7 +152,7 @@ class A3CWorker(Thread):
                     exploitation_count = 0
                     episode_actions = []
                     episode_avg_qvalues = []
-                    episode_losses = []  # Track losses for this episode
+                    episode_losses = []
                     done = False
 
                     while not done:
@@ -174,9 +180,9 @@ class A3CWorker(Thread):
                             next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action, 100)
                             
                             # Store transition
-                            state_batch.append(state_features)
-                            action_batch.append(action)
-                            reward_batch.append(reward)
+                            self.state_batch.append(state_features)
+                            self.action_batch.append(action)
+                            self.reward_batch.append(reward)
                             
                             # Update episode statistics
                             episode_reward += reward
@@ -191,13 +197,13 @@ class A3CWorker(Thread):
                             episode_avg_qvalues.append(value)
                             
                             # Update if enough transitions or episode is done
-                            if len(state_batch) >= self.update_interval or done:
+                            if len(self.state_batch) >= self.update_interval or done:
                                 try:
                                     print(f"Updating global networks")
                                     # Convert batches to tensors
-                                    states = torch.FloatTensor(np.array(state_batch)).to(self.device)
-                                    actions = torch.LongTensor(action_batch).to(self.device)
-                                    rewards = np.array(reward_batch)
+                                    states = torch.FloatTensor(np.array(self.state_batch)).to(self.device)
+                                    actions = torch.LongTensor(self.action_batch).to(self.device)
+                                    rewards = np.array(self.reward_batch)
                                     
                                     # Get next state value
                                     next_state_features = self.env.universe[next_state]
@@ -252,7 +258,11 @@ class A3CWorker(Thread):
                                         # Sync networks
                                         self.sync_networks()
                                     
-                                    state_batch, action_batch, reward_batch = [], [], []
+                                    # Clear batches
+                                    self.state_batch.clear()
+                                    self.action_batch.clear()
+                                    self.reward_batch.clear()
+                                    
                                 except Exception as e:
                                     print(f"Warning: Worker {self.worker_id} failed to update networks: {str(e)}")
                                     continue
@@ -300,7 +310,9 @@ class A3CWorker(Thread):
         try:
             print(f"Cleaning up resources")
             # Clear any remaining data
-            state_batch, action_batch, reward_batch = [], [], []
+            self.state_batch.clear()
+            self.action_batch.clear()
+            self.reward_batch.clear()
             # Ensure networks are synced one last time
             with self.network_lock:
                 self.sync_networks()
