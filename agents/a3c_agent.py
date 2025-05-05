@@ -18,23 +18,24 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class ActorCritic(nn.Module):
-    def __init__(self, state_dim, action_dim):
+    def __init__(self, state_dim, action_dim, entropy_beta=0.01):
         super(ActorCritic, self).__init__()
         # Shared layers
-        self.fc1 = nn.Linear(state_dim, 32)
-        self.fc2 = nn.Linear(32, 16)
-        
+        self.fc1 = nn.Linear(state_dim, 64)
+        self.fc2 = nn.Linear(64, 32)
+        self.fc3 = nn.Linear(32, 16)
         # Actor head
         self.actor = nn.Linear(16, action_dim)
         
         # Critic head
         self.critic = nn.Linear(16, 1)
         
-        self.entropy_beta = 0.01
+        self.entropy_beta = entropy_beta
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
         
         # Actor output (action probabilities)
         action_probs = F.softmax(self.actor(x), dim=-1)
@@ -59,7 +60,8 @@ class WorkerAgent(Thread):
         # Local network
         self.local_actor_critic = ActorCritic(
             env.state_dim,
-            env.action_space.n
+            env.action_space.n,
+            global_agent.entropy_beta if global_agent else 0.01
         ).to(device)
         self.local_actor_critic.load_state_dict(self.global_actor_critic.state_dict())
         
@@ -181,6 +183,10 @@ class WorkerAgent(Thread):
                             self.global_agent.training_data['epsilon'] = max(0.05, 
                                 self.global_agent.training_data['epsilon'] * 0.997)
                             
+                            # Decay entropy coefficient
+                            self.global_agent.decay_entropy()
+                            self.local_actor_critic.entropy_beta = self.global_agent.entropy_beta
+                            
                             # Update visited states
                             self.global_agent.all_visited_states.update(visited_states)
                     
@@ -193,11 +199,17 @@ class WorkerAgent(Thread):
 
 
 class A3CAgent(BaseAgent):
-    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, num_workers=None):
+    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, num_workers=None,
+                 entropy_beta=0.01, entropy_beta_decay=0.995, entropy_beta_min=0.001):
         super().__init__(state_dim, action_dim, device)
         self.lr = lr
         self.gamma = gamma
         self.num_workers = num_workers if num_workers is not None else cpu_count()
+        
+        # Entropy parameters
+        self.entropy_beta = entropy_beta
+        self.entropy_beta_decay = entropy_beta_decay
+        self.entropy_beta_min = entropy_beta_min
         
         # Initialize networks
         self._init_networks()
@@ -210,8 +222,13 @@ class A3CAgent(BaseAgent):
         
     def _init_networks(self):
         """Initialize the actor-critic network"""
-        self.actor_critic = ActorCritic(self.state_dim, self.action_dim).to(self.device)
+        self.actor_critic = ActorCritic(self.state_dim, self.action_dim, self.entropy_beta).to(self.device)
         self.optimizer = torch.optim.Adam(self.actor_critic.parameters(), lr=self.lr)
+    
+    def decay_entropy(self):
+        """Decay the entropy coefficient"""
+        self.entropy_beta = max(self.entropy_beta_min, self.entropy_beta * self.entropy_beta_decay)
+        self.actor_critic.entropy_beta = self.entropy_beta
     
     def get_action(self, state, epsilon):
         """Get action from the agent given a state"""
