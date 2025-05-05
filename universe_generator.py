@@ -45,12 +45,13 @@ def generate_mcqs(test_num, csv_file, num_topics, topic_column='topic', difficul
         df['topic'] = df['topic'].astype(int)
     else:
         df.rename(columns={'id': 'mcq_id'}, inplace=True)
+        df.rename(columns={'difficulty_level': 'difficulty'}, inplace=True)
         df['option_a'] = df['correct_answer']
         df.rename(columns={'correct_answer': 'correct_option', 'answer2': 'option_b', 'answer3': 'option_c', 'answer4': 'option_d'}, inplace=True)
         df['topic'] = df['topic'].astype(int)
 
     df['id'] = df.index
-    df['difficulty'] = df['difficulty_level']
+    df['difficulty'] = df['difficulty']
     
     # Get unique topics
     unique_topics = df['topic'].unique()
