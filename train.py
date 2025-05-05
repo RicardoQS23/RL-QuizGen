@@ -70,6 +70,21 @@ def train_agent(env, agent, max_episodes, test_num, args):
     """Train the agent for specified number of episodes"""
     all_visited_states = set()
     
+    # For A3C, start the workers and let them handle training
+    if isinstance(agent, A3CAgent):
+        save_to_log(f"Starting A3C training with {agent.num_workers} workers...", f'../logs/{test_num}/training')
+        agent.start_workers(env)
+        
+        # Wait for workers to complete their episodes
+        while any(worker.is_alive() for worker in agent.workers):
+            time.sleep(1)  # Check every second
+            
+        # Stop workers and clean up
+        agent.stop_workers()
+        save_to_log(f'A3C training complete! Total Visited States: {len(all_visited_states)}', f'../logs/{test_num}/training')
+        return
+    
+    # For other agents (DQN, SARSA), use single-agent training
     for ep in range(max_episodes):
         visited_states = set()
         done = False
