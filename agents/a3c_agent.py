@@ -111,7 +111,7 @@ class A3CWorker(Thread):
             exploration_count = 0
             exploitation_count = 0
             states, actions, rewards, next_states, dones = [], [], [], [], []
-            num_iterations = 0  # Track number of iterations
+            num_iterations = 0
             
             while True:
                 # Get action
@@ -138,7 +138,7 @@ class A3CWorker(Thread):
                 episode_reward_dim2 += reward_dim2
                 
                 state = next_state
-                num_iterations += 1  # Increment iteration counter
+                num_iterations += 1
                 
                 # Update if enough transitions or episode is done
                 if len(states) >= self.update_interval or done:
@@ -157,11 +157,12 @@ class A3CWorker(Thread):
 
     def train(self, states, actions, rewards, next_states, dones):
         """Train the local network and update global network"""
-        states = torch.FloatTensor(states).to(self.device)
-        actions = torch.LongTensor(actions).to(self.device)
-        rewards = torch.FloatTensor(rewards).to(self.device)
-        next_states = torch.FloatTensor(next_states).to(self.device)
-        dones = torch.FloatTensor(dones).to(self.device)
+        # Convert lists to numpy arrays first, then to tensors
+        states = torch.FloatTensor(np.array(states)).to(self.device)
+        actions = torch.LongTensor(np.array(actions)).to(self.device)
+        rewards = torch.FloatTensor(np.array(rewards)).to(self.device)
+        next_states = torch.FloatTensor(np.array(next_states)).to(self.device)
+        dones = torch.FloatTensor(np.array(dones)).to(self.device)
         
         # Get predictions
         action_probs, values = self.local_actor_critic(states)
@@ -172,8 +173,9 @@ class A3CWorker(Thread):
         advantages, returns = self.compute_advantages(
             rewards, values, next_values[-1], dones)
         
-        # Normalize advantages
-        advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+        # Normalize advantages only if we have enough samples
+        if len(advantages) > 1:
+            advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
         
         # Compute losses
         policy_loss = -(action_probs.gather(1, actions.unsqueeze(1)) * advantages.unsqueeze(1)).mean()
