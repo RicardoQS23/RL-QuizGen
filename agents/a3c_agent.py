@@ -409,42 +409,24 @@ class A3CAgent(BaseAgent):
         """Save the agent's model safely without serializing threads or locks"""
         try:
             print(f"Saving model")
-
-            # Debug: Check which training_data items are unpicklable
-            for key, val in self.training_data.items():
-                try:
-                    pickle.dumps(val)
-                except Exception as e:
-                    print(f"❌ Cannot pickle training_data['{key}']: {e}")
-
-            # Only copy primitives and safe types from training_data
-            safe_keys = [
-                "episode_rewards", "episode_rewards_dim1", "episode_rewards_dim2",
-                "exploration_counts", "exploitation_counts", "success_episodes",
-                "episode_losses", "replay_count", "epsilon", "episode_count"
-            ]
-            safe_training_data = {k: copy.deepcopy(self.training_data[k]) for k in safe_keys}
-
-            save_data = {
+            
+            # Save only the model state dicts
+            model_state = {
                 'global_actor_state_dict': self.global_actor.state_dict(),
                 'global_critic_state_dict': self.global_critic.state_dict(),
-                'training_data': safe_training_data,
                 'gamma': self.gamma,
                 'lr': self.lr,
                 'update_interval': self.update_interval,
                 'eps_decay': self.eps_decay,
                 'eps_min': self.eps_min
             }
-
-            temp_path = path + '.tmp'
-            torch.save(save_data, temp_path)
-            os.rename(temp_path, path)
+            
+            # Save model state
+            torch.save(model_state, path)
             print("Model saved successfully.")
-
+            
         except Exception as e:
             print(f"Warning: Failed to save model: {str(e)}")
-            if 'temp_path' in locals() and os.path.exists(temp_path):
-                os.remove(temp_path)
 
     def load(self, path):
         """Load the agent's model"""
@@ -457,19 +439,6 @@ class A3CAgent(BaseAgent):
                 self.global_actor.load_state_dict(checkpoint['global_actor_state_dict'])
                 self.global_critic.load_state_dict(checkpoint['global_critic_state_dict'])
             
-            # Load training data
-            with self.data_lock:
-                self.training_data['episode_rewards'] = checkpoint['episode_rewards']
-                self.training_data['episode_rewards_dim1'] = checkpoint['episode_rewards_dim1']
-                self.training_data['episode_rewards_dim2'] = checkpoint['episode_rewards_dim2']
-                self.training_data['exploration_counts'] = checkpoint['exploration_counts']
-                self.training_data['exploitation_counts'] = checkpoint['exploitation_counts']
-                self.training_data['success_episodes'] = checkpoint['success_episodes']
-                self.training_data['episode_losses'] = checkpoint['episode_losses']
-                self.training_data['replay_count'] = checkpoint['replay_count']
-                self.training_data['epsilon'] = checkpoint['epsilon']
-                self.training_data['episode_count'] = checkpoint['episode_count']
-            
             # Load hyperparameters
             self.gamma = checkpoint['gamma']
             self.lr = checkpoint['lr']
@@ -479,6 +448,24 @@ class A3CAgent(BaseAgent):
             
         except Exception as e:
             print(f"Warning: Failed to load model: {str(e)}")
+
+    def get_training_data(self):
+        """Get a copy of training data for saving to JSON"""
+        with self.data_lock:
+            return {
+                'episode_rewards': self.training_data['episode_rewards'].copy(),
+                'episode_rewards_dim1': self.training_data['episode_rewards_dim1'].copy(),
+                'episode_rewards_dim2': self.training_data['episode_rewards_dim2'].copy(),
+                'episode_actions': self.training_data['episode_actions'].copy(),
+                'episode_avg_qvalues': self.training_data['episode_avg_qvalues'].copy(),
+                'exploration_counts': self.training_data['exploration_counts'].copy(),
+                'exploitation_counts': self.training_data['exploitation_counts'].copy(),
+                'success_episodes': self.training_data['success_episodes'].copy(),
+                'episode_losses': self.training_data['episode_losses'].copy(),
+                'replay_count': self.training_data['replay_count'],
+                'epsilon': self.training_data['epsilon'],
+                'episode_count': self.training_data['episode_count']
+            }
 
     def update_episode_data(self, total_reward, total_reward_dim1, total_reward_dim2, 
                           exploration_count, exploitation_count, success,

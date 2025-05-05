@@ -47,9 +47,17 @@ def save_agent(save_path, agent):
     """Save the agent's model."""
     try:
         if hasattr(agent, 'model') and isinstance(agent.model, torch.nn.Module):
+            # For DQN agent
             torch.save(agent.model.state_dict(), save_path)
             print(f"Model saved at {save_path}")
+        elif hasattr(agent, 'global_actor') and hasattr(agent, 'global_critic'):
+            # For A3C agent
+            agent.save(save_path)
+            # Save training data separately
+            training_data = agent.get_training_data()
+            save_data(training_data, agent.training_data.get('alfa', 0), agent.training_data.get('test_num', 'default'))
         else:
+            # For other agents
             with open(save_path.replace(".pth", ".pkl"), 'wb') as f:
                 pickle.dump(agent, f)
             print(f"Agent object saved at {save_path.replace('.pth', '.pkl')}")
