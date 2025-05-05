@@ -21,9 +21,12 @@ class ActorCritic(nn.Module):
         
         # Entropy coefficient for exploration
         self.entropy_beta = entropy_beta
-        self.action_dim = action_dim  # Add action_dim attribute
-
+        self.action_dim = action_dim
+        
     def forward(self, x):
+        # Ensure input is properly shaped
+        if len(x.shape) == 1:
+            x = x.unsqueeze(0)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
@@ -50,7 +53,7 @@ class A3CWorker(Thread):
         
         # Local network
         self.local_actor_critic = ActorCritic(
-            env.state_dim,  # Use state_dim instead of observation_space.shape[0]
+            env.state_dim,
             env.action_space.n
         ).to(device)
         
@@ -162,16 +165,16 @@ class A3CWorker(Thread):
             
             while True:
                 # Get action
-                state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
+                state_tensor = torch.FloatTensor(state).to(self.device)
                 with torch.no_grad():
                     action_probs, value = self.local_actor_critic(state_tensor)
-                
+
                 # Sample action from policy
                 action = torch.multinomial(action_probs, 1).item()
                 
                 # Take action
                 next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action)
-                
+
                 # Store transition
                 states.append(state)
                 actions.append(action)
