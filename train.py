@@ -173,7 +173,7 @@ def train_a3c(env, num_episodes=1000, save_dir='models'):
     
     # Initialize A3C agent
     agent = A3CAgent(
-        state_dim=env.observation_space.shape[0],
+        state_dim=env.state_dim,
         action_dim=env.action_space.n,
         device=device,
         lr=0.0005,
@@ -188,15 +188,23 @@ def train_a3c(env, num_episodes=1000, save_dir='models'):
     try:
         # Training loop
         for episode in range(num_episodes):
+            print(f"Episode {episode + 1}/{num_episodes} started")
+            
             # Workers are running in parallel, we just need to wait for episodes to complete
             time.sleep(0.1)  # Small delay to prevent CPU overload
             
             # Print progress periodically
             if (episode + 1) % 10 == 0:
-                print(f"Episode {episode + 1}/{num_episodes}")
+                print(f"Completed {episode + 1} episodes")
+                # Print some statistics from the workers
+                for i, worker in enumerate(agent.workers):
+                    if worker.training_data['episode_rewards']:
+                        avg_reward = np.mean(worker.training_data['episode_rewards'][-10:])
+                        print(f"Worker {i} average reward (last 10 episodes): {avg_reward:.2f}")
             
             # Save model periodically
             if (episode + 1) % 100 == 0:
+                print(f"Saving model at episode {episode + 1}")
                 agent.save(os.path.join(save_dir, f'a3c_model_episode_{episode + 1}.pth'))
                 plot_training_results(agent, os.path.join(save_dir, f'a3c_training_plot_{episode + 1}.png'))
     
@@ -205,9 +213,11 @@ def train_a3c(env, num_episodes=1000, save_dir='models'):
     
     finally:
         # Stop worker threads
+        print("Stopping worker threads")
         agent.stop_workers()
         
         # Save final model and plot
+        print("Saving final model and plot")
         agent.save(os.path.join(save_dir, 'a3c_model_final.pth'))
         plot_training_results(agent, os.path.join(save_dir, 'a3c_training_plot_final.png'))
     
