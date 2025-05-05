@@ -46,7 +46,7 @@ class ActorCritic(nn.Module):
 
 
 class WorkerAgent(Thread):
-    def __init__(self, env, global_actor_critic, device, max_episodes, gamma=0.95, update_interval=5):
+    def __init__(self, env, global_actor_critic, device, max_episodes, gamma=0.95, update_interval=5, global_agent=None):
         super(WorkerAgent, self).__init__()
         self.env = env
         self.global_actor_critic = global_actor_critic
@@ -54,11 +54,12 @@ class WorkerAgent(Thread):
         self.max_episodes = max_episodes
         self.gamma = gamma
         self.update_interval = update_interval
+        self.global_agent = global_agent
         
         # Local network
         self.local_actor_critic = ActorCritic(
-            env.state_dim,  # Use state_dim instead of observation_space
-            env.action_space.n  # Use action_space.n for action dimension
+            env.state_dim,
+            env.action_space.n
         ).to(device)
         self.local_actor_critic.load_state_dict(self.global_actor_critic.state_dict())
         
@@ -77,20 +78,46 @@ class WorkerAgent(Thread):
         for episode in range(self.max_episodes):
             state = self.env.reset()
             state_batch, action_batch, reward_batch = [], [], []
-            episode_reward = 0
+            episode_reward = total_reward_dim1 = total_reward_dim2 = 0
+            exploration_count = exploitation_count = 0
+            episode_actions = []
+            episode_avg_qvalues = []
+            visited_states = set()
             done = False
             num_iterations = 0
             
             while not done:
+                if state not in visited_states:
+                    visited_states.add(state)
+                
                 state_tensor = torch.FloatTensor(self.env.universe[state]).unsqueeze(0).to(self.device)
                 action_probs, _ = self.local_actor_critic(state_tensor)
-                action = torch.multinomial(action_probs, 1).item()
+                
+                # Epsilon-greedy exploration
+                if np.random.random() < self.global_agent.training_data['epsilon']:
+                    action = np.random.randint(self.env.action_space.n)
+                    explore = True
+                else:
+                    action = torch.multinomial(action_probs, 1).item()
+                    explore = False
                 
                 next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action, num_iterations)
                 
                 state_batch.append(self.env.universe[state])
                 action_batch.append([action])
                 reward_batch.append([reward])
+                
+                episode_reward += reward
+                total_reward_dim1 += reward_dim1
+                total_reward_dim2 += reward_dim2
+                
+                if explore:
+                    exploration_count += 1
+                else:
+                    exploitation_count += 1
+                
+                episode_actions.append(action)
+                episode_avg_qvalues.append(action_probs.mean().item())
                 
                 if len(state_batch) >= self.update_interval or done:
                     states = torch.FloatTensor(np.array(state_batch)).to(self.device)
@@ -130,10 +157,27 @@ class WorkerAgent(Thread):
                         
                         # Update local network
                         self.local_actor_critic.load_state_dict(self.global_actor_critic.state_dict())
+                        
+                        # Update global agent's training data
+                        if self.global_agent is not None:
+                            self.global_agent.training_data['episode_rewards'].append(episode_reward/num_iterations)
+                            self.global_agent.training_data['episode_rewards_dim1'].append(total_reward_dim1/num_iterations)
+                            self.global_agent.training_data['episode_rewards_dim2'].append(total_reward_dim2/num_iterations)
+                            self.global_agent.training_data['episode_actions'].append(episode_actions)
+                            self.global_agent.training_data['episode_avg_qvalues'].append(episode_avg_qvalues)
+                            self.global_agent.training_data['episode_losses'].append(loss.item())
+                            self.global_agent.training_data['exploration_counts'].append(exploration_count)
+                            self.global_agent.training_data['exploitation_counts'].append(exploitation_count)
+                            self.global_agent.training_data['success_episodes'].append(success)
+                            self.global_agent.training_data['episode_count'] += 1
+                            self.global_agent.training_data['epsilon'] = max(0.05, 
+                                self.global_agent.training_data['epsilon'] * 0.997)
+                            
+                            # Update visited states
+                            self.global_agent.all_visited_states.update(visited_states)
                     
                     state_batch, action_batch, reward_batch = [], [], []
                 
-                episode_reward += reward
                 state = next_state
                 num_iterations += 1
             
@@ -154,6 +198,7 @@ class A3CAgent(BaseAgent):
         self.update_interval = 5
         self.workers = []
         self.lock = Lock()
+        self.all_visited_states = set()  # Track all visited states
         
     def _init_networks(self):
         """Initialize the actor-critic network"""
@@ -220,7 +265,7 @@ class A3CAgent(BaseAgent):
         """Start worker threads for parallel training"""
         self.workers = [
             WorkerAgent(env, self.actor_critic, self.device, self.training_data['max_episodes'],
-                       self.gamma, self.update_interval)
+                       self.gamma, self.update_interval, self)
             for _ in range(self.num_workers)
         ]
         for worker in self.workers:
