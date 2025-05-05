@@ -116,8 +116,9 @@ class A3CWorker(Thread):
     def sync_networks(self):
         """Synchronize local networks with global networks"""
         print(f"Synchronizing networks")
-        self.actor.load_state_dict(self.global_actor.state_dict())
-        self.critic.load_state_dict(self.global_critic.state_dict())
+        with torch.no_grad():
+            self.actor.load_state_dict(self.global_actor.state_dict())
+            self.critic.load_state_dict(self.global_critic.state_dict())
 
     def n_step_td_target(self, rewards, next_v_value, done):
         """Compute n-step TD targets"""
@@ -174,8 +175,8 @@ class A3CWorker(Thread):
                             
                             # Store transition
                             state_batch.append(state_features)
-                            action_batch.append([action])
-                            reward_batch.append([reward])
+                            action_batch.append(action)
+                            reward_batch.append(reward)
                             
                             # Update episode statistics
                             episode_reward += reward
@@ -193,36 +194,40 @@ class A3CWorker(Thread):
                             if len(state_batch) >= self.update_interval or done:
                                 try:
                                     print(f"Updating global networks")
+                                    # Convert batches to tensors
                                     states = torch.FloatTensor(np.array(state_batch)).to(self.device)
-                                    actions = torch.LongTensor(np.array(action_batch)).to(self.device)
+                                    actions = torch.LongTensor(action_batch).to(self.device)
                                     rewards = np.array(reward_batch)
                                     
                                     # Get next state value
                                     next_state_features = self.env.universe[next_state]
                                     next_state_tensor = torch.FloatTensor(next_state_features).unsqueeze(0).to(self.device)
-                                    next_v = self.critic(next_state_tensor).item()
+                                    with torch.no_grad():
+                                        next_v = self.critic(next_state_tensor).item()
                                     
                                     # Compute TD targets and advantages
                                     td_targets = self.n_step_td_target(rewards, next_v, done)
                                     td_targets = torch.FloatTensor(td_targets).to(self.device).view(-1, 1)
                                     
+                                    # Compute values and advantages
                                     values = self.critic(states)
                                     advantages = (td_targets - values.detach()).view(-1)
                                     
                                     # Update global networks with network lock
                                     with self.network_lock:
-                                        # Compute gradients
-                                        actor_loss = self.actor.compute_loss(self.actor(states), actions, advantages)
-                                        critic_loss = self.critic.compute_loss(self.critic(states), td_targets)
-                                        
-                                        # Track losses
-                                        episode_losses.append((actor_loss.item() + critic_loss.item()) / 2)
-                                        
                                         # Zero gradients
                                         self.actor.opt.zero_grad()
                                         self.critic.opt.zero_grad()
                                         self.global_actor.opt.zero_grad()
                                         self.global_critic.opt.zero_grad()
+                                        
+                                        # Compute losses
+                                        log_probs = self.actor(states)
+                                        actor_loss = self.actor.compute_loss(log_probs, actions.unsqueeze(1), advantages)
+                                        critic_loss = self.critic.compute_loss(values, td_targets)
+                                        
+                                        # Track losses
+                                        episode_losses.append((actor_loss.item() + critic_loss.item()) / 2)
                                         
                                         # Backward pass
                                         actor_loss.backward()
