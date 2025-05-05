@@ -75,11 +75,10 @@ class WorkerAgent(Thread):
             'rewards_dim1': [],
             'rewards_dim2': [],
             'successes': [],
-            'exploration_ratio': [],
             'visited_states': set(),
             'action_probs': []  # Track action probabilities
         }
-        
+
     def n_step_td_target(self, rewards, next_v_value, done):
         td_targets = np.zeros_like(rewards)
         cumulative = 0 if done else next_v_value
@@ -93,7 +92,6 @@ class WorkerAgent(Thread):
             state = self.env.reset()
             state_batch, action_batch, reward_batch = [], [], []
             episode_reward = total_reward_dim1 = total_reward_dim2 = 0
-            exploration_count = exploitation_count = 0
             episode_actions = []
             episode_avg_qvalues = []
             visited_states = set()
@@ -110,15 +108,8 @@ class WorkerAgent(Thread):
                 # Store action probabilities for analysis
                 self.worker_metrics['action_probs'].append(action_probs.detach().cpu().numpy())
                 
-                # Epsilon-greedy exploration with decaying epsilon
-                epsilon = self.global_agent.training_data['epsilon']
-                if np.random.random() < epsilon:
-                    action = np.random.randint(self.env.action_space.n)
-                    explore = True
-                else:
-                    # Use action probabilities for selection
-                    action = torch.multinomial(action_probs, 1).item()
-                    explore = False
+                # Always take the action with highest probability
+                action = torch.argmax(action_probs).item()
                 
                 next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action, num_iterations)
                 
@@ -129,11 +120,6 @@ class WorkerAgent(Thread):
                 episode_reward += reward
                 total_reward_dim1 += reward_dim1
                 total_reward_dim2 += reward_dim2
-                
-                if explore:
-                    exploration_count += 1
-                else:
-                    exploitation_count += 1
                 
                 episode_actions.append(action)
                 episode_avg_qvalues.append(action_probs.mean().item())
@@ -160,8 +146,8 @@ class WorkerAgent(Thread):
                     critic_loss = advantages.pow(2).mean()
                     entropy = -(action_probs * log_probs).sum(dim=1).mean()
                     
-                    # Total loss with entropy regularization
-                    loss = actor_loss + 0.5 * critic_loss - self.local_actor_critic.entropy_beta * entropy
+                    # Total loss with minimal entropy regularization
+                    loss = actor_loss + 0.5 * critic_loss - 0.001 * entropy
                     
                     # Update global network
                     with self.lock:
@@ -194,7 +180,6 @@ class WorkerAgent(Thread):
                             self.worker_metrics['rewards_dim1'].append(reward_dim1)
                             self.worker_metrics['rewards_dim2'].append(reward_dim2)
                             self.worker_metrics['successes'].append(success)
-                            self.worker_metrics['exploration_ratio'].append(exploration_count / (exploration_count + exploitation_count))
                             self.worker_metrics['visited_states'].update(visited_states)
                             
                             # Update global metrics
@@ -204,18 +189,8 @@ class WorkerAgent(Thread):
                             self.global_agent.training_data['episode_actions'].append(episode_actions)
                             self.global_agent.training_data['episode_avg_qvalues'].append(episode_avg_qvalues)
                             self.global_agent.training_data['episode_losses'].append(loss.item())
-                            self.global_agent.training_data['exploration_counts'].append(exploration_count)
-                            self.global_agent.training_data['exploitation_counts'].append(exploitation_count)
                             self.global_agent.training_data['success_episodes'].append(success)
                             self.global_agent.training_data['episode_count'] += 1
-                            
-                            # Decay epsilon more slowly
-                            self.global_agent.training_data['epsilon'] = max(0.05, 
-                                self.global_agent.training_data['epsilon'] * 0.999)
-                            
-                            # Decay entropy coefficient
-                            self.global_agent.decay_entropy()
-                            self.local_actor_critic.entropy_beta = self.global_agent.entropy_beta
                             
                             # Update visited states
                             self.global_agent.all_visited_states.update(visited_states)
@@ -224,14 +199,10 @@ class WorkerAgent(Thread):
                             if episode % 10 == 0:
                                 avg_reward = np.mean(self.worker_metrics['rewards'][-10:])
                                 avg_success = np.mean(self.worker_metrics['successes'][-10:])
-                                avg_explore = np.mean(self.worker_metrics['exploration_ratio'][-10:])
                                 print(f"\nWorker {self.worker_id} Metrics (Last 10 episodes):")
                                 print(f"Average Reward: {avg_reward:.4f}")
                                 print(f"Success Rate: {avg_success:.2%}")
-                                print(f"Exploration Ratio: {avg_explore:.2%}")
                                 print(f"Total States Visited: {len(self.worker_metrics['visited_states'])}")
-                                print(f"Current Entropy Beta: {self.local_actor_critic.entropy_beta:.4f}")
-                                print(f"Current Epsilon: {self.global_agent.training_data['epsilon']:.4f}")
                                 
                                 # Print action distribution
                                 if len(self.worker_metrics['action_probs']) > 0:
@@ -247,17 +218,11 @@ class WorkerAgent(Thread):
 
 
 class A3CAgent(BaseAgent):
-    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, num_workers=None,
-                 entropy_beta=0.01, entropy_beta_decay=0.995, entropy_beta_min=0.001):
+    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, num_workers=None):
         super().__init__(state_dim, action_dim, device)
         self.lr = lr
         self.gamma = gamma
         self.num_workers = num_workers if num_workers is not None else cpu_count()
-        
-        # Entropy parameters
-        self.entropy_beta = entropy_beta
-        self.entropy_beta_decay = entropy_beta_decay
-        self.entropy_beta_min = entropy_beta_min
         
         # Initialize networks
         self._init_networks()
@@ -273,13 +238,8 @@ class A3CAgent(BaseAgent):
     
     def _init_networks(self):
         """Initialize the actor-critic network"""
-        self.actor_critic = ActorCritic(self.state_dim, self.action_dim, self.entropy_beta).to(self.device)
+        self.actor_critic = ActorCritic(self.state_dim, self.action_dim, 0.01).to(self.device)
         self.optimizer = torch.optim.Adam(self.actor_critic.parameters(), lr=self.lr)
-    
-    def decay_entropy(self):
-        """Decay the entropy coefficient"""
-        self.entropy_beta = max(self.entropy_beta_min, self.entropy_beta * self.entropy_beta_decay)
-        self.actor_critic.entropy_beta = self.entropy_beta
     
     def get_action(self, state, epsilon):
         """Get action from the agent given a state"""
@@ -366,9 +326,6 @@ class A3CAgent(BaseAgent):
                 'episode_actions': self.training_data['episode_actions'],
                 'episode_avg_qvalues': self.training_data['episode_avg_qvalues'],
                 'episode_losses': self.training_data['episode_losses'],
-                'exploration_counts': self.training_data['exploration_counts'],
-                'exploitation_counts': self.training_data['exploitation_counts'],
-                'success_episodes': self.training_data['success_episodes'],
                 'episode_count': self.training_data['episode_count'],
                 'step_count': self.training_data['step_count'],
                 'replay_count': self.training_data['replay_count']
