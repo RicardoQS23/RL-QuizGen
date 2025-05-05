@@ -9,7 +9,6 @@ from .base_agent import BaseAgent
 class ActorCritic(nn.Module):
     def __init__(self, state_dim, action_dim, entropy_beta=0.01):
         super(ActorCritic, self).__init__()
-        # Shared feature extraction layers
         self.fc1 = nn.Linear(state_dim, 64)
         self.fc2 = nn.Linear(64, 32)
         self.fc3 = nn.Linear(32, 16)
@@ -24,7 +23,6 @@ class ActorCritic(nn.Module):
         self.entropy_beta = entropy_beta
 
     def forward(self, x):
-        # Shared feature extraction
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
@@ -168,12 +166,17 @@ class A3CWorker(Thread):
                     action_probs, value = self.local_actor_critic(state_tensor)
                 
                 # Epsilon-greedy action selection
-                if np.random.random() < 0.1:  # 10% exploration
-                    action = np.random.randint(self.env.action_space.n)
-                    explore = True
-                else:
-                    action = torch.multinomial(action_probs, 1).item()
-                    explore = False
+                #if np.random.random() < 0.1:  # 10% exploration
+                #    action = np.random.randint(self.env.action_space.n)
+                #    explore = True
+                #else:
+                #    action = torch.multinomial(action_probs, 1).item()
+                #    explore = False
+
+                print(action_probs[0])
+                print(action_probs.shape)
+                sys.exit()
+                action = np.random.choice(self.env.action_space.n, p=action_probs[0])
                 
                 # Take action
                 next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action)
