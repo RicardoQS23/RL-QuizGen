@@ -5,6 +5,9 @@ import numpy as np
 from threading import Thread, Lock
 from multiprocessing import cpu_count
 from .base_agent import BaseAgent
+import os
+import copy
+
 
 class Actor(nn.Module):
     def __init__(self, state_dim, action_dim, lr=0.0005):
@@ -406,11 +409,7 @@ class A3CAgent(BaseAgent):
         """Save the agent's model"""
         try:
             print(f"Saving model")
-            # Create a deep copy of training data without any thread-related objects
-            import copy
             training_data_copy = copy.deepcopy(self.training_data)
-            
-            # Create state dict with only serializable data
             state_dict = {
                 'global_actor_state_dict': self.global_actor.state_dict(),
                 'global_critic_state_dict': self.global_critic.state_dict(),
@@ -421,19 +420,15 @@ class A3CAgent(BaseAgent):
                 'eps_decay': self.eps_decay,
                 'eps_min': self.eps_min
             }
-            
-            # Save to temporary file first
+
             temp_path = path + '.tmp'
             torch.save(state_dict, temp_path)
-            
-            # If save was successful, rename to final path
-            import os
             os.rename(temp_path, path)
-            
+            print("Model saved successfully.")
+
         except Exception as e:
             print(f"Warning: Failed to save model: {str(e)}")
-            # Clean up temp file if it exists
-            if os.path.exists(temp_path):
+            if 'temp_path' in locals() and os.path.exists(temp_path):
                 os.remove(temp_path)
 
     def load(self, path):
