@@ -181,38 +181,34 @@ def train_a3c(env, num_episodes=1000, save_dir='models'):
         num_workers=4  # Adjust based on your system
     )
     
-    # Training loop
-    for episode in range(num_episodes):
-        state = env.reset()
-        episode_reward = 0
-        done = False
-        
-        while not done:
-            # Get action from agent
-            action, value, explore = agent.get_action(state, epsilon=0.1)
-            
-            # Take action in environment
-            next_state, reward, done, success, reward_dim1, reward_dim2 = env.step(action)
-            
-            # Train agent
-            agent.train_step(state, action, reward, next_state, done)
-            
-            # Update state and reward
-            state = next_state
-            episode_reward += reward
-            
-            # Print progress
-            if done:
-                print(f"Episode {episode + 1}/{num_episodes}, Reward: {episode_reward:.2f}, Success: {success}")
-        
-        # Save model periodically
-        if (episode + 1) % 100 == 0:
-            agent.save(os.path.join(save_dir, f'a3c_model_episode_{episode + 1}.pth'))
-            plot_training_results(agent, os.path.join(save_dir, f'a3c_training_plot_{episode + 1}.png'))
+    # Start worker threads
+    agent.start_workers(env)
     
-    # Save final model and plot
-    agent.save(os.path.join(save_dir, 'a3c_model_final.pth'))
-    plot_training_results(agent, os.path.join(save_dir, 'a3c_training_plot_final.png'))
+    try:
+        # Training loop
+        for episode in range(num_episodes):
+            # Workers are running in parallel, we just need to wait for episodes to complete
+            time.sleep(0.1)  # Small delay to prevent CPU overload
+            
+            # Print progress periodically
+            if (episode + 1) % 10 == 0:
+                print(f"Episode {episode + 1}/{num_episodes}")
+            
+            # Save model periodically
+            if (episode + 1) % 100 == 0:
+                agent.save(os.path.join(save_dir, f'a3c_model_episode_{episode + 1}.pth'))
+                plot_training_results(agent, os.path.join(save_dir, f'a3c_training_plot_{episode + 1}.png'))
+    
+    except KeyboardInterrupt:
+        print("Training interrupted by user")
+    
+    finally:
+        # Stop worker threads
+        agent.stop_workers()
+        
+        # Save final model and plot
+        agent.save(os.path.join(save_dir, 'a3c_model_final.pth'))
+        plot_training_results(agent, os.path.join(save_dir, 'a3c_training_plot_final.png'))
     
     return agent
 
