@@ -263,6 +263,7 @@ def main():
             target_distribution=args.target_distribution
         )
         num_topics = args.num_topics
+
     # Log initial information
     save_to_log(f"Starting {args.test_num} ... using device: {device}", f'../logs/{args.test_num}/training', mode='w')
     save_to_log(f"Parameters used: {args}", f'../logs/{args.test_num}/training')
@@ -290,19 +291,28 @@ def main():
             agent = DQNAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
                            lr=args.lr, gamma=args.gamma, target_sync_freq=args.target_sync_freq,
                            batch_size=args.batch_size, replay_buffer_type=args.replay_buffer)
+            train_agent(env, agent, args.max_episodes, args.test_num, args)
         elif args.agent_type == 'a3c':
             print('A3C A3C A3C A3C A3C')
             agent = A3CAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
                            lr=args.lr, gamma=args.gamma, update_interval=5, num_workers=4)
+            # Start worker threads for A3C
+            agent.start_workers(env)
+            try:
+                # Wait for training to complete
+                time.sleep(args.max_episodes * 0.1)  # Rough estimate of training time
+            except KeyboardInterrupt:
+                print("Training interrupted by user")
+            finally:
+                # Stop worker threads
+                agent.stop_workers()
         elif args.agent_type == 'sarsa':
             agent = SARSAAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
                              lr=args.lr, gamma=args.gamma, eps=args.eps, eps_decay=args.eps_decay,
                              eps_min=args.eps_min)
+            train_agent(env, agent, args.max_episodes, args.test_num, args)
         else:
             raise ValueError(f"Unknown agent type: {args.agent_type}")
-        
-        # Train agent
-        train_agent(env, agent, args.max_episodes, args.test_num, args)
         
         # Save results
         save_agent(os.path.join(f"../saved_agents/{args.test_num}", f"agent_alfa_{alfa}_bias.pth"), agent)

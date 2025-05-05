@@ -207,7 +207,7 @@ class A3CAgent:
         self.gamma = gamma
         self.update_interval = update_interval
         self.num_workers = num_workers
-        self.action_dim = action_dim  # Add action_dim attribute
+        self.action_dim = action_dim
         
         # Global network
         self.global_actor_critic = ActorCritic(state_dim, action_dim).to(device)
@@ -235,9 +235,12 @@ class A3CAgent:
             "value_losses": [],
             "entropies": [],
             "steps_per_update": [],
-            "epsilon": 1.0,  # Add epsilon to training data
+            "epsilon": 1.0,
             "episode_count": 0
         }
+        
+        # Optimizer for global network
+        self.optimizer = torch.optim.Adam(self.global_actor_critic.parameters(), lr=lr)
 
     def start_workers(self, env):
         """Start worker threads"""
@@ -268,14 +271,10 @@ class A3CAgent:
         state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
         with torch.no_grad():
             action_probs, value = self.global_actor_critic(state_tensor)
-        
-        # Epsilon-greedy action selection
-        if np.random.random() < epsilon:
-            action = np.random.randint(self.action_dim)  # Use self.action_dim instead
-            explore = True
-        else:
-            action = torch.multinomial(action_probs, 1).item()
-            explore = False
+            
+        # Sample action from policy (no epsilon-greedy for A3C)
+        action = torch.multinomial(action_probs, 1).item()
+        explore = True  # A3C uses policy-based exploration
         
         return action, value.item(), explore
 
@@ -286,7 +285,7 @@ class A3CAgent:
     def save(self, path):
         """Save the global network"""
         torch.save(self.global_actor_critic.state_dict(), path)
-
+    
     def load(self, path):
         """Load the global network"""
         self.global_actor_critic.load_state_dict(torch.load(path))
