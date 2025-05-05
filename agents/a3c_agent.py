@@ -76,7 +76,8 @@ class WorkerAgent(Thread):
             'rewards_dim2': [],
             'successes': [],
             'exploration_ratio': [],
-            'visited_states': set()
+            'visited_states': set(),
+            'action_probs': []  # Track action probabilities
         }
         
     def n_step_td_target(self, rewards, next_v_value, done):
@@ -106,11 +107,16 @@ class WorkerAgent(Thread):
                 state_tensor = torch.FloatTensor(self.env.universe[state]).unsqueeze(0).to(self.device)
                 action_probs, _ = self.local_actor_critic(state_tensor)
                 
-                # Epsilon-greedy exploration
-                if np.random.random() < self.global_agent.training_data['epsilon']:
+                # Store action probabilities for analysis
+                self.worker_metrics['action_probs'].append(action_probs.detach().cpu().numpy())
+                
+                # Epsilon-greedy exploration with decaying epsilon
+                epsilon = self.global_agent.training_data['epsilon']
+                if np.random.random() < epsilon:
                     action = np.random.randint(self.env.action_space.n)
                     explore = True
                 else:
+                    # Use action probabilities for selection
                     action = torch.multinomial(action_probs, 1).item()
                     explore = False
                 
@@ -154,8 +160,8 @@ class WorkerAgent(Thread):
                     critic_loss = advantages.pow(2).mean()
                     entropy = -(action_probs * log_probs).sum(dim=1).mean()
                     
-                    # Total loss
-                    loss = actor_loss + 0.5 * critic_loss - 0.01 * entropy
+                    # Total loss with entropy regularization
+                    loss = actor_loss + 0.5 * critic_loss - self.local_actor_critic.entropy_beta * entropy
                     
                     # Update global network
                     with self.lock:
@@ -202,8 +208,10 @@ class WorkerAgent(Thread):
                             self.global_agent.training_data['exploitation_counts'].append(exploitation_count)
                             self.global_agent.training_data['success_episodes'].append(success)
                             self.global_agent.training_data['episode_count'] += 1
+                            
+                            # Decay epsilon more slowly
                             self.global_agent.training_data['epsilon'] = max(0.05, 
-                                self.global_agent.training_data['epsilon'] * 0.997)
+                                self.global_agent.training_data['epsilon'] * 0.999)
                             
                             # Decay entropy coefficient
                             self.global_agent.decay_entropy()
@@ -222,7 +230,13 @@ class WorkerAgent(Thread):
                                 print(f"Success Rate: {avg_success:.2%}")
                                 print(f"Exploration Ratio: {avg_explore:.2%}")
                                 print(f"Total States Visited: {len(self.worker_metrics['visited_states'])}")
-                                print(f"Current Entropy Beta: {self.local_actor_critic.entropy_beta:.4f}\n")
+                                print(f"Current Entropy Beta: {self.local_actor_critic.entropy_beta:.4f}")
+                                print(f"Current Epsilon: {self.global_agent.training_data['epsilon']:.4f}")
+                                
+                                # Print action distribution
+                                if len(self.worker_metrics['action_probs']) > 0:
+                                    recent_probs = np.mean(self.worker_metrics['action_probs'][-10:], axis=0)
+                                    print(f"Action Distribution: {recent_probs}\n")
                     
                     state_batch, action_batch, reward_batch = [], [], []
                 
