@@ -409,37 +409,37 @@ class A3CAgent(BaseAgent):
         """Save the agent's model"""
         try:
             print(f"Saving model")
-            # Create a completely serializable copy of training data
-            training_data_copy = {
-                "episode_rewards": self.training_data["episode_rewards"].copy(),
-                "episode_rewards_dim1": self.training_data["episode_rewards_dim1"].copy(),
-                "episode_rewards_dim2": self.training_data["episode_rewards_dim2"].copy(),
-                "episode_actions": [actions.copy() if isinstance(actions, list) else actions 
-                                  for actions in self.training_data["episode_actions"]],
-                "episode_avg_qvalues": [qvalues.copy() if isinstance(qvalues, list) else qvalues 
-                                      for qvalues in self.training_data["episode_avg_qvalues"]],
-                "exploration_counts": self.training_data["exploration_counts"].copy(),
-                "exploitation_counts": self.training_data["exploitation_counts"].copy(),
-                "success_episodes": self.training_data["success_episodes"].copy(),
-                "episode_losses": self.training_data["episode_losses"].copy(),
-                "replay_count": self.training_data["replay_count"],
-                "epsilon": self.training_data["epsilon"],
-                "episode_count": self.training_data["episode_count"]
-            }
-            
-            state_dict = {
+            # Create a new dictionary with only essential data
+            save_data = {
+                # Network states
                 'global_actor_state_dict': self.global_actor.state_dict(),
                 'global_critic_state_dict': self.global_critic.state_dict(),
-                'training_data': training_data_copy,
-                'gamma': self.gamma,
-                'lr': self.lr,
-                'update_interval': self.update_interval,
-                'eps_decay': self.eps_decay,
-                'eps_min': self.eps_min
+                
+                # Training data (only essential metrics)
+                'episode_rewards': list(self.training_data['episode_rewards']),
+                'episode_rewards_dim1': list(self.training_data['episode_rewards_dim1']),
+                'episode_rewards_dim2': list(self.training_data['episode_rewards_dim2']),
+                'exploration_counts': list(self.training_data['exploration_counts']),
+                'exploitation_counts': list(self.training_data['exploitation_counts']),
+                'success_episodes': list(self.training_data['success_episodes']),
+                'episode_losses': list(self.training_data['episode_losses']),
+                'replay_count': int(self.training_data['replay_count']),
+                'epsilon': float(self.training_data['epsilon']),
+                'episode_count': int(self.training_data['episode_count']),
+                
+                # Hyperparameters
+                'gamma': float(self.gamma),
+                'lr': float(self.lr),
+                'update_interval': int(self.update_interval),
+                'eps_decay': float(self.eps_decay),
+                'eps_min': float(self.eps_min)
             }
             
+            # Save to temporary file first
             temp_path = path + '.tmp'
-            torch.save(state_dict, temp_path)
+            torch.save(save_data, temp_path)
+            
+            # If save was successful, rename to final path
             os.rename(temp_path, path)
             print("Model saved successfully.")
             
@@ -461,14 +461,23 @@ class A3CAgent(BaseAgent):
             
             # Load training data
             with self.data_lock:
-                self.training_data = checkpoint['training_data']
+                self.training_data['episode_rewards'] = checkpoint['episode_rewards']
+                self.training_data['episode_rewards_dim1'] = checkpoint['episode_rewards_dim1']
+                self.training_data['episode_rewards_dim2'] = checkpoint['episode_rewards_dim2']
+                self.training_data['exploration_counts'] = checkpoint['exploration_counts']
+                self.training_data['exploitation_counts'] = checkpoint['exploitation_counts']
+                self.training_data['success_episodes'] = checkpoint['success_episodes']
+                self.training_data['episode_losses'] = checkpoint['episode_losses']
+                self.training_data['replay_count'] = checkpoint['replay_count']
+                self.training_data['epsilon'] = checkpoint['epsilon']
+                self.training_data['episode_count'] = checkpoint['episode_count']
             
-            # Load other parameters
+            # Load hyperparameters
             self.gamma = checkpoint['gamma']
             self.lr = checkpoint['lr']
             self.update_interval = checkpoint['update_interval']
-            self.eps_decay = checkpoint.get('eps_decay', self.eps_decay)
-            self.eps_min = checkpoint.get('eps_min', self.eps_min)
+            self.eps_decay = checkpoint['eps_decay']
+            self.eps_min = checkpoint['eps_min']
             
         except Exception as e:
             print(f"Warning: Failed to load model: {str(e)}")
