@@ -135,13 +135,38 @@ def plot_agent_data(input_path, alfa_values, y_label, title, output_name, window
         if flag:
             data_array = flatten_nested_array(agent_data)
         else:
-            # Handle inhomogeneous data (like Q-values)
+            # Handle different types of data
             if y_label == 'Q-Value':
-                # Take mean of Q-values for each episode
-                data_array = np.array([np.mean(episode) if isinstance(episode, list) else episode 
-                                     for episode in agent_data])
+                # For Q-values, take mean of each episode's Q-values
+                data_array = []
+                for episode in agent_data:
+                    if isinstance(episode, list):
+                        # If episode contains multiple Q-values, take their mean
+                        episode_mean = np.mean([q for q in episode if isinstance(q, (int, float))])
+                        data_array.append(episode_mean)
+                    else:
+                        # If episode has a single Q-value
+                        data_array.append(episode)
+                data_array = np.array(data_array)
+            elif y_label == 'Action':
+                # For actions, count unique actions per episode
+                data_array = []
+                for episode in agent_data:
+                    if isinstance(episode, list):
+                        # Count most common action in episode
+                        unique, counts = np.unique(episode, return_counts=True)
+                        data_array.append(unique[np.argmax(counts)])
+                    else:
+                        data_array.append(episode)
+                data_array = np.array(data_array)
             else:
-                data_array = np.array(agent_data).flatten()
+                # For other metrics, try to flatten
+                try:
+                    data_array = np.array(agent_data).flatten()
+                except ValueError:
+                    # If flattening fails, take mean of each episode
+                    data_array = np.array([np.mean(episode) if isinstance(episode, list) else episode 
+                                         for episode in agent_data])
             
         # Calculate moving average
         smoothed_data = moving_average(data_array, window_size)
