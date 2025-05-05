@@ -82,7 +82,7 @@ def train_agent(env, agent, max_episodes, test_num, args):
             
         # Stop workers and clean up
         agent.stop_workers()
-        save_to_log(f'A3C training complete! Total Visited States: {len(all_visited_states)}', f'../logs/{test_num}/training')
+        save_to_log(f'A3C training complete! Total Visited States: {len(agent.all_visited_states)}', f'../logs/{test_num}/training')
         return
     
     # For other agents (DQN, SARSA), use single-agent training
