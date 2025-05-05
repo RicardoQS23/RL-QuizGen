@@ -46,7 +46,7 @@ def parse_args():
     parser.add_argument('--eps_decay', type=float, default=0.997, help='Epsilon decay rate')
     parser.add_argument('--eps_min', type=float, default=0.05, help='Minimum epsilon value')
     parser.add_argument('--target_sync_freq', type=int, default=1000, help='Frequency of target network updates')
-    
+    parser.add_argument('--num_workers', type=int, default=2, help='Number of worker threads')
     # Data generation parameters
     parser.add_argument('--data_source', type=int, default=1, choices=[0, 1, 2],
                        help='Data source: 0=load existing, 1=generate from real data, 2=generate synthetic')
@@ -73,6 +73,7 @@ def train_agent(env, agent, max_episodes, test_num, args):
     # For A3C, start the workers and let them handle training
     if isinstance(agent, A3CAgent):
         save_to_log(f"Starting A3C training with {agent.num_workers} workers...", f'../logs/{test_num}/training')
+        agent.training_data['max_episodes'] = max_episodes
         agent.start_workers(env)
         
         # Wait for workers to complete their episodes
@@ -215,7 +216,7 @@ def main():
                            batch_size=args.batch_size, replay_buffer_type=args.replay_buffer)
         elif args.agent_type == 'a3c':
             agent = A3CAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
-                           lr=args.lr, gamma=args.gamma)
+                           lr=args.lr, gamma=args.gamma, num_workers=args.num_workers)
         elif args.agent_type == 'sarsa':
             agent = SARSAAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
                              lr=args.lr, gamma=args.gamma, eps=args.eps, eps_decay=args.eps_decay,
