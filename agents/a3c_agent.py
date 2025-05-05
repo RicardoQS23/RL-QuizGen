@@ -106,6 +106,7 @@ class A3CWorker(Thread):
         dones = torch.FloatTensor(dones).to(self.device)
         
         # Get predictions
+        print('i am after get predictions')
         action_probs, values = self.local_actor_critic(states)
         _, next_values = self.local_actor_critic(next_states)
         next_values = next_values.detach()
@@ -130,6 +131,7 @@ class A3CWorker(Thread):
         total_loss.backward()
         
         # Update global network
+        print('i am updating global network')
         with self.lock:
             for local_param, global_param in zip(self.local_actor_critic.parameters(), 
                                                self.global_actor_critic.parameters()):
@@ -150,7 +152,9 @@ class A3CWorker(Thread):
 
     def run(self):
         """Main training loop for the worker"""
+        print('inside run')
         while True:
+            print('inside first true')
             state = self.env.reset()
             episode_reward = 0
             episode_reward_dim1 = 0
@@ -160,6 +164,7 @@ class A3CWorker(Thread):
             states, actions, rewards, next_states, dones = [], [], [], [], []
             
             while True:
+                print('inside while true 2')
                 # Get action
                 state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
                 with torch.no_grad():
