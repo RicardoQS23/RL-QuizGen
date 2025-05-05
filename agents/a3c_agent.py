@@ -334,7 +334,8 @@ class A3CAgent(BaseAgent):
             "exploration_counts": [],
             "exploitation_counts": [],
             "success_episodes": [],
-            "episode_losses": [],  # Added episode_losses
+            "episode_losses": [],
+            "replay_count": 0,  # Added replay count
             "epsilon": 1.0,
             "episode_count": 0
         }
@@ -411,6 +412,7 @@ class A3CAgent(BaseAgent):
                 if k not in ['network_lock', 'data_lock']
             }
             
+            # Create state dict without locks
             state_dict = {
                 'global_actor_state_dict': self.global_actor.state_dict(),
                 'global_critic_state_dict': self.global_critic.state_dict(),
@@ -419,23 +421,43 @@ class A3CAgent(BaseAgent):
                 'lr': self.lr,
                 'update_interval': self.update_interval
             }
-            torch.save(state_dict, path)
+            
+            # Save to temporary file first
+            temp_path = path + '.tmp'
+            torch.save(state_dict, temp_path)
+            
+            # If save was successful, rename to final path
+            import os
+            os.rename(temp_path, path)
+            
         except Exception as e:
             print(f"Warning: Failed to save model: {str(e)}")
+            # Clean up temp file if it exists
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
 
     def load(self, path):
         """Load the agent's model"""
         try:
             print(f"Loading model")
             checkpoint = torch.load(path)
-            with self.network_lock:  # Lock when updating networks
+            
+            # Load network states
+            with self.network_lock:
                 self.global_actor.load_state_dict(checkpoint['global_actor_state_dict'])
                 self.global_critic.load_state_dict(checkpoint['global_critic_state_dict'])
-            with self.data_lock:  # Lock when updating training data
-                self.training_data = checkpoint['training_data']
+            
+            # Load training data
+            with self.data_lock:
+                for k, v in checkpoint['training_data'].items():
+                    if k not in ['network_lock', 'data_lock']:
+                        self.training_data[k] = v
+            
+            # Load other parameters
             self.gamma = checkpoint['gamma']
             self.lr = checkpoint['lr']
             self.update_interval = checkpoint['update_interval']
+            
         except Exception as e:
             print(f"Warning: Failed to load model: {str(e)}")
 
@@ -455,6 +477,7 @@ class A3CAgent(BaseAgent):
                 self.training_data['episode_actions'].append(episode_actions)
                 self.training_data['episode_avg_qvalues'].append(episode_avg_qvalues)
                 self.training_data['episode_count'] += 1
+                self.training_data['replay_count'] += 1  # Increment replay count
                 # Add a placeholder for episode_losses if not present
                 if len(self.training_data['episode_losses']) < self.training_data['episode_count']:
                     self.training_data['episode_losses'].append(0.0)  # Default loss value
