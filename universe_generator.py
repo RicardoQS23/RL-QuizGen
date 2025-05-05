@@ -50,7 +50,7 @@ def generate_mcqs(test_num, csv_file, num_topics, topic_column='topic', difficul
         df['topic'] = df['topic'].astype(int)
 
     df['id'] = df.index
-    df['difficulty'] = df['difficulty_level']
+    df['difficulty'] = df['difficulty']
     
     # Get unique topics
     unique_topics = df['topic'].unique()
