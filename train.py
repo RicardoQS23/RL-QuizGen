@@ -111,6 +111,7 @@ def train_agent(env, agent, max_episodes, test_num, args):
             num_iterations += 1
             
         agent.training_data['episode_count'] += 1
+        # Update epsilon for all agent types
         agent.training_data['epsilon'] = max(args.eps_min, agent.training_data['epsilon'] * args.eps_decay)
         
         save_to_log(f'EP{ep + 1} Number of Visited States={len(visited_states)} EpisodeReward={total_reward/num_iterations}', 

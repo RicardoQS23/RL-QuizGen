@@ -232,7 +232,9 @@ class A3CAgent:
             "policy_losses": [],
             "value_losses": [],
             "entropies": [],
-            "steps_per_update": []
+            "steps_per_update": [],
+            "epsilon": 1.0,  # Add epsilon to training data
+            "episode_count": 0
         }
 
     def start_workers(self, env):
