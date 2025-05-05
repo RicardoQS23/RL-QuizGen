@@ -21,18 +21,27 @@ class Actor(nn.Module):
         self.max_grad_norm = 0.5
 
     def forward(self, x):
-        print(f"Forward pass input shape: {x.shape}")
+        if not isinstance(x, torch.Tensor):
+            x = torch.FloatTensor(x)
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         return F.log_softmax(self.fc3(x), dim=-1)
 
     def compute_loss(self, log_probs, actions, advantages):
-        print(f"Computing loss with log_probs shape: {log_probs.shape}, actions shape: {actions.shape}, advantages shape: {advantages.shape}")
+        if not isinstance(actions, torch.Tensor):
+            actions = torch.LongTensor(actions)
+        if not isinstance(advantages, torch.Tensor):
+            advantages = torch.FloatTensor(advantages)
+        
+        actions = actions.view(-1)
+        advantages = advantages.view(-1)
+        
         if log_probs.dim() == 1:
             log_probs = log_probs.unsqueeze(0)
-        actions = actions.view(-1)
+        
         log_probs_taken = log_probs.gather(1, actions.unsqueeze(1)).squeeze()
-        advantages = advantages.view(-1)
         policy_loss = -(log_probs_taken * advantages).mean()
         entropy = -(log_probs.exp() * log_probs).sum(dim=1).mean()
         return policy_loss - self.entropy_beta * entropy
@@ -58,13 +67,21 @@ class Critic(nn.Module):
         self.max_grad_norm = 0.5
 
     def forward(self, x):
-        print(f"Forward pass input shape: {x.shape}")
+        if not isinstance(x, torch.Tensor):
+            x = torch.FloatTensor(x)
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         return self.fc3(x)
 
     def compute_loss(self, v_pred, td_targets):
-        print(f"Computing loss with v_pred shape: {v_pred.shape}, td_targets shape: {td_targets.shape}")
+        if not isinstance(td_targets, torch.Tensor):
+            td_targets = torch.FloatTensor(td_targets)
+        if v_pred.dim() == 1:
+            v_pred = v_pred.unsqueeze(0)
+        if td_targets.dim() == 1:
+            td_targets = td_targets.unsqueeze(0)
         return F.mse_loss(v_pred, td_targets)
 
     def train_step(self, states, td_targets):
