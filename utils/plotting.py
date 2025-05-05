@@ -135,7 +135,13 @@ def plot_agent_data(input_path, alfa_values, y_label, title, output_name, window
         if flag:
             data_array = flatten_nested_array(agent_data)
         else:
-            data_array = np.array(agent_data).flatten()
+            # Handle inhomogeneous data (like Q-values)
+            if y_label == 'Q-Value':
+                # Take mean of Q-values for each episode
+                data_array = np.array([np.mean(episode) if isinstance(episode, list) else episode 
+                                     for episode in agent_data])
+            else:
+                data_array = np.array(agent_data).flatten()
             
         # Calculate moving average
         smoothed_data = moving_average(data_array, window_size)
