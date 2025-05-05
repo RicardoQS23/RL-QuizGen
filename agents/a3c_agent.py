@@ -409,40 +409,34 @@ class A3CAgent(BaseAgent):
         """Save the agent's model"""
         try:
             print(f"Saving model")
-            # Create a new dictionary with only essential data
+
+            # Extract only serializable training data
+            serializable_data = {
+                k: v for k, v in self.training_data.items()
+                if k in [
+                    'episode_rewards', 'episode_rewards_dim1', 'episode_rewards_dim2',
+                    'exploration_counts', 'exploitation_counts', 'success_episodes',
+                    'episode_losses', 'replay_count', 'epsilon', 'episode_count'
+                ]
+            }
+
+            # Assemble the dictionary to save
             save_data = {
-                # Network states
                 'global_actor_state_dict': self.global_actor.state_dict(),
                 'global_critic_state_dict': self.global_critic.state_dict(),
-                
-                # Training data (only essential metrics)
-                'episode_rewards': list(self.training_data['episode_rewards']),
-                'episode_rewards_dim1': list(self.training_data['episode_rewards_dim1']),
-                'episode_rewards_dim2': list(self.training_data['episode_rewards_dim2']),
-                'exploration_counts': list(self.training_data['exploration_counts']),
-                'exploitation_counts': list(self.training_data['exploitation_counts']),
-                'success_episodes': list(self.training_data['success_episodes']),
-                'episode_losses': list(self.training_data['episode_losses']),
-                'replay_count': int(self.training_data['replay_count']),
-                'epsilon': float(self.training_data['epsilon']),
-                'episode_count': int(self.training_data['episode_count']),
-                
-                # Hyperparameters
-                'gamma': float(self.gamma),
-                'lr': float(self.lr),
-                'update_interval': int(self.update_interval),
-                'eps_decay': float(self.eps_decay),
-                'eps_min': float(self.eps_min)
+                'training_data': serializable_data,
+                'gamma': self.gamma,
+                'lr': self.lr,
+                'update_interval': self.update_interval,
+                'eps_decay': self.eps_decay,
+                'eps_min': self.eps_min
             }
-            
-            # Save to temporary file first
+
             temp_path = path + '.tmp'
             torch.save(save_data, temp_path)
-            
-            # If save was successful, rename to final path
             os.rename(temp_path, path)
             print("Model saved successfully.")
-            
+
         except Exception as e:
             print(f"Warning: Failed to save model: {str(e)}")
             if 'temp_path' in locals() and os.path.exists(temp_path):
