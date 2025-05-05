@@ -24,6 +24,7 @@ class ActorCritic(nn.Module):
         self.action_dim = action_dim
         
     def forward(self, x):
+        print("Forward pass")
         # Ensure input is properly shaped
         if len(x.shape) == 1:
             x = x.unsqueeze(0)
@@ -41,6 +42,7 @@ class ActorCritic(nn.Module):
 
 class A3CWorker(Thread):
     def __init__(self, worker_id, env, global_actor_critic, device, gamma=0.95, update_interval=5):
+        print("Initializing worker")
         Thread.__init__(self)
         self.worker_id = worker_id
         self.env = env
@@ -85,10 +87,12 @@ class A3CWorker(Thread):
 
     def sync_networks(self):
         """Synchronize local network with global network"""
+        print("Synchronizing networks")
         self.local_actor_critic.load_state_dict(self.global_actor_critic.state_dict())
 
     def compute_advantages(self, rewards, values, next_value, dones):
         """Compute advantages using n-step returns"""
+        print("Computing advantages")
         advantages = []
         returns = []
         R = next_value
@@ -103,7 +107,9 @@ class A3CWorker(Thread):
 
     def run(self):
         """Main training loop for the worker"""
+        print("Running worker")
         while True:
+            print("Resetting environment")
             state = self.env.reset()
             episode_reward = 0
             episode_reward_dim1 = 0
@@ -114,6 +120,7 @@ class A3CWorker(Thread):
             num_iterations = 0
             
             while True:
+                print("Getting action")
                 # Get action
                 state_tensor = torch.FloatTensor(self.env.universe[state]).to(self.device)
                 with torch.no_grad():
@@ -142,11 +149,13 @@ class A3CWorker(Thread):
                 
                 # Update if enough transitions or episode is done
                 if len(states) >= self.update_interval or done:
+                    print("Training")
                     self.train(states, actions, rewards, next_states, dones)
                     states, actions, rewards, next_states, dones = [], [], [], [], []
                 
                 if done:
                     # Update training data
+                    print("Updating training data")
                     self.training_data['episode_rewards'].append(episode_reward)
                     self.training_data['episode_rewards_dim1'].append(episode_reward_dim1)
                     self.training_data['episode_rewards_dim2'].append(episode_reward_dim2)
@@ -157,6 +166,7 @@ class A3CWorker(Thread):
 
     def train(self, states, actions, rewards, next_states, dones):
         """Train the local network and update global network"""
+        print("Training")
         # Convert lists to numpy arrays first, then to tensors
         states = torch.FloatTensor(np.array(states)).to(self.device)
         actions = torch.LongTensor(np.array(actions)).to(self.device)
@@ -175,6 +185,7 @@ class A3CWorker(Thread):
         
         # Normalize advantages only if we have enough samples
         if len(advantages) > 1:
+            print("Normalizing advantages")
             advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
         
         # Compute losses
@@ -191,6 +202,7 @@ class A3CWorker(Thread):
         
         # Update global network
         with self.lock:
+            print("Updating global network")
             for local_param, global_param in zip(self.local_actor_critic.parameters(), 
                                                self.global_actor_critic.parameters()):
                 if global_param.grad is not None:
@@ -252,12 +264,14 @@ class A3CAgent:
 
     def start_workers(self, env):
         """Start worker threads"""
+        print(f"Starting {self.num_workers} workers")
         # Create environments for each worker
         for _ in range(self.num_workers):
             self.envs.append(env)
         
         # Create and start workers
         for i in range(self.num_workers):
+            print(f"Starting worker {i}")
             worker = A3CWorker(
                 worker_id=i,
                 env=self.envs[i],
@@ -271,10 +285,12 @@ class A3CAgent:
 
     def stop_workers(self):
         """Stop all worker threads"""
+        print("Stopping workers")
         for worker in self.workers:
             worker.join()
 
     def get_action(self, state, epsilon=0.1):
+        print("Getting action")
         """Get action from the global network"""
         state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
         with torch.no_grad():
@@ -288,19 +304,23 @@ class A3CAgent:
 
     def train_step(self, state, action, reward, next_state, done):
         """Single training step - not used in A3C as training is done by workers"""
+        print("Training step")
         pass  # Training is handled by workers
 
     def save(self, path):
         """Save the global network"""
+        print("Saving model")
         torch.save(self.global_actor_critic.state_dict(), path)
     
     def load(self, path):
         """Load the global network"""
+        print("Loading model")
         self.global_actor_critic.load_state_dict(torch.load(path))
 
     def update_episode_data(self, total_reward, total_reward_dim1, total_reward_dim2, 
                            exploration_count, exploitation_count, success,
                            episode_actions, episode_avg_qvalues, num_iterations):
+        print("Updating episode data")
         """Update training data after each episode"""
         self.training_data['episode_rewards'].append(total_reward)
         self.training_data['episode_rewards_dim1'].append(total_reward_dim1)
