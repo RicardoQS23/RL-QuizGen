@@ -47,7 +47,7 @@ class ActorCritic(nn.Module):
 
 
 class WorkerAgent(Thread):
-    def __init__(self, env, global_actor_critic, device, max_episodes, gamma=0.95, update_interval=5, global_agent=None):
+    def __init__(self, env, global_actor_critic, device, max_episodes, gamma=0.95, update_interval=5, global_agent=None, worker_id=0):
         super(WorkerAgent, self).__init__()
         self.env = env
         self.global_actor_critic = global_actor_critic
@@ -56,6 +56,7 @@ class WorkerAgent(Thread):
         self.gamma = gamma
         self.update_interval = update_interval
         self.global_agent = global_agent
+        self.worker_id = worker_id
         
         # Local network
         self.local_actor_critic = ActorCritic(
@@ -67,6 +68,16 @@ class WorkerAgent(Thread):
         
         self.optimizer = torch.optim.Adam(self.local_actor_critic.parameters(), lr=0.0005)
         self.lock = Lock()
+        
+        # Worker-specific metrics
+        self.worker_metrics = {
+            'rewards': [],
+            'rewards_dim1': [],
+            'rewards_dim2': [],
+            'successes': [],
+            'exploration_ratio': [],
+            'visited_states': set()
+        }
         
     def n_step_td_target(self, rewards, next_v_value, done):
         td_targets = np.zeros_like(rewards)
@@ -164,15 +175,26 @@ class WorkerAgent(Thread):
                         if self.global_agent is not None:
                             # Ensure we don't divide by zero
                             if num_iterations > 0:
-                                self.global_agent.training_data['episode_rewards'].append(episode_reward/num_iterations)
-                                self.global_agent.training_data['episode_rewards_dim1'].append(total_reward_dim1/num_iterations)
-                                self.global_agent.training_data['episode_rewards_dim2'].append(total_reward_dim2/num_iterations)
+                                reward = episode_reward/num_iterations
+                                reward_dim1 = total_reward_dim1/num_iterations
+                                reward_dim2 = total_reward_dim2/num_iterations
                             else:
-                                # If no iterations occurred, append the raw rewards
-                                self.global_agent.training_data['episode_rewards'].append(episode_reward)
-                                self.global_agent.training_data['episode_rewards_dim1'].append(total_reward_dim1)
-                                self.global_agent.training_data['episode_rewards_dim2'].append(total_reward_dim2)
+                                reward = episode_reward
+                                reward_dim1 = total_reward_dim1
+                                reward_dim2 = total_reward_dim2
                                 
+                            # Update worker-specific metrics
+                            self.worker_metrics['rewards'].append(reward)
+                            self.worker_metrics['rewards_dim1'].append(reward_dim1)
+                            self.worker_metrics['rewards_dim2'].append(reward_dim2)
+                            self.worker_metrics['successes'].append(success)
+                            self.worker_metrics['exploration_ratio'].append(exploration_count / (exploration_count + exploitation_count))
+                            self.worker_metrics['visited_states'].update(visited_states)
+                            
+                            # Update global metrics
+                            self.global_agent.training_data['episode_rewards'].append(reward)
+                            self.global_agent.training_data['episode_rewards_dim1'].append(reward_dim1)
+                            self.global_agent.training_data['episode_rewards_dim2'].append(reward_dim2)
                             self.global_agent.training_data['episode_actions'].append(episode_actions)
                             self.global_agent.training_data['episode_avg_qvalues'].append(episode_avg_qvalues)
                             self.global_agent.training_data['episode_losses'].append(loss.item())
@@ -189,13 +211,25 @@ class WorkerAgent(Thread):
                             
                             # Update visited states
                             self.global_agent.all_visited_states.update(visited_states)
+                            
+                            # Print detailed worker metrics every 10 episodes
+                            if episode % 10 == 0:
+                                avg_reward = np.mean(self.worker_metrics['rewards'][-10:])
+                                avg_success = np.mean(self.worker_metrics['successes'][-10:])
+                                avg_explore = np.mean(self.worker_metrics['exploration_ratio'][-10:])
+                                print(f"\nWorker {self.worker_id} Metrics (Last 10 episodes):")
+                                print(f"Average Reward: {avg_reward:.4f}")
+                                print(f"Success Rate: {avg_success:.2%}")
+                                print(f"Exploration Ratio: {avg_explore:.2%}")
+                                print(f"Total States Visited: {len(self.worker_metrics['visited_states'])}")
+                                print(f"Current Entropy Beta: {self.local_actor_critic.entropy_beta:.4f}\n")
                     
                     state_batch, action_batch, reward_batch = [], [], []
                 
                 state = next_state
                 num_iterations += 1
             
-            print(f"[Worker {self.name}] Episode {episode + 1} Reward: {episode_reward/num_iterations if num_iterations > 0 else episode_reward}")
+            print(f"[Worker {self.worker_id}] Episode {episode + 1} Reward: {episode_reward/num_iterations if num_iterations > 0 else episode_reward}")
 
 
 class A3CAgent(BaseAgent):
@@ -220,6 +254,9 @@ class A3CAgent(BaseAgent):
         self.lock = Lock()
         self.all_visited_states = set()  # Track all visited states
         
+        # Worker-specific data
+        self.worker_data = {}
+    
     def _init_networks(self):
         """Initialize the actor-critic network"""
         self.actor_critic = ActorCritic(self.state_dim, self.action_dim, self.entropy_beta).to(self.device)
@@ -290,8 +327,8 @@ class A3CAgent(BaseAgent):
         """Start worker threads for parallel training"""
         self.workers = [
             WorkerAgent(env, self.actor_critic, self.device, self.training_data['max_episodes'],
-                       self.gamma, self.update_interval, self)
-            for _ in range(self.num_workers)
+                       self.gamma, self.update_interval, self, worker_id=i)
+            for i in range(self.num_workers)
         ]
         for worker in self.workers:
             worker.start()
@@ -339,3 +376,7 @@ class A3CAgent(BaseAgent):
     def get_training_data(self):
         """Get the agent's training data"""
         return self.training_data
+
+    def get_worker_metrics(self):
+        """Get metrics for each worker"""
+        return {worker.worker_id: worker.worker_metrics for worker in self.workers}
