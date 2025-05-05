@@ -7,25 +7,27 @@ from multiprocessing import cpu_count
 from .base_agent import BaseAgent
 
 class ActorCritic(nn.Module):
-    def __init__(self, state_dim, action_dim):
+    def __init__(self, state_dim, action_dim, entropy_beta=0.01):
         super(ActorCritic, self).__init__()
         # Shared feature extraction layers
         self.fc1 = nn.Linear(state_dim, 64)
         self.fc2 = nn.Linear(64, 32)
+        self.fc3 = nn.Linear(32, 16)
         
         # Actor head - outputs action probabilities
-        self.actor_fc = nn.Linear(32, action_dim)
+        self.actor_fc = nn.Linear(16, action_dim)
         
         # Critic head - outputs state value
-        self.critic_fc = nn.Linear(32, 1)
+        self.critic_fc = nn.Linear(16, 1)
         
         # Entropy coefficient for exploration
-        self.entropy_beta = 0.01
+        self.entropy_beta = entropy_beta
 
     def forward(self, x):
         # Shared feature extraction
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
         
         # Actor output - action probabilities
         action_probs = F.softmax(self.actor_fc(x), dim=-1)
@@ -211,7 +213,7 @@ class A3CWorker(Thread):
 
 class A3CAgent(BaseAgent):
     def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, update_interval=5, num_workers=2,
-                 eps=1.0, eps_decay=0.997, eps_min=0.05):
+                 eps=1.0, eps_decay=0.997, eps_min=0.05, entropy_beta=0.01, entropy_decay=0.995, entropy_min=0.001):
         super().__init__(state_dim, action_dim, device)
         self.lr = lr
         self.gamma = gamma
@@ -220,12 +222,15 @@ class A3CAgent(BaseAgent):
         self.eps = eps
         self.eps_decay = eps_decay
         self.eps_min = eps_min
+        self.entropy_beta = entropy_beta
+        self.entropy_decay = entropy_decay
+        self.entropy_min = entropy_min
         
         # Set number of workers based on available GPUs
         self.num_workers = num_workers if num_workers is not None else (torch.cuda.device_count() if torch.cuda.is_available() else 1)
         
         # Initialize global actor-critic network
-        self.global_actor_critic = ActorCritic(state_dim, action_dim).to(device)
+        self.global_actor_critic = ActorCritic(state_dim, action_dim, entropy_beta).to(device)
         self.optimizer = torch.optim.Adam(self.global_actor_critic.parameters(), lr=lr)
         
         # Initialize training data
@@ -246,8 +251,9 @@ class A3CAgent(BaseAgent):
             "value_losses": [],
             "entropies": [],
             "steps_per_update": [],
-            "epsilon": self.eps,  # Initialize epsilon
-            "episode_count": 0    # Initialize episode count
+            "epsilon": self.eps,
+            "entropy_beta": self.entropy_beta,
+            "episode_count": 0
         }
 
     def get_action(self, state, epsilon):
@@ -271,9 +277,12 @@ class A3CAgent(BaseAgent):
         # Store experience
         self.training_data['step_count'] += 1
         
-        # Convert to tensors
+        # Convert to tensors and move to device
         state = torch.FloatTensor(state).unsqueeze(0).to(self.device)
         next_state = torch.FloatTensor(next_state).unsqueeze(0).to(self.device)
+        action = torch.LongTensor([action]).to(self.device)
+        reward = torch.FloatTensor([reward]).to(self.device)
+        done = torch.FloatTensor([done]).to(self.device)
         
         # Get current action probabilities and values
         action_probs, value = self.global_actor_critic(state)
@@ -287,9 +296,11 @@ class A3CAgent(BaseAgent):
         # Compute advantage
         advantage = td_target - value.detach()
         
-        # Normalize advantage (handle single value case)
+        # Normalize advantage (handle single value case and constant advantages)
         if advantage.numel() > 1:
-            advantage = (advantage - advantage.mean()) / (advantage.std() + 1e-8)
+            std = advantage.std()
+            if std > 0:
+                advantage = (advantage - advantage.mean()) / (std + 1e-8)
         
         # Compute policy loss
         policy_loss = -(action_probs[0, action] * advantage).mean()
@@ -300,10 +311,10 @@ class A3CAgent(BaseAgent):
         # Compute value loss
         value_loss = F.mse_loss(value, td_target)
         
-        # Total loss
-        total_loss = policy_loss + 0.5 * value_loss - self.global_actor_critic.entropy_beta * entropy
+        # Total loss with current entropy beta
+        total_loss = policy_loss + 0.5 * value_loss - self.training_data['entropy_beta'] * entropy
         
-        # Update network
+        # Update network with gradient clipping
         self.optimizer.zero_grad()
         total_loss.backward()
         torch.nn.utils.clip_grad_norm_(self.global_actor_critic.parameters(), 0.5)
@@ -334,8 +345,8 @@ class A3CAgent(BaseAgent):
         self.training_data = checkpoint['training_data']
 
     def update_episode_data(self, total_reward, total_reward_dim1, total_reward_dim2, 
-                          exploration_count, exploitation_count, success,
-                          episode_actions, episode_avg_qvalues, num_iterations):
+                           exploration_count, exploitation_count, success,
+                           episode_actions, episode_avg_qvalues, num_iterations):
         """Update training data after each episode"""
         self.training_data['episode_rewards'].append(total_reward)
         self.training_data['episode_rewards_dim1'].append(total_reward_dim1)
@@ -349,4 +360,10 @@ class A3CAgent(BaseAgent):
         # Update epsilon
         self.training_data['epsilon'] = max(self.eps_min, 
                                           self.training_data['epsilon'] * self.eps_decay)
+        
+        # Update entropy beta
+        self.training_data['entropy_beta'] = max(self.entropy_min,
+                                               self.training_data['entropy_beta'] * self.entropy_decay)
+        self.global_actor_critic.entropy_beta = self.training_data['entropy_beta']
+        
         self.training_data['episode_count'] += 1 
