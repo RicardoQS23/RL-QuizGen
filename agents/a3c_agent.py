@@ -335,7 +335,7 @@ class A3CAgent(BaseAgent):
             "exploitation_counts": [],
             "success_episodes": [],
             "episode_losses": [],
-            "replay_count": 0,  # Added replay count
+            "replay_count": 0,
             "epsilon": 1.0,
             "episode_count": 0
         }
@@ -406,20 +406,20 @@ class A3CAgent(BaseAgent):
         """Save the agent's model"""
         try:
             print(f"Saving model")
-            # Create a copy of training data without locks
-            training_data_copy = {
-                k: v for k, v in self.training_data.items() 
-                if k not in ['network_lock', 'data_lock']
-            }
+            # Create a deep copy of training data without any thread-related objects
+            import copy
+            training_data_copy = copy.deepcopy(self.training_data)
             
-            # Create state dict without locks
+            # Create state dict with only serializable data
             state_dict = {
                 'global_actor_state_dict': self.global_actor.state_dict(),
                 'global_critic_state_dict': self.global_critic.state_dict(),
                 'training_data': training_data_copy,
                 'gamma': self.gamma,
                 'lr': self.lr,
-                'update_interval': self.update_interval
+                'update_interval': self.update_interval,
+                'eps_decay': self.eps_decay,
+                'eps_min': self.eps_min
             }
             
             # Save to temporary file first
@@ -449,14 +449,14 @@ class A3CAgent(BaseAgent):
             
             # Load training data
             with self.data_lock:
-                for k, v in checkpoint['training_data'].items():
-                    if k not in ['network_lock', 'data_lock']:
-                        self.training_data[k] = v
+                self.training_data = checkpoint['training_data']
             
             # Load other parameters
             self.gamma = checkpoint['gamma']
             self.lr = checkpoint['lr']
             self.update_interval = checkpoint['update_interval']
+            self.eps_decay = checkpoint.get('eps_decay', self.eps_decay)
+            self.eps_min = checkpoint.get('eps_min', self.eps_min)
             
         except Exception as e:
             print(f"Warning: Failed to load model: {str(e)}")
