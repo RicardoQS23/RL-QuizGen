@@ -48,7 +48,7 @@ def agent_inference(env, agent, test_num, start_state):
     done = False
     env.state = start_state
     all_states = [env.state]
-    
+    action_history = np.zeros(4, dtype=int)
     save_to_log(f"Starting inference from state {env.state}...", f'../logs/{test_num}/inference')
     while not done:
         steps += 1
@@ -58,8 +58,9 @@ def agent_inference(env, agent, test_num, start_state):
         save_to_log(f"Step {steps}: State = {env.state} Action={action}, Reward={reward}",
                         f'../logs/{test_num}/inference')
         all_states.append(env.state)
+        action_history[action] += 1
     save_to_log("Inference complete!", f'../logs/{test_num}/inference')
-    return all_states
+    return all_states, action_history
 
 def main():
     args = parse_args()
@@ -85,7 +86,8 @@ def main():
                    f'../logs/{args.test_num}/training')
         # Run inference 10 times
         agent_inference_states = []
-        for _ in range(10):
+        agent_action_history = []
+        for _ in range(2):
             start_state = np.random.choice(args.universe_size, 1)[0]
             save_to_log(f"Starting inference for {args.test_num}...", 
                         f'../logs/{args.test_num}/inference')
@@ -112,11 +114,14 @@ def main():
             agent.model.eval()
             # Train agent
             start_time = time.time()
-            inference_states = agent_inference(env, agent, args.test_num, start_state)
+            inference_states, action_history = agent_inference(env, agent, args.test_num, start_state)
             end_time = time.time()
             total_time += end_time - start_time
             num_iterations += len(inference_states)
             agent_inference_states.append(inference_states)
+            agent_action_history.append(action_history)
+        agent_action_dist=np.sum(agent_action_history, axis=0)/np.sum(np.sum(agent_action_history, axis=0))
+        save_to_log(f"Agent action distribution for alfa = {alfa}: {agent_action_dist}", f'../logs/{args.test_num}/inference')
         save_to_json(agent_inference_states, f'../jsons/{args.test_num}/agent_inference/inference_states_alfa_{alfa}')
     save_to_json(all_best_states, f'../jsons/{args.test_num}/baseline_inference/baseline_states')
     save_to_log(f"Avg number of iterations: {round(num_iterations/(len(args.alfa_values)*10))}", f'../logs/{args.test_num}/inference')
