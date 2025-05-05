@@ -50,7 +50,7 @@ class A3CWorker(Thread):
         
         # Local network
         self.local_actor_critic = ActorCritic(
-            env.observation_space.shape[0],
+            env.state_dim,  # Use state_dim instead of observation_space.shape[0]
             env.action_space.n
         ).to(device)
         
@@ -208,6 +208,7 @@ class A3CAgent:
         self.update_interval = update_interval
         self.num_workers = num_workers
         self.action_dim = action_dim
+        self.state_dim = state_dim  # Add state_dim attribute
         
         # Global network
         self.global_actor_critic = ActorCritic(state_dim, action_dim).to(device)
