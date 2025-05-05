@@ -409,7 +409,24 @@ class A3CAgent(BaseAgent):
         """Save the agent's model"""
         try:
             print(f"Saving model")
-            training_data_copy = copy.deepcopy(self.training_data)
+            # Create a completely serializable copy of training data
+            training_data_copy = {
+                "episode_rewards": self.training_data["episode_rewards"].copy(),
+                "episode_rewards_dim1": self.training_data["episode_rewards_dim1"].copy(),
+                "episode_rewards_dim2": self.training_data["episode_rewards_dim2"].copy(),
+                "episode_actions": [actions.copy() if isinstance(actions, list) else actions 
+                                  for actions in self.training_data["episode_actions"]],
+                "episode_avg_qvalues": [qvalues.copy() if isinstance(qvalues, list) else qvalues 
+                                      for qvalues in self.training_data["episode_avg_qvalues"]],
+                "exploration_counts": self.training_data["exploration_counts"].copy(),
+                "exploitation_counts": self.training_data["exploitation_counts"].copy(),
+                "success_episodes": self.training_data["success_episodes"].copy(),
+                "episode_losses": self.training_data["episode_losses"].copy(),
+                "replay_count": self.training_data["replay_count"],
+                "epsilon": self.training_data["epsilon"],
+                "episode_count": self.training_data["episode_count"]
+            }
+            
             state_dict = {
                 'global_actor_state_dict': self.global_actor.state_dict(),
                 'global_critic_state_dict': self.global_critic.state_dict(),
@@ -420,12 +437,12 @@ class A3CAgent(BaseAgent):
                 'eps_decay': self.eps_decay,
                 'eps_min': self.eps_min
             }
-
+            
             temp_path = path + '.tmp'
             torch.save(state_dict, temp_path)
             os.rename(temp_path, path)
             print("Model saved successfully.")
-
+            
         except Exception as e:
             print(f"Warning: Failed to save model: {str(e)}")
             if 'temp_path' in locals() and os.path.exists(temp_path):
