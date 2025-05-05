@@ -142,6 +142,7 @@ class A3CWorker(Thread):
                     exploitation_count = 0
                     episode_actions = []
                     episode_avg_qvalues = []
+                    episode_losses = []  # Track losses for this episode
                     done = False
 
                     while not done:
@@ -211,6 +212,9 @@ class A3CWorker(Thread):
                                         actor_loss = self.actor.compute_loss(self.actor(states), actions, advantages)
                                         critic_loss = self.critic.compute_loss(self.critic(states), td_targets)
                                         
+                                        # Track losses
+                                        episode_losses.append((actor_loss.item() + critic_loss.item()) / 2)
+                                        
                                         # Zero gradients
                                         self.actor.opt.zero_grad()
                                         self.critic.opt.zero_grad()
@@ -254,11 +258,22 @@ class A3CWorker(Thread):
                     # Update training data through agent
                     try:
                         print(f"Updating training data")
+                        # Calculate average loss for the episode
+                        avg_episode_loss = np.mean(episode_losses) if episode_losses else 0.0
+                        
                         self.agent.update_episode_data(
                             episode_reward, episode_reward_dim1, episode_reward_dim2,
                             exploration_count, exploitation_count, success,
                             episode_actions, episode_avg_qvalues, self.episode_count
                         )
+                        
+                        # Update episode losses
+                        with self.agent.data_lock:
+                            if len(self.agent.training_data['episode_losses']) < self.episode_count + 1:
+                                self.agent.training_data['episode_losses'].append(avg_episode_loss)
+                            else:
+                                self.agent.training_data['episode_losses'][self.episode_count] = avg_episode_loss
+                        
                         self.episode_count += 1
                         self.update_epsilon()
                     except Exception as e:
@@ -319,6 +334,7 @@ class A3CAgent(BaseAgent):
             "exploration_counts": [],
             "exploitation_counts": [],
             "success_episodes": [],
+            "episode_losses": [],  # Added episode_losses
             "epsilon": 1.0,
             "episode_count": 0
         }
@@ -389,15 +405,20 @@ class A3CAgent(BaseAgent):
         """Save the agent's model"""
         try:
             print(f"Saving model")
-            with self.data_lock:  # Lock when accessing training data
-                state_dict = {
-                    'global_actor_state_dict': self.global_actor.state_dict(),
-                    'global_critic_state_dict': self.global_critic.state_dict(),
-                    'training_data': self.training_data,
-                    'gamma': self.gamma,
-                    'lr': self.lr,
-                    'update_interval': self.update_interval
-                }
+            # Create a copy of training data without locks
+            training_data_copy = {
+                k: v for k, v in self.training_data.items() 
+                if k not in ['network_lock', 'data_lock']
+            }
+            
+            state_dict = {
+                'global_actor_state_dict': self.global_actor.state_dict(),
+                'global_critic_state_dict': self.global_critic.state_dict(),
+                'training_data': training_data_copy,
+                'gamma': self.gamma,
+                'lr': self.lr,
+                'update_interval': self.update_interval
+            }
             torch.save(state_dict, path)
         except Exception as e:
             print(f"Warning: Failed to save model: {str(e)}")
@@ -434,5 +455,8 @@ class A3CAgent(BaseAgent):
                 self.training_data['episode_actions'].append(episode_actions)
                 self.training_data['episode_avg_qvalues'].append(episode_avg_qvalues)
                 self.training_data['episode_count'] += 1
+                # Add a placeholder for episode_losses if not present
+                if len(self.training_data['episode_losses']) < self.training_data['episode_count']:
+                    self.training_data['episode_losses'].append(0.0)  # Default loss value
         except Exception as e:
             print(f"Warning: Failed to update episode data: {str(e)}") 
