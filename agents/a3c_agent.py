@@ -111,10 +111,11 @@ class A3CWorker(Thread):
             exploration_count = 0
             exploitation_count = 0
             states, actions, rewards, next_states, dones = [], [], [], [], []
+            num_iterations = 0  # Track number of iterations
             
             while True:
                 # Get action
-                state_tensor = torch.FloatTensor(self.env.universe[state]).to(self.device)  # Use universe[state] to get the actual state vector
+                state_tensor = torch.FloatTensor(self.env.universe[state]).to(self.device)
                 with torch.no_grad():
                     action_probs, value = self.local_actor_critic(state_tensor)
 
@@ -122,13 +123,13 @@ class A3CWorker(Thread):
                 action = torch.multinomial(action_probs, 1).item()
                 
                 # Take action
-                next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action)
+                next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action, num_iterations)
 
                 # Store transition
-                states.append(self.env.universe[state])  # Store the actual state vector
+                states.append(self.env.universe[state])
                 actions.append(action)
                 rewards.append(reward)
-                next_states.append(self.env.universe[next_state])  # Store the actual next state vector
+                next_states.append(self.env.universe[next_state])
                 dones.append(done)
                 
                 # Update episode statistics
@@ -137,6 +138,7 @@ class A3CWorker(Thread):
                 episode_reward_dim2 += reward_dim2
                 
                 state = next_state
+                num_iterations += 1  # Increment iteration counter
                 
                 # Update if enough transitions or episode is done
                 if len(states) >= self.update_interval or done:
