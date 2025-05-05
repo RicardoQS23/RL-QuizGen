@@ -101,6 +101,9 @@ class A3CWorker(Thread):
         self.state_batch = []
         self.action_batch = []
         self.reward_batch = []
+        # Initialize CUDA stream for this worker
+        if torch.cuda.is_available():
+            self.stream = torch.cuda.Stream()
 
     def get_epsilon(self):
         """Get epsilon value from agent"""
@@ -263,6 +266,10 @@ class A3CWorker(Thread):
                                     self.action_batch.clear()
                                     self.reward_batch.clear()
                                     
+                                    # Clear CUDA cache if using GPU
+                                    if torch.cuda.is_available():
+                                        torch.cuda.empty_cache()
+                                    
                                 except Exception as e:
                                     print(f"Warning: Worker {self.worker_id} failed to update networks: {str(e)}")
                                     continue
@@ -316,6 +323,9 @@ class A3CWorker(Thread):
             # Ensure networks are synced one last time
             with self.network_lock:
                 self.sync_networks()
+            # Clear CUDA cache if using GPU
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
         except Exception as e:
             print(f"Warning: Worker {self.worker_id} failed to cleanup: {str(e)}")
 
