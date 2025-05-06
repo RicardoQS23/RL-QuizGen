@@ -194,7 +194,7 @@ class WorkerAgent(Thread):
                 print(f"Success Rate: {avg_success:.2%}")
                 
                 if len(self.worker_training_data['action_probs']) > 0:
-                    print(np.array(self.worker_training_data['action_probs'][-10:]).shape)
+                    print(self.worker_training_data['action_probs'][-10:])
                     recent_probs = np.array(self.worker_training_data['action_probs'][-10:]).mean(axis=0)
                     print(f"Action Distribution: {recent_probs}\n")
 
