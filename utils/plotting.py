@@ -342,3 +342,36 @@ def plot_all_results(test_num, alfa_values, save=True, show=False, window_size=6
     # Plot action distribution
     plot_action_distribution(f'../jsons/{test_num}/actions/all_actions', alfa_values, 
                             f'Action Distribution', f'{test_num}/all_actions', window_size=int(window_size/4), save=save, show=show) 
+
+def plot_all_results_a3c(test_num, alfa_values, worker_id, save=True, show=False, window_size=64):
+    """Plot all results for a given test number and alfa values.
+    
+    Args:
+        test_num (str): The test number identifier
+        alfa_values (list): List of alfa values to plot
+    """
+    # Plot success rates
+    plot_agent_data(f'../jsons/{test_num}/{worker_id}/success/all_success', alfa_values, 'Success', 
+                    f'Episode Success', f'{test_num}/{worker_id}/all_success', window_size=window_size, save=save, show=show)
+    
+    # Plot rewards
+    plot_agent_data(f'../jsons/{test_num}/{worker_id}/reward/all_rewards', alfa_values, 'Reward', 
+                   f'Episode Total Rewards', f'{test_num}/{worker_id}/all_rewards', window_size=window_size, save=save, show=show)
+    
+    # Plot dimension-specific rewards
+    plot_agent_data(f'../jsons/{test_num}/{worker_id}/reward_dim1/all_rewards_dim1', alfa_values, 'Reward topic component', 
+                    f'Episode Rewards for Dimension 1', f'{test_num}/{worker_id}/all_rewards_dim1', window_size=window_size, save=save, show=show)
+    plot_agent_data(f'../jsons/{test_num}/{worker_id}/reward_dim2/all_rewards_dim2', alfa_values, 'Reward difficulty component', 
+                    f'Episode Rewards for Dimension 2', f'{test_num}/{worker_id}/all_rewards_dim2', window_size=window_size, save=save, show=show)
+    
+    # Plot Q-values
+    plot_agent_data(f'../jsons/{test_num}/{worker_id}/qvalues/all_qvalues', alfa_values, 'Q_value', 
+                    f'Q-Values', f'{test_num}/{worker_id}/all_qvalues', window_size=window_size, flag=True, save=save, show=show)
+    
+    # Plot losses
+    plot_agent_data(f'../jsons/{test_num}/{worker_id}/loss/all_losses', alfa_values, 'Loss', 
+                    f'Losses', f'{test_num}/{worker_id}/all_losses', window_size=window_size, save=save, show=show)
+    
+    # Plot action distribution
+    plot_action_distribution(f'../jsons/{test_num}/{worker_id}/actions/all_actions', alfa_values, 
+                            f'Action Distribution', f'{test_num}/{worker_id}/all_actions', window_size=int(window_size/4), save=save, show=show) 
