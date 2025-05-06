@@ -194,11 +194,12 @@ class WorkerAgent(Thread):
                 print(f"Success Rate: {avg_success:.2%}")
                 
                 if len(self.worker_training_data['action_probs']) > 0:
-                    recent_probs = np.mean(self.worker_training_data['action_probs'][-10:], axis=0)
+                    recent_probs = np.array(self.worker_training_data['action_probs'][-10:]).mean(axis=0)
                     print(f"Action Distribution: {recent_probs}\n")
 
             print(f"[Worker {self.worker_id}] Episode {episode + 1} Reward: {episode_reward / num_iterations if num_iterations > 0 else episode_reward}")
 
+        ##SAVE HERE THE TRAINING DATA
         save_to_log(f'Train complete! Total Visited States: {len(all_visited_states)}', f'../logs/{self.test_num}/{self.worker_id}/training')
 
 class A3CAgent(BaseAgent):
