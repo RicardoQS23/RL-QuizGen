@@ -311,39 +311,28 @@ class A3CAgent(BaseAgent):
     def load(self, path):
         """Load the agent's model"""
         try:
-            # Try different loading methods
-            try:
-                # First try: standard torch.load
-                checkpoint = torch.load(path, map_location=self.device, weights_only=False)
-            except:
-                try:
-                    # Second try: with pickle
-                    with open(path, 'rb') as f:
-                        checkpoint = pickle.load(f)
-                except:
-                    # Third try: with torch.load and different settings
-                    checkpoint = torch.load(path, map_location=self.device, pickle_module=pickle)
+            # Load the checkpoint
+            checkpoint = torch.load(path, map_location=self.device, weights_only=False)
             
-            # Handle different checkpoint formats
-            if isinstance(checkpoint, dict):
+            # If checkpoint is an A3CAgent instance
+            if isinstance(checkpoint, A3CAgent):
+                self.actor_critic.load_state_dict(checkpoint.actor_critic.state_dict())
+                self.optimizer.load_state_dict(checkpoint.optimizer.state_dict())
+                for key, value in checkpoint.training_data.items():
+                    if key in self.training_data:
+                        self.training_data[key] = value
+            # If checkpoint is a dictionary
+            elif isinstance(checkpoint, dict):
                 if 'model_state_dict' in checkpoint:
                     self.actor_critic.load_state_dict(checkpoint['model_state_dict'])
-                elif 'state_dict' in checkpoint:
-                    self.actor_critic.load_state_dict(checkpoint['state_dict'])
-                else:
-                    # Try loading the entire checkpoint as state dict
-                    self.actor_critic.load_state_dict(checkpoint)
-                
                 if 'optimizer_state_dict' in checkpoint:
                     self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-                
                 if 'training_data' in checkpoint:
                     for key, value in checkpoint['training_data'].items():
                         if key in self.training_data:
                             self.training_data[key] = value
             else:
-                # If checkpoint is not a dict, try loading it directly as state dict
-                self.actor_critic.load_state_dict(checkpoint)
+                raise ValueError(f"Unexpected checkpoint type: {type(checkpoint)}")
             
             print(f"Successfully loaded model from {path}")
             
