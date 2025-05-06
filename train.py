@@ -209,7 +209,13 @@ def main():
             raise ValueError(f"Unknown agent type: {args.agent_type}")
         
         # Train agent
-        train_agent(env, agent, args.max_episodes, args.test_num, args)
+        #train_agent(env, agent, args.max_episodes, args.test_num, args)
+
+        if args.agent_type == 'a3c':
+            agent.train_async(env, args.max_episodes)
+        else:
+            train_agent(env, agent, args.max_episodes, args.test_num, args)
+
         
         # Save results
         save_agent(os.path.join(f"../saved_agents/{args.test_num}", f"agent_alfa_{alfa}_bias.pth"), agent)
