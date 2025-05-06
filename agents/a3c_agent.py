@@ -195,6 +195,8 @@ class A3CAgent(BaseAgent):
         self.lr = lr
         self.gamma = gamma
         self.entropy_beta = entropy_beta
+        self.test_num = test_num
+        
         self.num_workers = num_workers if num_workers is not None else cpu_count()
 
         self.update_interval = 1
