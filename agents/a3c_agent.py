@@ -72,7 +72,7 @@ class WorkerAgent(Thread):
 
     def run(self):
         save_to_log(f"Starting worker {self.worker_id} ...", 
-        f'../logs/{test_num}/{self.worker_id}/training')
+        f'../logs/{self.test_num}/{self.worker_id}/training')
         
         for episode in range(self.max_episodes):
             state = self.env.reset()
