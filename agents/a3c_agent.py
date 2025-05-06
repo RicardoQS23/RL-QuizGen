@@ -348,11 +348,19 @@ class A3CAgent(BaseAgent):
             # Process the loaded checkpoint
             if isinstance(checkpoint, A3CAgent):
                 print("Loading from A3CAgent instance")
-                self.actor_critic.load_state_dict(checkpoint.actor_critic.state_dict())
-                self.optimizer.load_state_dict(checkpoint.optimizer.state_dict())
-                for key, value in checkpoint.training_data.items():
-                    if key in self.training_data:
-                        self.training_data[key] = value
+                # Check which attributes are available in the loaded agent
+                if hasattr(checkpoint, 'actor_critic'):
+                    self.actor_critic.load_state_dict(checkpoint.actor_critic.state_dict())
+                elif hasattr(checkpoint, 'model'):
+                    self.actor_critic.load_state_dict(checkpoint.model.state_dict())
+                
+                if hasattr(checkpoint, 'optimizer'):
+                    self.optimizer.load_state_dict(checkpoint.optimizer.state_dict())
+                
+                if hasattr(checkpoint, 'training_data'):
+                    for key, value in checkpoint.training_data.items():
+                        if key in self.training_data:
+                            self.training_data[key] = value
             elif isinstance(checkpoint, dict):
                 print("Loading from dictionary")
                 if 'model_state_dict' in checkpoint:
