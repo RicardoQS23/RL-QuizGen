@@ -111,7 +111,11 @@ def main():
                 raise ValueError(f"Unknown agent type: {args.agent_type}")
             
             agent.load(f"../saved_agents/{args.test_num}/agent_alfa_{alfa}_bias.pth")
-            agent.model.eval()
+            # Set eval mode based on agent type
+            if args.agent_type == 'a3c':
+                agent.actor_critic.eval()
+            else:
+                agent.model.eval()
             # Train agent
             start_time = time.time()
             inference_states, action_history = agent_inference(env, agent, args.test_num, start_state)
