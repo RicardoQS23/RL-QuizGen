@@ -230,7 +230,7 @@ class WorkerAgent(Thread):
 
         ##SAVE HERE THE TRAINING DATA
         save_data(self.worker_training_data, self.global_agent.alfa, self.test_num, self.worker_id)
-        save_to_log(f'Train complete! Total Visited States: {len(all_visited_states)}', f'../logs/{self.test_num}/{self.worker_id}/training')
+        save_to_log('Train complete!', f'../logs/{self.test_num}/{self.worker_id}/training')
 
 class A3CAgent(BaseAgent):
     def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, entropy_beta=0.01, num_workers=None, test_num=None, alfa=0.0):
