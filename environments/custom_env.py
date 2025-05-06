@@ -54,7 +54,7 @@ class CustomEnv(gym.Env):
 
         done = num_iterations >= max_iterations or reward > self.reward_threshold
         success = 1 if reward > self.reward_threshold else 0
-        return self.state, 1 if reward > reward_primitive else 0, done, success, first_dim_metric, second_dim_metric
+        return self.state, reward - reward_primitive, done, success, first_dim_metric, second_dim_metric
 
     def choose_similar(self, mode):
         if mode == 0:
