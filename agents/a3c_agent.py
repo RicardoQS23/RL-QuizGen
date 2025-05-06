@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-from utils.logging import save_to_log
+from utils.logging import save_to_log_a3c
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -71,12 +71,12 @@ class WorkerAgent(Thread):
         return td_targets
 
     def run(self):
-        save_to_log(f"Starting worker {self.worker_id} ...", 
+        save_to_log_a3c(f"Starting worker {self.worker_id} ...", 
         f'../logs/{self.test_num}/{self.worker_id}/training')
         
         for episode in range(self.max_episodes):
             state = self.env.reset()
-            save_to_log(f"Episode {episode + 1} started on state {state}...", f'../logs/{self.test_num}/{self.worker_id}/training')
+            save_to_log_a3c(f"Episode {episode + 1} started on state {state}...", f'../logs/{self.test_num}/{self.worker_id}/training')
 
             state_batch, action_batch, reward_batch = [], [], []
             episode_reward = total_reward_dim1 = total_reward_dim2 = 0
@@ -153,7 +153,7 @@ class WorkerAgent(Thread):
 
                         self.worker_training_data['episode_losses'].append(loss.item())
 
-                    save_to_log(f'Iteration {num_iterations + 1} State={state} Action={action} Reward={reward}', 
+                    save_to_log_a3c(f'Iteration {num_iterations + 1} State={state} Action={action} Reward={reward}', 
                         f'../logs/{self.test_num}/{self.worker_id}/training', flag=False)
                     
                     state = next_state
@@ -163,7 +163,7 @@ class WorkerAgent(Thread):
             
             self.worker_training_data['episode_count'] += 1
 
-            save_to_log(f'EP{episode + 1} Number of Visited States={len(visited_states)} EpisodeReward={episode_reward/num_iterations}', 
+            save_to_log_a3c(f'EP{episode + 1} Number of Visited States={len(visited_states)} EpisodeReward={episode_reward/num_iterations}', 
                    f'../logs/{self.test_num}/{self.worker_id}/training', flag=False)
 
             self.worker_training_data['episode_rewards'].append(episode_reward/num_iterations)
@@ -188,7 +188,7 @@ class WorkerAgent(Thread):
 
             print(f"[Worker {self.worker_id}] Episode {episode + 1} Reward: {episode_reward / num_iterations if num_iterations > 0 else episode_reward}")
 
-        save_to_log(f'Train complete! Total Visited States: {len(all_visited_states)}', f'../logs/{self.test_num}/{self.worker_id}/training')
+        save_to_log_a3c(f'Train complete! Total Visited States: {len(all_visited_states)}', f'../logs/{self.test_num}/{self.worker_id}/training')
 
 class A3CAgent(BaseAgent):
     def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, entropy_beta=0.01, num_workers=None, test_num=None):
