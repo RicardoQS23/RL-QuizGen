@@ -72,7 +72,8 @@ def train_agent(env, agent, max_episodes, test_num, args):
     
     # For A3C, start the workers and let them handle training
     if isinstance(agent, A3CAgent):
-        save_to_log(f"Starting A3C training with {agent.num_workers} workers...", f'../logs/{test_num}/training')
+        #save_to_log(f"Starting A3C training with {agent.num_workers} workers...", f'../logs/{test_num}/training')
+        print(f"Starting A3C training with {agent.num_workers} workers...")
         agent.training_data['max_episodes'] = max_episodes
         agent.start_workers(env)
         
@@ -82,7 +83,7 @@ def train_agent(env, agent, max_episodes, test_num, args):
             
         # Stop workers and clean up
         agent.stop_workers()
-        save_to_log(f'A3C training complete! Total Visited States: {len(agent.all_visited_states)}', f'../logs/{test_num}/training')
+        #save_to_log(f'A3C training complete! Total Visited States: {len(agent.all_visited_states)}', f'../logs/{test_num}/training')
         return
     
     # For other agents (DQN, SARSA), use single-agent training
@@ -216,7 +217,7 @@ def main():
                            batch_size=args.batch_size, replay_buffer_type=args.replay_buffer)
         elif args.agent_type == 'a3c':
             agent = A3CAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
-                           lr=args.lr, gamma=args.gamma, num_workers=args.num_workers)
+                           lr=args.lr, gamma=args.gamma, entropy_beta=0.01, num_workers=args.num_workers, test_num=args.test_num)
         elif args.agent_type == 'sarsa':
             agent = SARSAAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
                              lr=args.lr, gamma=args.gamma, eps=args.eps, eps_decay=args.eps_decay,
@@ -242,9 +243,13 @@ def main():
         save_to_log(f"{replay_count_msg}Time elapsed for agent with alfa = {alfa}: {elapsed_time:.4f} seconds\n{50 * '-'}",
                    f'../logs/{args.test_num}/training')
     
+    print("WESH")
+    print()
+    print()
     # Plot all results
     plot_all_results(args.test_num, args.alfa_values)
-    
+    print("Y'a une erreur, je sais")
+    print()
     # Log final information
     program_end_time = time.time()
     program_elapsed_time = program_end_time - program_start_time

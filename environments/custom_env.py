@@ -94,3 +94,15 @@ class CustomEnv(gym.Env):
             similarities_matrix = cosine_similarity(self.universe[:, self.num_topics:])
 
         return similarities_matrix 
+
+    def clone(self):
+        """Create a deep copy of the environment."""
+        return CustomEnv(
+            universe=self.universe.copy(),
+            target_dim1=self.target_dim1.copy(),
+            target_dim2=self.target_dim2.copy(),
+            num_topics=int(self.num_topics),
+            alfa=float(self.alfa),
+            reward_threshold=float(self.reward_threshold),
+            state=int(self.state)
+        ) 

@@ -36,7 +36,7 @@ class ActorCritic(nn.Module):
 
 class WorkerAgent(Thread):
     def __init__(self, env, global_actor_critic, device, max_episodes, gamma, update_interval,
-                 global_agent, global_optimizer, shared_lock, worker_id=0):
+                 global_agent, global_optimizer, shared_lock, test_num, worker_id=0):
         super(WorkerAgent, self).__init__()
         self.env = env
         self.global_actor_critic = global_actor_critic
@@ -48,21 +48,17 @@ class WorkerAgent(Thread):
         self.optimizer = global_optimizer
         self.lock = shared_lock
         self.worker_id = worker_id
+        self.test_num = test_num
 
         self.local_actor_critic = ActorCritic(
             env.state_dim,
             env.action_space.n,
-            0.01
+            self.global_agent.entropy_beta
         ).to(device)
+
         self.local_actor_critic.load_state_dict(self.global_actor_critic.state_dict())
 
-        self.worker_metrics = {
-            'rewards': [],
-            'rewards_dim1': [],
-            'rewards_dim2': [],
-            'successes': [],
-            'visited_states': set(),
-            'action_probs': []
+        self.worker_training_data = {
         }
 
     def n_step_td_target(self, rewards, next_v_value, done):
@@ -74,12 +70,18 @@ class WorkerAgent(Thread):
         return td_targets
 
     def run(self):
+        save_to_log(f"Starting worker {self.worker_id} ...", 
+        f'../logs/{test_num}/{self.worker_id}/training')
+        
         for episode in range(self.max_episodes):
             state = self.env.reset()
+            save_to_log(f"Episode {episode + 1} started on state {state}...", f'../logs/{self.test_num}/{self.worker_id}/training')
+
             state_batch, action_batch, reward_batch = [], [], []
             episode_reward = total_reward_dim1 = total_reward_dim2 = 0
             episode_actions = []
             episode_avg_qvalues = []
+            action_probs_list = []
             visited_states = set()
             done = False
             num_iterations = 0
@@ -109,7 +111,8 @@ class WorkerAgent(Thread):
                 total_reward_dim2 += reward_dim2
 
                 episode_actions.append(action)
-                episode_avg_qvalues.append(action_probs.mean().item())
+                episode_avg_qvalues.append(action_probs.max().item())
+                action_probs_list.append(action_probs.cpu().numpy())
 
                 if len(state_batch) >= self.update_interval or done:
                     states = torch.FloatTensor(np.array(state_batch)).to(self.device)
@@ -132,7 +135,7 @@ class WorkerAgent(Thread):
                     actor_loss = -(log_probs.gather(1, actions) * advantages.unsqueeze(1)).mean()
                     critic_loss = advantages.pow(2).mean()
                     entropy = -(action_probs * log_probs).sum(dim=1).mean()
-                    loss = actor_loss + 0.5 * critic_loss - 0.001 * entropy
+                    loss = actor_loss + critic_loss - self.global_agent.entropy_beta * entropy
 
                     with self.lock:
                         self.optimizer.zero_grad()
@@ -142,75 +145,69 @@ class WorkerAgent(Thread):
                                 self.global_actor_critic.parameters(), self.local_actor_critic.parameters()):
                             if local_param.grad is not None:
                                 global_param._grad = local_param.grad.clone()
-                        torch.nn.utils.clip_grad_norm_(self.global_actor_critic.parameters(), 40.0)
+                        #torch.nn.utils.clip_grad_norm_(self.global_actor_critic.parameters(), 40.0)
                         self.optimizer.step()
-
+                        
                         self.local_actor_critic.load_state_dict(self.global_actor_critic.state_dict())
 
-                        if self.global_agent is not None:
-                            if num_iterations > 0:
-                                reward = episode_reward / num_iterations
-                                reward_dim1 = total_reward_dim1 / num_iterations
-                                reward_dim2 = total_reward_dim2 / num_iterations
-                            else:
-                                reward = episode_reward
-                                reward_dim1 = total_reward_dim1
-                                reward_dim2 = total_reward_dim2
+                        self.worker_training_data['episode_losses'].append(loss.item())
 
-                            self.worker_metrics['rewards'].append(reward)
-                            self.worker_metrics['rewards_dim1'].append(reward_dim1)
-                            self.worker_metrics['rewards_dim2'].append(reward_dim2)
-                            self.worker_metrics['successes'].append(success)
-                            self.worker_metrics['visited_states'].update(visited_states)
-
-                            self.global_agent.training_data['episode_rewards'].append(reward)
-                            self.global_agent.training_data['episode_rewards_dim1'].append(reward_dim1)
-                            self.global_agent.training_data['episode_rewards_dim2'].append(reward_dim2)
-                            self.global_agent.training_data['episode_actions'].append(episode_actions)
-                            self.global_agent.training_data['episode_avg_qvalues'].append(episode_avg_qvalues)
-                            self.global_agent.training_data['episode_losses'].append(loss.item())
-                            self.global_agent.training_data['success_episodes'].append(success)
-                            self.global_agent.training_data['episode_count'] += 1
-                            self.global_agent.all_visited_states.update(visited_states)
-
-                            if episode % 10 == 0:
-                                avg_reward = np.mean(self.worker_metrics['rewards'][-10:])
-                                avg_success = np.mean(self.worker_metrics['successes'][-10:])
-                                print(f"\nWorker {self.worker_id} Metrics (Last 10 episodes):")
-                                print(f"Average Reward: {avg_reward:.4f}")
-                                print(f"Success Rate: {avg_success:.2%}")
-                                print(f"Total States Visited: {len(self.worker_metrics['visited_states'])}")
-                                if len(self.worker_metrics['action_probs']) > 0:
-                                    recent_probs = np.mean(self.worker_metrics['action_probs'][-10:], axis=0)
-                                    print(f"Action Distribution: {recent_probs}\n")
+                    save_to_log(f'Iteration {num_iterations + 1} State={state} Action={action} Reward={reward}', 
+                        f'../logs/{self.test_num}/{self.worker_id}/training', flag=False)
+                    
+                    state = next_state
+                    num_iterations += 1
 
                     state_batch, action_batch, reward_batch = [], [], []
+            
+            self.worker_training_data['episode_count'] += 1
 
-                state = next_state
-                num_iterations += 1
+            save_to_log(f'EP{episode + 1} Number of Visited States={len(visited_states)} EpisodeReward={episode_reward/num_iterations}', 
+                   f'../logs/{self.test_num}/{self.worker_id}/training', flag=False)
+
+            self.worker_training_data['episode_rewards'].append(episode_reward/num_iterations)
+            self.worker_training_data['episode_rewards_dim1'].append(total_reward_dim1/num_iterations)
+            self.worker_training_data['episode_rewards_dim2'].append(total_reward_dim2/num_iterations)
+            self.worker_training_data['num_iterations'].append(num_iterations)
+            self.worker_training_data['successes'].append(success)
+            self.worker_training_data['episode_actions'].append(episode_actions)
+            self.worker_training_data['episode_avg_qvalues'].append(episode_avg_qvalues)
+            self.worker_training_data['action_probs'].append(action_probs_list)
+            if episode % 10 == 0:
+                avg_reward = np.mean(self.worker_training_data['episode_rewards'][-10:])
+                avg_success = np.mean(self.worker_training_data['successes'][-10:])
+
+                print(f"\nWorker {self.worker_id} Metrics (Last 10 episodes):")
+                print(f"Average Reward: {avg_reward:.4f}")
+                print(f"Success Rate: {avg_success:.2%}")
+                
+                if len(self.worker_training_data['action_probs']) > 0:
+                    recent_probs = np.mean(self.worker_training_data['action_probs'][-10:], axis=0)
+                    print(f"Action Distribution: {recent_probs}\n")
 
             print(f"[Worker {self.worker_id}] Episode {episode + 1} Reward: {episode_reward / num_iterations if num_iterations > 0 else episode_reward}")
 
+        save_to_log(f'Train complete! Total Visited States: {len(all_visited_states)}', f'../logs/{self.test_num}/{self.worker_id}/training')
 
 class A3CAgent(BaseAgent):
-    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, num_workers=None):
+    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, entropy_beta=0.01, num_workers=None, test_num=None):
         super().__init__(state_dim, action_dim, device)
         self.lr = lr
         self.gamma = gamma
+        self.entropy_beta = entropy_beta
         self.num_workers = num_workers if num_workers is not None else cpu_count()
 
-        self._init_networks()
-        self.update_interval = 5
+        self.update_interval = 1
         self.workers = []
         self.lock = Lock()
-        self.all_visited_states = set()
+        #self.all_visited_states = set()
 
-        self.worker_data = {}
-
-    def _init_networks(self):
-        self.actor_critic = ActorCritic(self.state_dim, self.action_dim, 0.01).to(self.device)
+        self.actor_critic = ActorCritic(self.state_dim, self.action_dim, self.entropy_beta).to(self.device)
         self.optimizer = torch.optim.Adam(self.actor_critic.parameters(), lr=self.lr)
 
+        self.worker_data = {}
+        
+    '''
     def get_action(self, state, epsilon=None):
         state = torch.FloatTensor(state).unsqueeze(0).to(self.device)
         with torch.no_grad():
@@ -218,6 +215,7 @@ class A3CAgent(BaseAgent):
         action = torch.multinomial(action_probs, 1).item()
         mean_q_value = action_probs.mean().item()
         return action, mean_q_value, False
+    '''
 
     def train_step(self, state, action, reward, next_state, done):
         # Left as is for single-step training; multi-thread training handled in workers
@@ -226,10 +224,10 @@ class A3CAgent(BaseAgent):
     def start_workers(self, env):
         self.workers = [
             WorkerAgent(
-                env, self.actor_critic, self.device,
+                env.clone(), self.actor_critic, self.device,
                 self.training_data['max_episodes'],
                 self.gamma, self.update_interval,
-                self, self.optimizer, self.lock, worker_id=i
+                self, self.optimizer, self.lock, self.test_num, worker_id=i
             )
             for i in range(self.num_workers)
         ]
