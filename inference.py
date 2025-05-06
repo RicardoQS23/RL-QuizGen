@@ -87,7 +87,7 @@ def main():
         # Run inference 10 times
         agent_inference_states = []
         agent_action_history = []
-        for _ in range(2):
+        for _ in range(10):
             start_state = np.random.choice(args.universe_size, 1)[0]
             save_to_log(f"Starting inference for {args.test_num}...", 
                         f'../logs/{args.test_num}/inference')
