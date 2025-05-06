@@ -202,8 +202,10 @@ def plot_agent_data(input_path, alfa_values, y_label, title, output_name, window
     # Adjust layout
     plt.tight_layout()
     
-    # Save and show
+    # Create directory if it doesn't exist
     if save:
+        output_dir = os.path.dirname(f'../images/{output_name}.png')
+        os.makedirs(output_dir, exist_ok=True)
         plt.savefig(f'../images/{output_name}.png', 
                     bbox_inches='tight',
                     dpi=300,
@@ -289,8 +291,10 @@ def plot_action_distribution(input_path, alfa_values, title, output_name, window
     plt.suptitle(title, y=1.02, fontsize=12)
     plt.tight_layout()
     
-    # Save and show
+    # Create directory if it doesn't exist
     if save:
+        output_dir = os.path.dirname(f'../images/{output_name}.png')
+        os.makedirs(output_dir, exist_ok=True)
         plt.savefig(f'../images/{output_name}.png', bbox_inches='tight', dpi=300)
     if show:
         plt.show()
@@ -351,28 +355,32 @@ def plot_all_results_a3c(test_num, alfa_values, worker_id, save=True, show=False
         alfa_values (list): List of alfa values to plot
         worker_id (int): Worker ID to plot
     """
+    # Create base directory for this worker's plots
+    base_dir = f'../images/{test_num}/{worker_id}'
+    os.makedirs(base_dir, exist_ok=True)
+    
     # Plot success rates
     plot_agent_data(f'../jsons/{test_num}/{worker_id}/success/all_success', alfa_values, 'Success', 
-                    f'Episode Success', f'{test_num}/{worker_id}/all_success', window_size=window_size, save=save, show=show)
+                    f'Episode Success', f'{test_num}/{worker_id}/success', window_size=window_size, save=save, show=show)
     
     # Plot rewards
     plot_agent_data(f'../jsons/{test_num}/{worker_id}/reward/all_rewards', alfa_values, 'Reward', 
-                   f'Episode Total Rewards', f'{test_num}/{worker_id}/all_rewards', window_size=window_size, save=save, show=show)
+                   f'Episode Total Rewards', f'{test_num}/{worker_id}/rewards', window_size=window_size, save=save, show=show)
     
     # Plot dimension-specific rewards
     plot_agent_data(f'../jsons/{test_num}/{worker_id}/reward_dim1/all_rewards_dim1', alfa_values, 'Reward topic component', 
-                    f'Episode Rewards for Dimension 1', f'{test_num}/{worker_id}/all_rewards_dim1', window_size=window_size, save=save, show=show)
+                    f'Episode Rewards for Dimension 1', f'{test_num}/{worker_id}/rewards_dim1', window_size=window_size, save=save, show=show)
     plot_agent_data(f'../jsons/{test_num}/{worker_id}/reward_dim2/all_rewards_dim2', alfa_values, 'Reward difficulty component', 
-                    f'Episode Rewards for Dimension 2', f'{test_num}/{worker_id}/all_rewards_dim2', window_size=window_size, save=save, show=show)
+                    f'Episode Rewards for Dimension 2', f'{test_num}/{worker_id}/rewards_dim2', window_size=window_size, save=save, show=show)
     
     # Plot Q-values
     plot_agent_data(f'../jsons/{test_num}/{worker_id}/qvalues/all_qvalues', alfa_values, 'Q_value', 
-                    f'Q-Values', f'{test_num}/{worker_id}/all_qvalues', window_size=window_size, flag=True, save=save, show=show)
+                    f'Q-Values', f'{test_num}/{worker_id}/qvalues', window_size=window_size, flag=True, save=save, show=show)
     
     # Plot losses
     plot_agent_data(f'../jsons/{test_num}/{worker_id}/loss/all_losses', alfa_values, 'Loss', 
-                    f'Losses', f'{test_num}/{worker_id}/all_losses', window_size=window_size, save=save, show=show)
+                    f'Losses', f'{test_num}/{worker_id}/losses', window_size=window_size, save=save, show=show)
     
     # Plot action distribution
     plot_action_distribution(f'../jsons/{test_num}/{worker_id}/actions/all_actions', alfa_values, 
-                            f'Action Distribution', f'{test_num}/{worker_id}/all_actions', window_size=int(window_size/4), save=save, show=show) 
+                            f'Action Distribution', f'{test_num}/{worker_id}/actions', window_size=int(window_size/4), save=save, show=show) 
