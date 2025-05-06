@@ -10,6 +10,11 @@ def save_to_log(data, output_name, mode='a', flag=True):
     if flag:
         print(data)
 
+def create_worker_dir(log_path):
+    # Ensure the directory exists
+    os.makedirs(log_path, exist_ok=True)
+
+
 def save_to_json(data, output_name):
     """Save the data to a JSON file."""
     def convert(obj):
