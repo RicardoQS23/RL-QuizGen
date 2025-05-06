@@ -308,7 +308,8 @@ class A3CAgent(BaseAgent):
         torch.save(save_dict, path)
 
     def load(self, path):
-        checkpoint = torch.load(path, map_location=self.device)
+        """Load the agent's model"""
+        checkpoint = torch.load(path, map_location=self.device, weights_only=False)
         self.actor_critic.load_state_dict(checkpoint['model_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         if 'training_data' in checkpoint:
