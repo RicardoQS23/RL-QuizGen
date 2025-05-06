@@ -13,6 +13,7 @@ import seaborn as sns
 from .base_agent import BaseAgent
 
 import os
+import pickle
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -309,12 +310,47 @@ class A3CAgent(BaseAgent):
 
     def load(self, path):
         """Load the agent's model"""
-        checkpoint = torch.load(path, map_location=self.device, weights_only=False)
-        self.actor_critic.load_state_dict(checkpoint['model_state_dict'])
-        self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        if 'training_data' in checkpoint:
-            for key, value in checkpoint['training_data'].items():
-                self.training_data[key] = value
+        try:
+            # Try different loading methods
+            try:
+                # First try: standard torch.load
+                checkpoint = torch.load(path, map_location=self.device, weights_only=False)
+            except:
+                try:
+                    # Second try: with pickle
+                    with open(path, 'rb') as f:
+                        checkpoint = pickle.load(f)
+                except:
+                    # Third try: with torch.load and different settings
+                    checkpoint = torch.load(path, map_location=self.device, pickle_module=pickle)
+            
+            # Handle different checkpoint formats
+            if isinstance(checkpoint, dict):
+                if 'model_state_dict' in checkpoint:
+                    self.actor_critic.load_state_dict(checkpoint['model_state_dict'])
+                elif 'state_dict' in checkpoint:
+                    self.actor_critic.load_state_dict(checkpoint['state_dict'])
+                else:
+                    # Try loading the entire checkpoint as state dict
+                    self.actor_critic.load_state_dict(checkpoint)
+                
+                if 'optimizer_state_dict' in checkpoint:
+                    self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+                
+                if 'training_data' in checkpoint:
+                    for key, value in checkpoint['training_data'].items():
+                        if key in self.training_data:
+                            self.training_data[key] = value
+            else:
+                # If checkpoint is not a dict, try loading it directly as state dict
+                self.actor_critic.load_state_dict(checkpoint)
+            
+            print(f"Successfully loaded model from {path}")
+            
+        except Exception as e:
+            print(f"Error loading model from {path}: {str(e)}")
+            print("Please ensure the model file exists and is in the correct format.")
+            raise
 
     def get_training_data(self):
         return self.training_data
