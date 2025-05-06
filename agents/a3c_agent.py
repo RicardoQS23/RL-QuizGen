@@ -207,15 +207,19 @@ class A3CAgent(BaseAgent):
 
         self.worker_data = {}
         
-    '''
+    
     def get_action(self, state, epsilon=None):
+        print('YEDKHOL')
+        pass
+        '''
         state = torch.FloatTensor(state).unsqueeze(0).to(self.device)
         with torch.no_grad():
             action_probs, _ = self.actor_critic(state)
         action = torch.multinomial(action_probs, 1).item()
         mean_q_value = action_probs.mean().item()
         return action, mean_q_value, False
-    '''
+        '''
+    
 
     def train_step(self, state, action, reward, next_state, done):
         # Left as is for single-step training; multi-thread training handled in workers
