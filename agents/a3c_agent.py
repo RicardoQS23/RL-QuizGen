@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-from utils.utils import save_to_log
+from utils.logging import save_to_log
 
 import matplotlib.pyplot as plt
 import seaborn as sns
