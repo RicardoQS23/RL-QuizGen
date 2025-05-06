@@ -28,7 +28,8 @@ class ActorCritic(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.relu(self.fc3(x))
-        action_probs = F.softmax(self.actor(x), dim=-1)
+        action_logits = self.actor(x)
+        action_probs = F.softmax(action_logits, dim=-1)
         state_value = self.critic(x)
         return action_probs, state_value
 
@@ -89,9 +90,13 @@ class WorkerAgent(Thread):
 
                 state_tensor = torch.FloatTensor(self.env.universe[state]).unsqueeze(0).to(self.device)
                 action_probs, _ = self.local_actor_critic(state_tensor)
-
+                
+                # Ensure action probabilities are valid
+                action_probs = action_probs.clamp(min=1e-7, max=1-1e-7)
+                action_probs = action_probs / action_probs.sum(dim=-1, keepdim=True)
+                
                 self.worker_metrics['action_probs'].append(action_probs.detach().cpu().numpy())
-                action = torch.argmax(action_probs).item()
+                action = torch.multinomial(action_probs, 1).item()
 
                 next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action, num_iterations)
 
@@ -118,6 +123,11 @@ class WorkerAgent(Thread):
 
                     action_probs, values = self.local_actor_critic(states)
                     advantages = (td_targets - values.detach()).view(-1)
+                    
+                    # Ensure action probabilities are valid for loss calculation
+                    action_probs = action_probs.clamp(min=1e-7, max=1-1e-7)
+                    action_probs = action_probs / action_probs.sum(dim=-1, keepdim=True)
+                    
                     log_probs = torch.log(action_probs)
                     actor_loss = -(log_probs.gather(1, actions) * advantages.unsqueeze(1)).mean()
                     critic_loss = advantages.pow(2).mean()
@@ -127,7 +137,7 @@ class WorkerAgent(Thread):
                     with self.lock:
                         self.optimizer.zero_grad()
                         loss.backward()
-                        # Apply gradients to global network
+                        # Apply gradients to global network with gradient clipping
                         for global_param, local_param in zip(
                                 self.global_actor_critic.parameters(), self.local_actor_critic.parameters()):
                             if local_param.grad is not None:
