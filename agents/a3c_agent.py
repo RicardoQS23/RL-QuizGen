@@ -100,7 +100,6 @@ class WorkerAgent(Thread):
                 action_probs = action_probs.clamp(min=1e-7, max=1-1e-7)
                 action_probs = action_probs / action_probs.sum(dim=-1, keepdim=True)
                 
-                self.worker_metrics['action_probs'].append(action_probs.detach().cpu().numpy())
                 action = torch.multinomial(action_probs, 1).item()
 
                 next_state, reward, done, success, reward_dim1, reward_dim2 = self.env.step(action, num_iterations)
