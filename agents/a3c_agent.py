@@ -14,6 +14,33 @@ from .base_agent import BaseAgent
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+def save_data(training_data, alfa, test_num, worker_id):
+    """Save all training data to JSON files."""
+    # Create base directories
+    base_dirs = [
+        f'../jsons/{test_num}/{worker_id}/success',
+        f'../jsons/{test_num}/{worker_id}/reward',
+        f'../jsons/{test_num}/{worker_id}/reward_dim1',
+        f'../jsons/{test_num}/{worker_id}/reward_dim2',
+        f'../jsons/{test_num}/{worker_id}/qvalues',
+        f'../jsons/{test_num}/{worker_id}/actions',
+        f'../jsons/{test_num}/{worker_id}/loss',
+        f'../jsons/{test_num}/{worker_id}/num_iterations'
+    ]
+    
+    for directory in base_dirs:
+        os.makedirs(directory, exist_ok=True)
+    
+    # Save data to JSON files
+    save_to_json(training_data['successes'], f'../jsons/{test_num}/{worker_id}/success/all_success_alfa_{alfa}')
+    save_to_json(training_data['episode_rewards'], f'../jsons/{test_num}/{worker_id}/reward/all_rewards_alfa_{alfa}')
+    save_to_json(training_data['episode_rewards_dim1'], f'../jsons/{test_num}/{worker_id}/reward_dim1/all_rewards_dim1_alfa_{alfa}')
+    save_to_json(training_data['episode_rewards_dim2'], f'../jsons/{test_num}/{worker_id}/reward_dim2/all_rewards_dim2_alfa_{alfa}')
+    save_to_json(training_data['episode_avg_qvalues'], f'../jsons/{test_num}/{worker_id}/qvalues/all_qvalues_alfa_{alfa}')
+    save_to_json(training_data['episode_actions'], f'../jsons/{test_num}/{worker_id}/actions/all_actions_alfa_{alfa}')
+    save_to_json(training_data['episode_losses'], f'../jsons/{test_num}/{worker_id}/loss/all_losses_alfa_{alfa}')
+    save_to_json(training_data['num_iterations'], f'../jsons/{test_num}/{worker_id}/num_iterations/all_num_iterations_alfa_{alfa}')
+    
 
 class ActorCritic(nn.Module):
     def __init__(self, state_dim, action_dim, entropy_beta=0.01):
@@ -194,23 +221,23 @@ class WorkerAgent(Thread):
                 print(f"Success Rate: {avg_success:.2%}")
                 
                 if len(self.worker_training_data['action_probs']) > 0:
-                    print(self.worker_training_data['action_probs'][-10:])
                     recent_probs = np.array(self.worker_training_data['action_probs'][-10:]).mean(axis=0)
                     print(f"Action Distribution: {recent_probs}\n")
 
             print(f"[Worker {self.worker_id}] Episode {episode + 1} Reward: {episode_reward / num_iterations if num_iterations > 0 else episode_reward}")
 
         ##SAVE HERE THE TRAINING DATA
+        save_data(self.worker_training_data, self.global_agent.alfa, self.test_num, self.worker_id)
         save_to_log(f'Train complete! Total Visited States: {len(all_visited_states)}', f'../logs/{self.test_num}/{self.worker_id}/training')
 
 class A3CAgent(BaseAgent):
-    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, entropy_beta=0.01, num_workers=None, test_num=None):
+    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, entropy_beta=0.01, num_workers=None, test_num=None, alfa=0.0):
         super().__init__(state_dim, action_dim, device)
         self.lr = lr
         self.gamma = gamma
         self.entropy_beta = entropy_beta
         self.test_num = test_num
-
+        self.alfa = alfa
         self.num_workers = num_workers if num_workers is not None else cpu_count()
 
         self.update_interval = 1

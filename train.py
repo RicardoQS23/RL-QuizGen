@@ -217,7 +217,7 @@ def main():
                            batch_size=args.batch_size, replay_buffer_type=args.replay_buffer)
         elif args.agent_type == 'a3c':
             agent = A3CAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
-                           lr=args.lr, gamma=args.gamma, entropy_beta=0.01, num_workers=args.num_workers, test_num=args.test_num)
+                           lr=args.lr, gamma=args.gamma, entropy_beta=0.01, num_workers=args.num_workers, test_num=args.test_num, alfa=alfa)
         elif args.agent_type == 'sarsa':
             agent = SARSAAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
                              lr=args.lr, gamma=args.gamma, eps=args.eps, eps_decay=args.eps_decay,
@@ -230,8 +230,9 @@ def main():
         
         # Save results
         save_agent(os.path.join(f"../saved_agents/{args.test_num}", f"agent_alfa_{alfa}_bias.pth"), agent)
-        save_data(agent.training_data, alfa, args.test_num)
-        
+        if not isinstance(agent, A3CAgent):
+            save_data(agent.training_data, alfa, args.test_num)
+
         end_time = time.time()
         elapsed_time = end_time - start_time
         
