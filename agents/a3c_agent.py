@@ -72,14 +72,20 @@ class ActorCritic(nn.Module):
         return total_loss, policy_loss.item(), value_loss.item(), entropy.item()
 
 class A3CAgent(BaseAgent):
-    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95):
+    def __init__(self, state_dim, action_dim, device, lr=0.0005, gamma=0.95, entropy_start=0.01, entropy_end=0.001, entropy_decay=0.995):
         super().__init__(state_dim, action_dim, device)
         self.lr = lr
         self.gamma = gamma
         self.device = device
         
+        # Entropy decay parameters
+        self.entropy_start = entropy_start
+        self.entropy_end = entropy_end
+        self.entropy_decay = entropy_decay
+        
         # Initialize actor-critic network
         self.actor_critic = ActorCritic(state_dim, action_dim).to(device)
+        self.actor_critic.entropy_beta = entropy_start  # Set initial entropy coefficient
         self.optimizer = torch.optim.Adam(self.actor_critic.parameters(), lr=lr)
         
         # Initialize training data
@@ -117,10 +123,20 @@ class A3CAgent(BaseAgent):
             
         return action, value.item(), explore
 
+    def update_entropy(self):
+        """Update the entropy coefficient using decay"""
+        self.actor_critic.entropy_beta = max(
+            self.entropy_end,
+            self.actor_critic.entropy_beta * self.entropy_decay
+        )
+
     def train_step(self, state, action, reward, next_state, done):
         """Perform a training step"""
         # Store experience
         self.training_data['step_count'] += 1
+        
+        # Update entropy coefficient
+        self.update_entropy()
         
         # Convert to tensors
         state = torch.FloatTensor(state).unsqueeze(0).to(self.device)
