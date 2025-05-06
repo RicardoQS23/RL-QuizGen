@@ -184,7 +184,7 @@ class WorkerAgent(Thread):
             self.worker_training_data['successes'].append(success)
             self.worker_training_data['episode_actions'].append(episode_actions)
             self.worker_training_data['episode_avg_qvalues'].append(episode_avg_qvalues)
-            self.worker_training_data['action_probs'].append(action_probs_list)
+            self.worker_training_data['action_probs'].extend(action_probs_list)
             if episode % 10 == 0:
                 avg_reward = np.mean(self.worker_training_data['episode_rewards'][-10:])
                 avg_success = np.mean(self.worker_training_data['successes'][-10:])
