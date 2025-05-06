@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+from utils.utils import save_to_log
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -196,7 +197,7 @@ class A3CAgent(BaseAgent):
         self.gamma = gamma
         self.entropy_beta = entropy_beta
         self.test_num = test_num
-        
+
         self.num_workers = num_workers if num_workers is not None else cpu_count()
 
         self.update_interval = 1
