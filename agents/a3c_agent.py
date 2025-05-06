@@ -37,7 +37,7 @@ class ActorCritic(nn.Module):
 
 class WorkerAgent(Thread):
     def __init__(self, env, global_actor_critic, device, max_episodes, gamma, update_interval,
-                 global_agent, global_optimizer, shared_lock, test_num, worker_id=0):
+                 global_agent, global_optimizer, shared_lock, worker_id=0, test_num=0):
         super(WorkerAgent, self).__init__()
         self.env = env
         self.global_actor_critic = global_actor_critic
@@ -234,7 +234,7 @@ class A3CAgent(BaseAgent):
                 env.clone(), self.actor_critic, self.device,
                 self.training_data['max_episodes'],
                 self.gamma, self.update_interval,
-                self, self.optimizer, self.lock, self.test_num, worker_id=i
+                self, self.optimizer, self.lock, worker_id=i, test_num=self.test_num
             )
             for i in range(self.num_workers)
         ]
