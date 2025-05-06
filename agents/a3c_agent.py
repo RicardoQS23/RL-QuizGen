@@ -114,7 +114,7 @@ class WorkerAgent(Thread):
 
                 episode_actions.append(action)
                 episode_avg_qvalues.append(action_probs.max().item())
-                action_probs_list.append(action_probs.cpu().numpy())
+                action_probs_list.append(action_probs.detach().cpu().numpy())
 
                 if len(state_batch) >= self.update_interval or done:
                     states = torch.FloatTensor(np.array(state_batch)).to(self.device)
