@@ -124,7 +124,7 @@ class WorkerAgent(Thread):
 
                 episode_actions.append(action)
                 episode_avg_qvalues.append(action_probs.max().item())
-                action_probs_list.append(action_probs.detach().cpu().numpy())
+                action_probs_list.append(action_probs.detach().cpu().numpy().tolist())
 
                 if len(state_batch) >= self.update_interval or done:
                     states = torch.FloatTensor(np.array(state_batch)).to(self.device)
@@ -184,7 +184,7 @@ class WorkerAgent(Thread):
             self.worker_training_data['successes'].append(success)
             self.worker_training_data['episode_actions'].append(episode_actions)
             self.worker_training_data['episode_avg_qvalues'].append(episode_avg_qvalues)
-            self.worker_training_data['action_probs'].append(action_probs_list.tolist())
+            self.worker_training_data['action_probs'].append(action_probs_list)
             if episode % 10 == 0:
                 avg_reward = np.mean(self.worker_training_data['episode_rewards'][-10:])
                 avg_success = np.mean(self.worker_training_data['successes'][-10:])
