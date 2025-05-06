@@ -113,7 +113,7 @@ def main():
             agent.load(f"../saved_agents/{args.test_num}/agent_alfa_{alfa}_bias.pkl")
             # Set eval mode based on agent type
             if args.agent_type == 'a3c':
-                agent.actor_critic.eval()
+                agent.global_actor_critic.eval()
             else:
                 agent.model.eval()
             # Train agent
