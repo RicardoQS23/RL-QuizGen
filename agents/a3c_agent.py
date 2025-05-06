@@ -245,7 +245,7 @@ class A3CAgent(BaseAgent):
         self.update_interval = 1
         self.workers = []
         self.lock = Lock()
-        #self.all_visited_states = set()
+        self.worker_ids = []  # Store worker IDs
 
         self.actor_critic = ActorCritic(self.state_dim, self.action_dim, self.entropy_beta).to(self.device)
         self.optimizer = torch.optim.Adam(self.actor_critic.parameters(), lr=self.lr)
@@ -271,16 +271,17 @@ class A3CAgent(BaseAgent):
         pass
 
     def start_workers(self, env):
-        self.workers = [
-            WorkerAgent(
+        self.workers = []
+        self.worker_ids = []  # Reset worker IDs
+        for i in range(self.num_workers):
+            worker = WorkerAgent(
                 env.clone(), self.actor_critic, self.device,
                 self.training_data['max_episodes'],
                 self.gamma, self.update_interval,
                 self, self.optimizer, self.lock, worker_id=i, test_num=self.test_num
             )
-            for i in range(self.num_workers)
-        ]
-        for worker in self.workers:
+            self.workers.append(worker)
+            self.worker_ids.append(i)  # Store worker ID
             worker.start()
 
     def stop_workers(self):
@@ -319,3 +320,7 @@ class A3CAgent(BaseAgent):
 
     def get_worker_metrics(self):
         return {worker.worker_id: worker.worker_metrics for worker in self.workers}
+
+    def get_worker_ids(self):
+        """Return the list of worker IDs."""
+        return self.worker_ids

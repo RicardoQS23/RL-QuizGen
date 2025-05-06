@@ -9,7 +9,7 @@ import pandas as pd
 from agents.dqn_agent import DQNAgent
 from agents.a3c_agent import A3CAgent
 from agents.sarsa_agent import SARSAAgent
-from utils.plotting import plot_all_results
+from utils.plotting import plot_all_results, plot_all_results_a3c
 from environments.custom_env import CustomEnv
 from utils.logging import save_to_log, save_data, save_agent
 from utils.utilities import setup_directories, get_best_state
@@ -243,14 +243,15 @@ def main():
             
         save_to_log(f"{replay_count_msg}Time elapsed for agent with alfa = {alfa}: {elapsed_time:.4f} seconds\n{50 * '-'}",
                    f'../logs/{args.test_num}/training')
-    
-    print("WESH")
-    print()
-    print()
-    # Plot all results
-    plot_all_results(args.test_num, args.alfa_values)
-    print("Y'a une erreur, je sais")
-    print()
+
+    # Plot results after all training is complete
+    if args.agent_type != 'a3c':
+        plot_all_results(args.test_num, args.alfa_values)
+    else:
+        # Plot results for each worker using their actual IDs
+        for worker_id in agent.get_worker_ids():
+            plot_all_results_a3c(args.test_num, args.alfa_values, worker_id)
+
     # Log final information
     program_end_time = time.time()
     program_elapsed_time = program_end_time - program_start_time
