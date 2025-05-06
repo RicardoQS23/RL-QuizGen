@@ -60,6 +60,16 @@ class WorkerAgent(Thread):
         self.local_actor_critic.load_state_dict(self.global_actor_critic.state_dict())
 
         self.worker_training_data = {
+            'episode_rewards': [],
+            'episode_rewards_dim1': [],
+            'episode_rewards_dim2': [],
+            'episode_actions': [],
+            'episode_avg_qvalues': [],
+            'episode_losses': [],
+            'episode_count': 0,
+            'successes': [],
+            'num_iterations': [],
+            'action_probs': [],
         }
 
     def n_step_td_target(self, rewards, next_v_value, done):
