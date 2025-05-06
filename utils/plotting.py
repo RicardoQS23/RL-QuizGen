@@ -349,6 +349,7 @@ def plot_all_results_a3c(test_num, alfa_values, worker_id, save=True, show=False
     Args:
         test_num (str): The test number identifier
         alfa_values (list): List of alfa values to plot
+        worker_id (int): Worker ID to plot
     """
     # Plot success rates
     plot_agent_data(f'../jsons/{test_num}/{worker_id}/success/all_success', alfa_values, 'Success', 

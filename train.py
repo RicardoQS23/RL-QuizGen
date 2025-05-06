@@ -244,13 +244,15 @@ def main():
         save_to_log(f"{replay_count_msg}Time elapsed for agent with alfa = {alfa}: {elapsed_time:.4f} seconds\n{50 * '-'}",
                    f'../logs/{args.test_num}/training')
 
-    # Plot results after all training is complete
-    if args.agent_type != 'a3c':
-        plot_all_results(args.test_num, args.alfa_values)
-    else:
-        # Plot results for each worker using their actual IDs
-        for worker_id in agent.get_worker_ids():
+    # Plot results after training
+    if args.agent_type == 'a3c':
+        print("\nPlotting results...")
+        for worker_id in range(args.num_workers):
+            print(f"Plotting results for worker {worker_id}...")
             plot_all_results_a3c(args.test_num, args.alfa_values, worker_id)
+        print("Plotting complete!")
+    else:
+        plot_all_results(args.test_num, args.alfa_values)
 
     # Log final information
     program_end_time = time.time()
