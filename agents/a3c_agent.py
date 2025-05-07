@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from utils.logging import save_to_log, create_worker_dir, save_to_json
+import json
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -252,6 +253,8 @@ class A3CAgent(BaseAgent):
         self.optimizer = torch.optim.Adam(self.actor_critic.parameters(), lr=self.lr)
 
         self.worker_data = {}
+        self.training_data = {}
+
         
     
     def get_action(self, state, epsilon=None):
@@ -270,6 +273,25 @@ class A3CAgent(BaseAgent):
     def train_step(self, state, action, reward, next_state, done):
         # Left as is for single-step training; multi-thread training handled in workers
         pass
+    
+    def save_global_data(self, global_data, alfa, test_num):
+        base_path = f'../jsons/{test_num}/global'
+        os.makedirs(base_path, exist_ok=True)
+
+        def save_json(data, name):
+            with open(f'{base_path}/{name}_alfa_{alfa}.json', 'w') as f:
+                json.dump(data, f)
+
+        save_json(global_data['successes'], 'success_all')
+        save_json(global_data['rewards'], 'rewards_all')
+        save_json(global_data['rewards_dim1'], 'rewards_dim1_all')
+        save_json(global_data['rewards_dim2'], 'rewards_dim2_all')
+        save_json(global_data['qvalues'], 'qvalues_all')
+        save_json(global_data['actions'], 'actions_all')
+        save_json(global_data['loss'], 'loss_all')
+        save_json(global_data['iterations'], 'iterations_all')
+
+
 
     def start_workers(self, env):
         self.workers = []
@@ -288,6 +310,38 @@ class A3CAgent(BaseAgent):
     def stop_workers(self):
         for worker in self.workers:
             worker.join()
+
+        # Aggregate global data after all workers finish
+        global_data = {
+            'successes': [],
+            'rewards': [],
+            'rewards_dim1': [],
+            'rewards_dim2': [],
+            'qvalues': [],
+            'actions': [],
+            'loss': [],
+            'iterations': [],
+        }
+
+        for worker in self.workers:
+            data = worker.worker_training_data
+            global_data['successes'].extend(data['successes'])
+            global_data['rewards'].extend(data['episode_rewards'])
+            global_data['rewards_dim1'].extend(data['episode_rewards_dim1'])
+            global_data['rewards_dim2'].extend(data['episode_rewards_dim2'])
+            global_data['qvalues'].extend(data['episode_avg_qvalues'])
+            global_data['actions'].extend(data['episode_actions'])
+            global_data['loss'].extend(data['episode_losses'])
+            global_data['iterations'].extend(data['num_iterations'])
+            
+        for key in global_data:
+            try:
+                global_data[key] = sorted(global_data[key], key=lambda x: x if isinstance(x, (int, float)) else len(x))
+            except Exception:
+                # Fallback if sorting fails (e.g., if contents are non-comparable)
+                pass
+
+        self.save_global_data(global_data, self.alfa, self.test_num)
         self.workers = []
 
     def save(self, path):
