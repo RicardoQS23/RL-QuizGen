@@ -15,6 +15,7 @@ class CustomEnv(gym.Env):
         self.universe_size = self.universe.shape[0]
 
         self.state = state   #idx of the current state
+        self.previous_state = state
         self.state_dim = self.universe.shape[1]
         self.action_space = gym.spaces.Discrete(4)
 
@@ -28,6 +29,7 @@ class CustomEnv(gym.Env):
 
     def step(self, action, num_iterations, max_iterations=100):
         """Take a step in the environment given an action."""
+        self.previous_state = self.state
         if action in [0, 1]:  # Similar actions
             self.state = self.choose_similar(mode=action%2)
         else:  # Different actions
@@ -35,16 +37,24 @@ class CustomEnv(gym.Env):
 
         # Add the current state to memory
         state_value = self.universe[self.state]
-
         vec1, vec2 = state_value[:self.num_topics], state_value[self.num_topics:] 
 
         # Reward function
         first_dim_metric = cosine_similarity(vec1.reshape(1, -1), self.target_dim1.reshape(1, -1))[0][0]
         second_dim_metric = cosine_similarity(vec2.reshape(1, -1), self.target_dim2.reshape(1, -1))[0][0]
         reward = self.alfa * first_dim_metric + (1 - self.alfa) * second_dim_metric
+
+        # Add the current state to memory
+        state_value = self.universe[self.previous_state]
+        vec1, vec2 = state_value[:self.num_topics], state_value[self.num_topics:] 
+        # Reward function
+        first_dim_metric_primitive = cosine_similarity(vec1.reshape(1, -1), self.target_dim1.reshape(1, -1))[0][0]
+        second_dim_metric_primitive = cosine_similarity(vec2.reshape(1, -1), self.target_dim2.reshape(1, -1))[0][0]
+        reward_primitive = self.alfa * first_dim_metric_primitive + (1 - self.alfa) * second_dim_metric_primitive
+
         done = num_iterations >= max_iterations or reward > self.reward_threshold
         success = 1 if reward > self.reward_threshold else 0
-        return self.state, reward, done, success, first_dim_metric, second_dim_metric
+        return self.state, reward - reward_primitive, done, success, first_dim_metric, second_dim_metric
 
     def choose_similar(self, mode):
         if mode == 0:
