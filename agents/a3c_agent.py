@@ -258,16 +258,28 @@ class A3CAgent(BaseAgent):
         
     
     def get_action(self, state, epsilon=None):
-        print('YEDKHOL')
-        pass
-        '''
-        state = torch.FloatTensor(state).unsqueeze(0).to(self.device)
+        """
+        Selects an action given a state using the actor-critic policy.
+        Epsilon is unused in A3C but kept for compatibility with other agent interfaces.
+        Returns:
+            action (int): chosen action
+            mean_q_value (float): mean of action probabilities (not true Q-values)
+            use_random (bool): always False for A3C since it uses policy sampling
+        """
+        self.actor_critic.eval()
         with torch.no_grad():
-            action_probs, _ = self.actor_critic(state)
-        action = torch.multinomial(action_probs, 1).item()
-        mean_q_value = action_probs.mean().item()
+            state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
+            action_probs, _ = self.actor_critic(state_tensor)
+    
+            # Clamp and normalize to ensure valid distribution
+            action_probs = action_probs.clamp(min=1e-7, max=1.0 - 1e-7)
+            action_probs /= action_probs.sum(dim=-1, keepdim=True)
+    
+            action = torch.multinomial(action_probs, 1).item()
+            mean_q_value = action_probs.mean().item()
+    
         return action, mean_q_value, False
-        '''
+
     
 
     def train_step(self, state, action, reward, next_state, done):
