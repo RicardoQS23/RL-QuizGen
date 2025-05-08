@@ -355,6 +355,7 @@ class A3CAgent(BaseAgent):
                 pass
 
         self.save_global_data(global_data, self.alfa, self.test_num)
+        self.training_data = global_data
         self.workers = []
 
     def save(self, path):
