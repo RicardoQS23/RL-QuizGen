@@ -266,20 +266,20 @@ class A3CAgent(BaseAgent):
             mean_q_value (float): mean of action probabilities (not true Q-values)
             use_random (bool): always False for A3C since it uses policy sampling
         """
-        # self.actor_critic.eval()
-        # with torch.no_grad():
-        #     state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
-        #     action_probs, _ = self.actor_critic(state_tensor)
+        self.actor_critic.eval()
+        with torch.no_grad():
+            state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
+            action_probs, _ = self.actor_critic(state_tensor)
     
-        #     # Clamp and normalize to ensure valid distribution
-        #     action_probs = action_probs.clamp(min=1e-7, max=1.0 - 1e-7)
-        #     action_probs /= action_probs.sum(dim=-1, keepdim=True)
+            # Clamp and normalize to ensure valid distribution
+            action_probs = action_probs.clamp(min=1e-7, max=1.0 - 1e-7)
+            action_probs /= action_probs.sum(dim=-1, keepdim=True)
     
-        #     action = torch.multinomial(action_probs, 1).item()
-        #     mean_q_value = action_probs.mean().item()
+            action = torch.multinomial(action_probs, 1).item()
+            mean_q_value = action_probs.mean().item()
     
-        # return action, mean_q_value, False
-        pass
+        return action, mean_q_value, False
+        # pass
 
     
 
