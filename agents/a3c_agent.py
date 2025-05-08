@@ -355,7 +355,17 @@ class A3CAgent(BaseAgent):
                 pass
 
         self.save_global_data(global_data, self.alfa, self.test_num)
-        self.training_data = global_data
+        self.training_data = {
+            'episode_rewards': global_data['rewards'],
+            'episode_rewards_dim1': global_data['rewards_dim1'],
+            'episode_rewards_dim2': global_data['rewards_dim2'],
+            'episode_actions': global_data['actions'],
+            'episode_avg_qvalues': global_data['qvalues'],
+            'episode_losses': global_data['loss'],
+            'episode_count': len(global_data['rewards']),
+            'step_count': 0,
+            'replay_count': 0
+            }
         self.workers = []
 
     def save(self, path):
