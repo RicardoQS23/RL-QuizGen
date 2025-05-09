@@ -318,8 +318,10 @@ class RealDataGenerator(BaseDataGenerator):
         quiz = []
         topics = list(self.mcqs_by_topic_diff.keys())
         # Randomly sample topics for the quiz (with replacement)
-        sampled_topics = np.random.choice(topics, size=self.quiz_size, replace=True)
-        for topic in sampled_topics:
+        sampled_topics = np.random.choice(topics, size=self.num_topics, replace=False)
+        # Distribute remaining MCQs randomly across sampled topics
+        while len(quiz) < self.quiz_size:
+            topic = np.random.choice(sampled_topics)
             difficulties = list(self.mcqs_by_topic_diff[topic].keys())
             difficulty = np.random.choice(difficulties)
             mcq = np.random.choice(self.mcqs_by_topic_diff[topic][difficulty])
