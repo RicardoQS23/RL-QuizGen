@@ -52,8 +52,8 @@ class CustomEnv(gym.Env):
         second_dim_metric_primitive = cosine_similarity(vec2.reshape(1, -1), self.target_dim2.reshape(1, -1))[0][0]
         reward_primitive = self.alfa * first_dim_metric_primitive + (1 - self.alfa) * second_dim_metric_primitive
 
-        done = num_iterations >= max_iterations or reward > self.reward_threshold
-        success = 1 if reward > self.reward_threshold else 0
+        done = num_iterations >= max_iterations or reward >= self.reward_threshold
+        success = 1 if reward >= self.reward_threshold else 0
         return self.state, reward - reward_primitive, done, success, first_dim_metric, second_dim_metric
 
     def choose_similar(self, mode):
