@@ -139,9 +139,9 @@ def main():
         try:
             universe, targets = load_universe(args.test_num)
             num_topics = args.num_topics
-            save_to_log("Loaded existing data", f'../logs/{args.test_num}/training')
+            save_to_log("Loaded existing data", f'../logs/{args.test_num}/training', mode='w')
         except (FileNotFoundError, json.JSONDecodeError) as e:
-            save_to_log(f"Error loading existing data: {e}", f'../logs/{args.test_num}/training')
+            save_to_log(f"Error loading existing data: {e}", f'../logs/{args.test_num}/training', mode='w')
             save_to_log("Falling back to generating from real data", f'../logs/{args.test_num}/training')
             universe, targets, num_topics = generate_universe_from_real_data(
                 test_num=args.test_num,
@@ -151,7 +151,7 @@ def main():
                 dataset=args.dataset
             )
     elif args.data_source == 1:  # Generate from real data
-        save_to_log("Generating universe from real data", f'../logs/{args.test_num}/training')
+        save_to_log("Generating universe from real data", f'../logs/{args.test_num}/training', mode='w')
         universe, targets, num_topics = generate_universe_from_real_data(
             test_num=args.test_num,
             num_topics=args.num_topics,
@@ -161,7 +161,7 @@ def main():
             target_distribution=args.target_distribution
         )
     else:  # Generate synthetic data
-        save_to_log("Generating synthetic universe", f'../logs/{args.test_num}/training')
+        save_to_log("Generating synthetic universe", f'../logs/{args.test_num}/training', mode='w')
         universe, targets = generate_synthetic_universe(
             test_num=args.test_num,
             num_topics=args.num_topics,
@@ -172,7 +172,7 @@ def main():
         )
         num_topics = args.num_topics
     # Log initial information
-    save_to_log(f"Starting {args.test_num} ... using device: {device}", f'../logs/{args.test_num}/training', mode='w')
+    save_to_log(f"Starting {args.test_num} ... using device: {device}", f'../logs/{args.test_num}/training')
     save_to_log(f"Parameters used: {args}", f'../logs/{args.test_num}/training')
     save_to_log(f"Universe has shape: {universe.shape}", f'../logs/{args.test_num}/training')
     save_to_log(f"Training agent with target1 = {targets[0]} and target2 = {targets[1]}", 
