@@ -1,0 +1,1360 @@
+Starting inference for test11...
+Inference for alfa = 0...
+Starting inference for test11...
+Starting inference from state 8787...
+Step 1: State = 8046 Action=2, Reward=-0.07137668132781982
+Step 2: State = 5264 Action=2, Reward=0.04521596431732178
+Step 3: State = 3360 Action=2, Reward=0.16751492023468018
+Inference complete!
+Starting inference for test11...
+Starting inference from state 39...
+Step 1: State = 3890 Action=2, Reward=-0.20339256525039673
+Step 2: State = 7303 Action=2, Reward=0.17069989442825317
+Step 3: State = 9867 Action=2, Reward=0.0
+Step 4: State = 8155 Action=2, Reward=0.032692670822143555
+Step 5: State = 422 Action=2, Reward=-0.0879773497581482
+Step 6: State = 5078 Action=2, Reward=0.0879773497581482
+Step 7: State = 8935 Action=2, Reward=0.07953757047653198
+Inference complete!
+Starting inference for test11...
+Starting inference from state 4499...
+Step 1: State = 6172 Action=2, Reward=-0.02154785394668579
+Step 2: State = 2305 Action=1, Reward=-0.019726157188415527
+Step 3: State = 2666 Action=2, Reward=-0.018147647380828857
+Step 4: State = 9375 Action=2, Reward=0.1383744478225708
+Step 5: State = 3320 Action=2, Reward=0.06974756717681885
+Inference complete!
+Starting inference for test11...
+Starting inference from state 3702...
+Step 1: State = 6189 Action=2, Reward=-0.03705489635467529
+Step 2: State = 7997 Action=2, Reward=0.07953757047653198
+Inference complete!
+Starting inference for test11...
+Starting inference from state 7648...
+Step 1: State = 1537 Action=2, Reward=-0.029124021530151367
+Step 2: State = 3672 Action=2, Reward=5.960464477539063e-08
+Step 3: State = 4604 Action=2, Reward=0.09887146949768066
+Inference complete!
+Starting inference for test11...
+Starting inference from state 9109...
+Step 1: State = 4612 Action=2, Reward=-0.13319331407546997
+Step 2: State = 9852 Action=1, Reward=0.1331932544708252
+Step 3: State = 9122 Action=2, Reward=-0.061816632747650146
+Step 4: State = 5867 Action=2, Reward=0.029124021530151367
+Step 5: State = 4437 Action=2, Reward=0.0
+Step 6: State = 3392 Action=2, Reward=0.032692670822143555
+Step 7: State = 5827 Action=2, Reward=0.0
+Step 8: State = 8284 Action=2, Reward=0.03705489635467529
+Inference complete!
+Starting inference for test11...
+Starting inference from state 8659...
+Step 1: State = 6334 Action=2, Reward=-0.1529194712638855
+Step 2: State = 1209 Action=3, Reward=0.0649421215057373
+Step 3: State = 5988 Action=2, Reward=0.0879773497581482
+Step 4: State = 7469 Action=2, Reward=-0.0879773497581482
+Step 5: State = 5801 Action=2, Reward=0.1250322461128235
+Inference complete!
+Starting inference for test11...
+Starting inference from state 4890...
+Step 1: State = 7347 Action=2, Reward=0.06974750757217407
+Inference complete!
+Starting inference for test11...
+Starting inference from state 3834...
+Step 1: State = 2400 Action=2, Reward=0.0
+Step 2: State = 3642 Action=2, Reward=0.06974756717681885
+Inference complete!
+Starting inference for test11...
+Starting inference from state 3750...
+Step 1: State = 9542 Action=2, Reward=0.06974756717681885
+Inference complete!
+Agent action distribution for alfa = 0: [0.         0.05405405 0.91891892 0.02702703]
+Inference for alfa = 0.25...
+Starting inference for test11...
+Starting inference from state 9045...
+Step 1: State = 6916 Action=0, Reward=-0.075375497341156
+Step 2: State = 2917 Action=0, Reward=0.033911943435668945
+Step 3: State = 3408 Action=0, Reward=0.011393904685974121
+Step 4: State = 8182 Action=0, Reward=0.014667332172393799
+Step 5: State = 388 Action=0, Reward=0.06713598966598511
+Step 6: State = 8182 Action=0, Reward=-0.06713598966598511
+Step 7: State = 2386 Action=0, Reward=0.024964630603790283
+Step 8: State = 6453 Action=0, Reward=-0.0312955379486084
+Step 9: State = 110 Action=0, Reward=-0.041463494300842285
+Step 10: State = 388 Action=0, Reward=0.11493039131164551
+Step 11: State = 2849 Action=0, Reward=-0.04261654615402222
+Step 12: State = 496 Action=0, Reward=0.052755892276763916
+Step 13: State = 4077 Action=0, Reward=-0.1526508927345276
+Step 14: State = 6811 Action=0, Reward=0.16395419836044312
+Inference complete!
+Starting inference for test11...
+Starting inference from state 3389...
+Step 1: State = 2229 Action=0, Reward=-0.23714715242385864
+Step 2: State = 670 Action=0, Reward=0.2605355978012085
+Inference complete!
+Starting inference for test11...
+Starting inference from state 6745...
+Step 1: State = 9673 Action=0, Reward=0.009562313556671143
+Step 2: State = 9053 Action=0, Reward=-0.0004451870918273926
+Step 3: State = 9673 Action=0, Reward=0.0004451870918273926
+Step 4: State = 1065 Action=0, Reward=-0.010539650917053223
+Step 5: State = 6001 Action=0, Reward=-0.030923843383789062
+Step 6: State = 180 Action=0, Reward=0.04819399118423462
+Step 7: State = 6637 Action=0, Reward=0.004572868347167969
+Step 8: State = 2172 Action=0, Reward=0.05231064558029175
+Inference complete!
+Starting inference for test11...
+Starting inference from state 7486...
+Step 1: State = 97 Action=0, Reward=0.039761900901794434
+Step 2: State = 1804 Action=0, Reward=0.02496469020843506
+Step 3: State = 4379 Action=0, Reward=-0.08247089385986328
+Step 4: State = 8256 Action=0, Reward=-0.033911943435668945
+Step 5: State = 6226 Action=0, Reward=0.17319440841674805
+Inference complete!
+Starting inference for test11...
+Starting inference from state 6631...
+Step 1: State = 3000 Action=0, Reward=0.15609151124954224
+Inference complete!
+Starting inference for test11...
+Starting inference from state 5652...
+Step 1: State = 3105 Action=0, Reward=-0.0510178804397583
+Step 2: State = 9613 Action=0, Reward=-0.0025147199630737305
+Step 3: State = 7072 Action=0, Reward=0.016160905361175537
+Step 4: State = 9923 Action=0, Reward=0.0041048526763916016
+Step 5: State = 3820 Action=0, Reward=0.06598305702209473
+Step 6: State = 4287 Action=0, Reward=-0.10104340314865112
+Step 7: State = 776 Action=0, Reward=0.05468094348907471
+Step 8: State = 5738 Action=0, Reward=0.013646125793457031
+Step 9: State = 7623 Action=0, Reward=0.06050747632980347
+Inference complete!
+Starting inference for test11...
+Starting inference from state 169...
+Step 1: State = 3345 Action=0, Reward=-0.006330907344818115
+Step 2: State = 6522 Action=0, Reward=0.05908679962158203
+Step 3: State = 8301 Action=0, Reward=-0.06187295913696289
+Step 4: State = 6599 Action=0, Reward=-0.03190124034881592
+Step 5: State = 1147 Action=0, Reward=0.09093254804611206
+Step 6: State = 5551 Action=0, Reward=-0.2730603814125061
+Step 7: State = 9433 Action=0, Reward=0.1866559386253357
+Step 8: State = 4092 Action=0, Reward=0.07968372106552124
+Step 9: State = 5109 Action=0, Reward=-0.043193519115448
+Step 10: State = 9557 Action=0, Reward=-0.05269342660903931
+Step 11: State = 8375 Action=0, Reward=0.028173983097076416
+Step 12: State = 3552 Action=0, Reward=0.05231058597564697
+Step 13: State = 8375 Action=0, Reward=-0.05231058597564697
+Step 14: State = 6369 Action=0, Reward=-0.022946596145629883
+Step 15: State = 9765 Action=0, Reward=0.05921459197998047
+Step 16: State = 2120 Action=0, Reward=0.013216197490692139
+Step 17: State = 163 Action=0, Reward=0.018228769302368164
+Step 18: State = 7557 Action=0, Reward=-0.018228769302368164
+Step 19: State = 4417 Action=0, Reward=-0.07554543018341064
+Step 20: State = 7088 Action=0, Reward=0.009024441242218018
+Step 21: State = 7939 Action=0, Reward=0.06301647424697876
+Step 22: State = 7058 Action=0, Reward=-0.05231058597564697
+Step 23: State = 5173 Action=0, Reward=-0.010168015956878662
+Step 24: State = 6228 Action=0, Reward=0.07728642225265503
+Step 25: State = 1358 Action=0, Reward=-0.05233687162399292
+Step 26: State = 4470 Action=0, Reward=-0.04270058870315552
+Step 27: State = 1020 Action=0, Reward=-0.007213592529296875
+Step 28: State = 4322 Action=0, Reward=0.029492855072021484
+Step 29: State = 5899 Action=0, Reward=-0.02227926254272461
+Step 30: State = 3504 Action=0, Reward=0.09373623132705688
+Step 31: State = 4054 Action=0, Reward=-0.081329345703125
+Step 32: State = 1249 Action=0, Reward=0.021843016147613525
+Step 33: State = 5487 Action=0, Reward=-0.08170640468597412
+Step 34: State = 9843 Action=0, Reward=0.06703907251358032
+Step 35: State = 3956 Action=0, Reward=0.023118019104003906
+Step 36: State = 4021 Action=0, Reward=0.05233687162399292
+Step 37: State = 5650 Action=0, Reward=0.04143732786178589
+Inference complete!
+Starting inference for test11...
+Starting inference from state 7763...
+Step 1: State = 3981 Action=0, Reward=0.11731898784637451
+Inference complete!
+Starting inference for test11...
+Starting inference from state 8866...
+Step 1: State = 815 Action=0, Reward=0.024519503116607666
+Step 2: State = 4900 Action=0, Reward=0.06405919790267944
+Inference complete!
+Starting inference for test11...
+Starting inference from state 6931...
+Step 1: State = 5626 Action=0, Reward=-0.10742044448852539
+Step 2: State = 6190 Action=0, Reward=0.06598305702209473
+Step 3: State = 9722 Action=0, Reward=-0.01087331771850586
+Step 4: State = 6836 Action=0, Reward=-0.1490335464477539
+Step 5: State = 1991 Action=0, Reward=0.10756999254226685
+Step 6: State = 3846 Action=0, Reward=0.080128014087677
+Inference complete!
+Agent action distribution for alfa = 0.25: [1. 0. 0. 0.]
+Inference for alfa = 0.5...
+Starting inference for test11...
+Starting inference from state 7126...
+Step 1: State = 7183 Action=1, Reward=-0.05224531888961792
+Step 2: State = 3355 Action=0, Reward=0.0938730239868164
+Step 3: State = 7941 Action=0, Reward=-0.022606611251831055
+Step 4: State = 4829 Action=0, Reward=0.03090834617614746
+Step 5: State = 3838 Action=0, Reward=-0.06311333179473877
+Step 6: State = 9639 Action=0, Reward=0.03171133995056152
+Step 7: State = 3507 Action=0, Reward=0.03140193223953247
+Step 8: State = 2025 Action=0, Reward=-0.07893747091293335
+Step 9: State = 3507 Action=0, Reward=0.07893747091293335
+Step 10: State = 1987 Action=0, Reward=0.02888047695159912
+Step 11: State = 8836 Action=0, Reward=-0.14970135688781738
+Step 12: State = 8477 Action=0, Reward=0.00777822732925415
+Step 13: State = 5255 Action=0, Reward=0.021641850471496582
+Step 14: State = 8947 Action=0, Reward=0.11400747299194336
+Step 15: State = 2435 Action=0, Reward=-0.11400747299194336
+Step 16: State = 4112 Action=0, Reward=0.05582273006439209
+Step 17: State = 4572 Action=0, Reward=0.07671225070953369
+Step 18: State = 7204 Action=0, Reward=-0.05818474292755127
+Step 19: State = 4236 Action=0, Reward=-0.11264300346374512
+Step 20: State = 1415 Action=0, Reward=0.050756096839904785
+Step 21: State = 2985 Action=0, Reward=0.03487372398376465
+Step 22: State = 5232 Action=0, Reward=-0.049854278564453125
+Step 23: State = 2716 Action=0, Reward=0.049854278564453125
+Step 24: State = 6395 Action=0, Reward=0.008592844009399414
+Step 25: State = 8342 Action=0, Reward=-0.016453444957733154
+Step 26: State = 9037 Action=0, Reward=-0.03379690647125244
+Step 27: State = 8983 Action=0, Reward=0.02260798215866089
+Step 28: State = 0 Action=0, Reward=-0.03247106075286865
+Step 29: State = 7241 Action=0, Reward=0.09498715400695801
+Step 30: State = 6894 Action=0, Reward=-0.08512407541275024
+Step 31: State = 7713 Action=0, Reward=0.03568834066390991
+Step 32: State = 6258 Action=0, Reward=-0.06649309396743774
+Step 33: State = 6861 Action=0, Reward=0.050250351428985596
+Step 34: State = 9355 Action=0, Reward=0.022211909294128418
+Step 35: State = 6861 Action=0, Reward=-0.022211909294128418
+Step 36: State = 3474 Action=0, Reward=-0.0003209710121154785
+Step 37: State = 2495 Action=0, Reward=0.10773080587387085
+Step 38: State = 8380 Action=0, Reward=-0.04943585395812988
+Step 39: State = 7223 Action=0, Reward=1.1920928955078125e-07
+Step 40: State = 8742 Action=0, Reward=-0.07802963256835938
+Step 41: State = 8185 Action=0, Reward=0.11988389492034912
+Step 42: State = 900 Action=0, Reward=-0.054934680461883545
+Step 43: State = 6698 Action=0, Reward=-0.02260798215866089
+Step 44: State = 5761 Action=0, Reward=0.05025029182434082
+Step 45: State = 4882 Action=0, Reward=0.012267112731933594
+Step 46: State = 1172 Action=0, Reward=-0.019124627113342285
+Step 47: State = 7372 Action=0, Reward=-0.16857826709747314
+Step 48: State = 8546 Action=1, Reward=0.017549753189086914
+Step 49: State = 7792 Action=0, Reward=0.10169631242752075
+Step 50: State = 4808 Action=0, Reward=0.018527448177337646
+Step 51: State = 5757 Action=0, Reward=-0.04505777359008789
+Step 52: State = 7562 Action=0, Reward=0.010184049606323242
+Step 53: State = 8658 Action=0, Reward=-0.06291216611862183
+Step 54: State = 2858 Action=0, Reward=0.0553169846534729
+Step 55: State = 8059 Action=0, Reward=0.0
+Step 56: State = 5923 Action=0, Reward=0.05474621057510376
+Step 57: State = 8059 Action=0, Reward=-0.05474621057510376
+Step 58: State = 306 Action=0, Reward=0.021946489810943604
+Step 59: State = 3633 Action=0, Reward=0.025363624095916748
+Step 60: State = 6557 Action=0, Reward=0.032821059226989746
+Step 61: State = 4334 Action=0, Reward=0.0348738431930542
+Step 62: State = 7158 Action=0, Reward=-0.0348738431930542
+Step 63: State = 4334 Action=0, Reward=0.0348738431930542
+Step 64: State = 3004 Action=0, Reward=0.027292370796203613
+Inference complete!
+Starting inference for test11...
+Starting inference from state 3114...
+Step 1: State = 6710 Action=0, Reward=-0.0228307843208313
+Step 2: State = 6796 Action=0, Reward=0.07571274042129517
+Inference complete!
+Starting inference for test11...
+Starting inference from state 3667...
+Step 1: State = 148 Action=1, Reward=0.17071998119354248
+Step 2: State = 1217 Action=0, Reward=-0.11282587051391602
+Step 3: State = 6482 Action=0, Reward=0.11282587051391602
+Step 4: State = 3809 Action=0, Reward=-0.08080732822418213
+Step 5: State = 8629 Action=0, Reward=0.051552414894104004
+Step 6: State = 491 Action=0, Reward=-0.002116680145263672
+Step 7: State = 6482 Action=0, Reward=0.0313715934753418
+Step 8: State = 7909 Action=0, Reward=-0.027292370796203613
+Step 9: State = 9390 Action=0, Reward=-0.004079222679138184
+Step 10: State = 905 Action=0, Reward=-0.04943573474884033
+Step 11: State = 4174 Action=0, Reward=0.0117836594581604
+Step 12: State = 9291 Action=0, Reward=0.0
+Step 13: State = 4174 Action=0, Reward=0.0
+Step 14: State = 4308 Action=0, Reward=-0.09291321039199829
+Step 15: State = 7160 Action=0, Reward=0.04892456531524658
+Step 16: State = 2811 Action=0, Reward=-0.10606217384338379
+Step 17: State = 9752 Action=1, Reward=0.09008586406707764
+Step 18: State = 5677 Action=0, Reward=0.09808039665222168
+Step 19: State = 165 Action=0, Reward=-0.027292370796203613
+Step 20: State = 5209 Action=0, Reward=-0.03568840026855469
+Step 21: State = 6686 Action=0, Reward=0.09388899803161621
+Step 22: State = 1131 Action=0, Reward=-0.03090822696685791
+Step 23: State = 6808 Action=0, Reward=0.014561891555786133
+Step 24: State = 1131 Action=0, Reward=-0.014561891555786133
+Step 25: State = 6808 Action=0, Reward=0.014561891555786133
+Step 26: State = 6707 Action=0, Reward=-0.027292370796203613
+Step 27: State = 6808 Action=0, Reward=0.027292370796203613
+Step 28: State = 2014 Action=0, Reward=-0.010946035385131836
+Step 29: State = 6707 Action=0, Reward=-0.016346335411071777
+Step 30: State = 3012 Action=0, Reward=-0.03716862201690674
+Step 31: State = 4420 Action=0, Reward=-0.013080358505249023
+Step 32: State = 4128 Action=0, Reward=0.08512282371520996
+Step 33: State = 4828 Action=0, Reward=-0.0348738431930542
+Step 34: State = 2314 Action=0, Reward=0.0348738431930542
+Step 35: State = 6508 Action=0, Reward=-0.007581472396850586
+Step 36: State = 6443 Action=0, Reward=-0.054934680461883545
+Step 37: State = 4271 Action=0, Reward=-0.01183408498764038
+Step 38: State = 8216 Action=0, Reward=0.0023077726364135742
+Step 39: State = 3731 Action=0, Reward=0.0
+Step 40: State = 8526 Action=0, Reward=0.07204246520996094
+Step 41: State = 4283 Action=0, Reward=-0.0348738431930542
+Step 42: State = 9586 Action=0, Reward=-0.03716862201690674
+Step 43: State = 7270 Action=0, Reward=-0.022944748401641846
+Step 44: State = 1466 Action=0, Reward=0.09498721361160278
+Step 45: State = 3025 Action=0, Reward=-0.08512413501739502
+Step 46: State = 9086 Action=0, Reward=0.06251740455627441
+Step 47: State = 9691 Action=0, Reward=-0.05399841070175171
+Step 48: State = 9086 Action=0, Reward=0.05399841070175171
+Step 49: State = 9404 Action=0, Reward=-0.1042487621307373
+Step 50: State = 4974 Action=0, Reward=-0.009863018989562988
+Step 51: State = 4936 Action=0, Reward=0.045551419258117676
+Step 52: State = 5353 Action=0, Reward=0.0186309814453125
+Step 53: State = 7113 Action=0, Reward=-0.06209754943847656
+Step 54: State = 2252 Action=0, Reward=-0.046968042850494385
+Step 55: State = 9819 Action=1, Reward=0.1404675841331482
+Step 56: State = 339 Action=0, Reward=-0.0664864182472229
+Step 57: State = 7255 Action=0, Reward=0.05818474292755127
+Step 58: State = 6972 Action=0, Reward=0.07067710161209106
+Inference complete!
+Starting inference for test11...
+Starting inference from state 160...
+Step 1: State = 2853 Action=0, Reward=-0.03487372398376465
+Step 2: State = 6391 Action=0, Reward=0.0
+Step 3: State = 3484 Action=0, Reward=0.03487372398376465
+Step 4: State = 2853 Action=0, Reward=-0.03487372398376465
+Step 5: State = 7879 Action=0, Reward=-0.04676699638366699
+Step 6: State = 5415 Action=0, Reward=0.06730401515960693
+Step 7: State = 3588 Action=0, Reward=0.01841592788696289
+Step 8: State = 1731 Action=0, Reward=0.03976881504058838
+Inference complete!
+Starting inference for test11...
+Starting inference from state 6688...
+Step 1: State = 1343 Action=2, Reward=0.06779628992080688
+Step 2: State = 1136 Action=0, Reward=0.0902172327041626
+Step 3: State = 4906 Action=0, Reward=-0.0662757158279419
+Step 4: State = 5537 Action=0, Reward=-0.04030412435531616
+Step 5: State = 1068 Action=0, Reward=0.07110881805419922
+Step 6: State = 5729 Action=0, Reward=0.016346335411071777
+Step 7: State = 8128 Action=0, Reward=-0.016453444957733154
+Step 8: State = 5285 Action=0, Reward=0.0
+Step 9: State = 809 Action=0, Reward=0.025417447090148926
+Step 10: State = 4422 Action=0, Reward=0.010160684585571289
+Step 11: State = 3777 Action=0, Reward=-0.010160624980926514
+Step 12: State = 6713 Action=0, Reward=-0.09641927480697632
+Step 13: State = 7283 Action=0, Reward=0.043653011322021484
+Step 14: State = 4590 Action=0, Reward=0.06115072965621948
+Step 15: State = 2864 Action=0, Reward=0.03532892465591431
+Step 16: State = 6553 Action=0, Reward=-0.08740592002868652
+Step 17: State = 8277 Action=0, Reward=0.03247112035751343
+Step 18: State = 2665 Action=0, Reward=0.0
+Step 19: State = 3222 Action=0, Reward=0.04037266969680786
+Step 20: State = 6319 Action=0, Reward=-0.027292370796203613
+Step 21: State = 9118 Action=0, Reward=-0.05829495191574097
+Step 22: State = 5692 Action=0, Reward=0.08920329809188843
+Step 23: State = 7323 Action=0, Reward=0.018527507781982422
+Step 24: State = 6417 Action=0, Reward=-0.018527507781982422
+Step 25: State = 9012 Action=0, Reward=0.09175097942352295
+Inference complete!
+Starting inference for test11...
+Starting inference from state 7616...
+Step 1: State = 8075 Action=0, Reward=-0.01842033863067627
+Step 2: State = 1069 Action=0, Reward=0.03487372398376465
+Step 3: State = 7616 Action=0, Reward=-0.01645338535308838
+Step 4: State = 6245 Action=0, Reward=0.05818474292755127
+Step 5: State = 9142 Action=0, Reward=-0.03522378206253052
+Step 6: State = 6939 Action=0, Reward=-0.022256672382354736
+Step 7: State = 3890 Action=0, Reward=-0.1592208743095398
+Step 8: State = 9515 Action=1, Reward=0.1446589231491089
+Step 9: State = 9528 Action=0, Reward=-0.05481302738189697
+Step 10: State = 7524 Action=0, Reward=0.010773956775665283
+Step 11: State = 7591 Action=0, Reward=0.011834025382995605
+Step 12: State = 2493 Action=0, Reward=0.0
+Step 13: State = 8879 Action=0, Reward=-0.0033731460571289062
+Step 14: State = 3328 Action=0, Reward=0.0033731460571289062
+Step 15: State = 8670 Action=0, Reward=-0.05530059337615967
+Step 16: State = 6676 Action=0, Reward=0.07442522048950195
+Step 17: State = 4875 Action=0, Reward=-0.011834025382995605
+Step 18: State = 2283 Action=0, Reward=-0.03809535503387451
+Step 19: State = 5788 Action=0, Reward=0.043885111808776855
+Step 20: State = 6621 Action=0, Reward=-0.052141785621643066
+Step 21: State = 1572 Action=0, Reward=0.1357274055480957
+Step 22: State = 2658 Action=0, Reward=-0.05025029182434082
+Step 23: State = 495 Action=0, Reward=0.0352250337600708
+Step 24: State = 6561 Action=0, Reward=-0.019124627113342285
+Step 25: State = 7651 Action=0, Reward=-0.030804753303527832
+Step 26: State = 4586 Action=0, Reward=-0.09498715400695801
+Step 27: State = 7696 Action=1, Reward=0.13264942169189453
+Step 28: State = 3134 Action=0, Reward=5.960464477539063e-08
+Step 29: State = 1245 Action=0, Reward=0.034873783588409424
+Step 30: State = 5767 Action=0, Reward=-0.04943573474884033
+Step 31: State = 9033 Action=0, Reward=-0.03568708896636963
+Step 32: State = 2060 Action=0, Reward=-1.3113021850585938e-06
+Step 33: State = 935 Action=0, Reward=0.0629807710647583
+Step 34: State = 1883 Action=0, Reward=-0.04037278890609741
+Step 35: State = 3326 Action=0, Reward=0.08375746011734009
+Inference complete!
+Starting inference for test11...
+Starting inference from state 5481...
+Step 1: State = 71 Action=0, Reward=-0.005695939064025879
+Step 2: State = 8314 Action=0, Reward=0.0625162124633789
+Step 3: State = 86 Action=0, Reward=0.08547711372375488
+Inference complete!
+Starting inference for test11...
+Starting inference from state 6293...
+Step 1: State = 7837 Action=0, Reward=0.013080358505249023
+Step 2: State = 305 Action=0, Reward=0.007168292999267578
+Step 3: State = 9110 Action=0, Reward=0.019734561443328857
+Step 4: State = 7458 Action=0, Reward=0.03568834066390991
+Step 5: State = 9198 Action=0, Reward=-0.004562675952911377
+Step 6: State = 7795 Action=0, Reward=0.056115150451660156
+Step 7: State = 9759 Action=0, Reward=-0.07057356834411621
+Step 8: State = 9564 Action=0, Reward=-0.06498169898986816
+Step 9: State = 3798 Action=0, Reward=0.12944024801254272
+Step 10: State = 6775 Action=0, Reward=-0.11930835247039795
+Step 11: State = 6162 Action=0, Reward=-0.016332387924194336
+Step 12: State = 917 Action=0, Reward=0.07118213176727295
+Step 13: State = 6200 Action=0, Reward=0.005939483642578125
+Step 14: State = 6105 Action=0, Reward=-0.011832714080810547
+Step 15: State = 8506 Action=0, Reward=0.0
+Step 16: State = 9774 Action=0, Reward=0.001969635486602783
+Step 17: State = 5324 Action=0, Reward=0.07238048315048218
+Step 18: State = 457 Action=0, Reward=-0.13505351543426514
+Step 19: State = 2388 Action=0, Reward=0.07253742218017578
+Step 20: State = 4319 Action=0, Reward=0.06659531593322754
+Step 21: State = 415 Action=0, Reward=0.045819878578186035
+Inference complete!
+Starting inference for test11...
+Starting inference from state 3059...
+Step 1: State = 3156 Action=1, Reward=0.046549439430236816
+Step 2: State = 6156 Action=0, Reward=0.030804753303527832
+Step 3: State = 138 Action=0, Reward=0.06251609325408936
+Step 4: State = 2851 Action=0, Reward=-0.06251609325408936
+Step 5: State = 2769 Action=0, Reward=0.06311333179473877
+Step 6: State = 7511 Action=0, Reward=0.01852738857269287
+Step 7: State = 1795 Action=0, Reward=-0.1449165940284729
+Step 8: State = 5609 Action=0, Reward=0.08240050077438354
+Step 9: State = 1584 Action=0, Reward=-0.03557807207107544
+Step 10: State = 6037 Action=0, Reward=0.029533743858337402
+Step 11: State = 9444 Action=0, Reward=0.005969226360321045
+Step 12: State = 7485 Action=0, Reward=0.008485674858093262
+Step 13: State = 1222 Action=0, Reward=-0.04842478036880493
+Step 14: State = 37 Action=0, Reward=-0.11129677295684814
+Step 15: State = 3116 Action=1, Reward=0.21790629625320435
+Step 16: State = 5321 Action=0, Reward=-0.05351489782333374
+Step 17: State = 3207 Action=0, Reward=0.07204240560531616
+Step 18: State = 9628 Action=0, Reward=-0.13422954082489014
+Step 19: State = 1024 Action=0, Reward=0.09900575876235962
+Step 20: State = 6613 Action=0, Reward=-0.02260798215866089
+Step 21: State = 8654 Action=0, Reward=-0.004684388637542725
+Step 22: State = 6964 Action=0, Reward=0.04398864507675171
+Step 23: State = 8883 Action=0, Reward=-0.03895294666290283
+Step 24: State = 6253 Action=0, Reward=-0.07757174968719482
+Step 25: State = 8231 Action=0, Reward=0.06300973892211914
+Step 26: State = 9811 Action=0, Reward=-0.04818129539489746
+Step 27: State = 4190 Action=0, Reward=0.05770760774612427
+Step 28: State = 9811 Action=0, Reward=-0.05770760774612427
+Step 29: State = 8883 Action=0, Reward=0.06274330615997314
+Step 30: State = 1833 Action=0, Reward=-0.05014002323150635
+Step 31: State = 8495 Action=0, Reward=0.10003900527954102
+Step 32: State = 1221 Action=0, Reward=-0.027292370796203613
+Step 33: State = 8888 Action=0, Reward=0.04363870620727539
+Step 34: State = 2895 Action=0, Reward=-0.0831151008605957
+Step 35: State = 4049 Action=0, Reward=0.016165494918823242
+Step 36: State = 6145 Action=0, Reward=-0.08512413501739502
+Step 37: State = 5810 Action=0, Reward=0.10843509435653687
+Step 38: State = 4848 Action=0, Reward=0.016346275806427002
+Step 39: State = 7168 Action=0, Reward=-0.05818474292755127
+Step 40: State = 9661 Action=0, Reward=-0.04398864507675171
+Step 41: State = 6819 Action=0, Reward=0.10217338800430298
+Step 42: State = 9623 Action=0, Reward=-0.039304256439208984
+Step 43: State = 6687 Action=0, Reward=-0.016518473625183105
+Step 44: State = 7583 Action=0, Reward=0.03261888027191162
+Step 45: State = 4305 Action=0, Reward=-0.018527448177337646
+Step 46: State = 9428 Action=0, Reward=0.039768755435943604
+Step 47: State = 7729 Action=0, Reward=-0.020644068717956543
+Step 48: State = 8191 Action=0, Reward=-0.031401991844177246
+Step 49: State = 7290 Action=0, Reward=-0.06251609325408936
+Step 50: State = 3102 Action=0, Reward=0.0939180850982666
+Step 51: State = 4231 Action=0, Reward=-0.03547102212905884
+Step 52: State = 134 Action=0, Reward=0.034873783588409424
+Step 53: State = 1947 Action=0, Reward=-0.018527448177337646
+Step 54: State = 3172 Action=0, Reward=0.0
+Step 55: State = 3459 Action=0, Reward=0.01912468671798706
+Step 56: State = 4130 Action=0, Reward=0.0
+Step 57: State = 4022 Action=0, Reward=-0.035578131675720215
+Step 58: State = 310 Action=0, Reward=0.029654383659362793
+Step 59: State = 989 Action=0, Reward=-0.015458285808563232
+Step 60: State = 5142 Action=0, Reward=0.08584052324295044
+Inference complete!
+Starting inference for test11...
+Starting inference from state 5774...
+Step 1: State = 9357 Action=0, Reward=-0.07253599166870117
+Step 2: State = 2626 Action=0, Reward=0.014458417892456055
+Step 3: State = 326 Action=0, Reward=-0.014561951160430908
+Step 4: State = 6279 Action=0, Reward=-0.012558281421661377
+Step 5: State = 4586 Action=0, Reward=-0.0637979507446289
+Step 6: State = 2693 Action=1, Reward=0.09091812372207642
+Step 7: State = 1430 Action=0, Reward=-0.02764230966567993
+Step 8: State = 8406 Action=0, Reward=0.013183891773223877
+Step 9: State = 5570 Action=0, Reward=-0.01666724681854248
+Step 10: State = 7427 Action=0, Reward=0.050250351428985596
+Step 11: State = 7752 Action=0, Reward=-0.05752456188201904
+Step 12: State = 5378 Action=0, Reward=-0.026478350162506104
+Step 13: State = 9352 Action=3, Reward=0.03375256061553955
+Step 14: State = 6561 Action=0, Reward=0.06599944829940796
+Step 15: State = 202 Action=0, Reward=-0.018527448177337646
+Step 16: State = 5588 Action=0, Reward=0.03976881504058838
+Step 17: State = 4903 Action=0, Reward=-0.056115150451660156
+Step 18: State = 4693 Action=0, Reward=-0.014561951160430908
+Step 19: State = 8459 Action=0, Reward=-0.029533803462982178
+Step 20: State = 8899 Action=0, Reward=-0.04154485464096069
+Step 21: State = 8328 Action=0, Reward=0.12737196683883667
+Step 22: State = 3531 Action=0, Reward=-0.037168681621551514
+Step 23: State = 7648 Action=0, Reward=-0.035367369651794434
+Step 24: State = 360 Action=0, Reward=0.03069758415222168
+Step 25: State = 3985 Action=0, Reward=-0.0665966272354126
+Step 26: State = 9939 Action=0, Reward=0.08512413501739502
+Step 27: State = 2226 Action=0, Reward=-0.09498727321624756
+Step 28: State = 8411 Action=0, Reward=0.15317201614379883
+Step 29: State = 4379 Action=0, Reward=-0.06251615285873413
+Step 30: State = 7978 Action=0, Reward=0.005035698413848877
+Step 31: State = 4379 Action=0, Reward=-0.005035698413848877
+Step 32: State = 4365 Action=0, Reward=0.06251615285873413
+Step 33: State = 6698 Action=0, Reward=-0.08512413501739502
+Step 34: State = 4753 Action=0, Reward=0.08512407541275024
+Step 35: State = 9395 Action=0, Reward=0.02729243040084839
+Inference complete!
+Agent action distribution for alfa = 0.5: [0.96141479 0.03215434 0.00321543 0.00321543]
+Inference for alfa = 0.75...
+Starting inference for test11...
+Starting inference from state 8458...
+Step 1: State = 1204 Action=0, Reward=-0.0709952712059021
+Step 2: State = 8349 Action=0, Reward=0.0709952712059021
+Step 3: State = 2572 Action=0, Reward=-0.013821184635162354
+Step 4: State = 3559 Action=0, Reward=-0.027117371559143066
+Step 5: State = 2572 Action=0, Reward=0.027117371559143066
+Step 6: State = 8965 Action=0, Reward=-0.005917012691497803
+Step 7: State = 9730 Action=0, Reward=0.01245725154876709
+Step 8: State = 1061 Action=0, Reward=-0.07484865188598633
+Step 9: State = 5562 Action=0, Reward=0.01545417308807373
+Step 10: State = 1894 Action=0, Reward=0.009263753890991211
+Step 11: State = 332 Action=0, Reward=0.04453068971633911
+Step 12: State = 2179 Action=0, Reward=-0.0009402036666870117
+Step 13: State = 5146 Action=0, Reward=-0.009680449962615967
+Step 14: State = 9103 Action=0, Reward=-0.0174369215965271
+Step 15: State = 5146 Action=0, Reward=0.0174369215965271
+Step 16: State = 6783 Action=0, Reward=0.04093855619430542
+Inference complete!
+Starting inference for test11...
+Starting inference from state 9875...
+Step 1: State = 1121 Action=1, Reward=0.12167555093765259
+Step 2: State = 7333 Action=0, Reward=-0.027117490768432617
+Step 3: State = 6280 Action=0, Reward=-0.10109829902648926
+Step 4: State = 1016 Action=3, Reward=-0.011176526546478271
+Step 5: State = 2160 Action=3, Reward=0.08221811056137085
+Step 6: State = 8042 Action=0, Reward=0.04749363660812378
+Step 7: State = 5810 Action=0, Reward=-0.0174369215965271
+Step 8: State = 3778 Action=0, Reward=0.04911172389984131
+Step 9: State = 4985 Action=0, Reward=-0.056392669677734375
+Step 10: State = 2844 Action=0, Reward=0.04093855619430542
+Step 11: State = 9122 Action=0, Reward=-0.07484865188598633
+Step 12: State = 5713 Action=0, Reward=0.04936420917510986
+Step 13: State = 8451 Action=0, Reward=-0.0427667498588562
+Step 14: State = 4828 Action=0, Reward=0.03459358215332031
+Step 15: State = 7157 Action=0, Reward=0.027117371559143066
+Step 16: State = 4864 Action=0, Reward=0.03125810623168945
+Inference complete!
+Starting inference for test11...
+Starting inference from state 2201...
+Step 1: State = 2204 Action=1, Reward=0.021526992321014404
+Step 2: State = 6972 Action=1, Reward=0.0872771143913269
+Step 3: State = 6226 Action=0, Reward=0.04093855619430542
+Inference complete!
+Starting inference for test11...
+Starting inference from state 6152...
+Step 1: State = 1379 Action=3, Reward=0.009945690631866455
+Step 2: State = 4765 Action=3, Reward=0.14445120096206665
+Step 3: State = 6920 Action=0, Reward=-0.034398436546325684
+Step 4: State = 7300 Action=0, Reward=-0.018455862998962402
+Step 5: State = 8358 Action=0, Reward=-0.01942312717437744
+Step 6: State = 6056 Action=0, Reward=-0.0774652361869812
+Step 7: State = 4576 Action=1, Reward=0.010222911834716797
+Step 8: State = 7880 Action=1, Reward=0.0332983136177063
+Step 9: State = 5681 Action=3, Reward=0.0949174165725708
+Step 10: State = 1842 Action=0, Reward=0.0016235113143920898
+Step 11: State = 437 Action=0, Reward=-0.07186073064804077
+Step 12: State = 6377 Action=0, Reward=0.020513713359832764
+Step 13: State = 2959 Action=0, Reward=0.06756770610809326
+Step 14: State = 2233 Action=0, Reward=-0.04747873544692993
+Step 15: State = 6714 Action=0, Reward=0.0
+Step 16: State = 7926 Action=0, Reward=0.047478675842285156
+Step 17: State = 6236 Action=0, Reward=-0.05013066530227661
+Step 18: State = 8262 Action=0, Reward=-0.07080399990081787
+Step 19: State = 7551 Action=1, Reward=-0.02512514591217041
+Step 20: State = 7230 Action=3, Reward=0.0035982131958007812
+Step 21: State = 4247 Action=1, Reward=0.032385945320129395
+Step 22: State = 4308 Action=3, Reward=-0.04091578722000122
+Step 23: State = 4143 Action=3, Reward=-0.07612943649291992
+Step 24: State = 8630 Action=3, Reward=0.14573216438293457
+Step 25: State = 9892 Action=0, Reward=-0.0646710991859436
+Step 26: State = 568 Action=3, Reward=-0.0264585018157959
+Step 27: State = 7439 Action=3, Reward=0.09766966104507446
+Step 28: State = 1631 Action=0, Reward=0.015454232692718506
+Step 29: State = 7439 Action=0, Reward=-0.015454232692718506
+Step 30: State = 1288 Action=0, Reward=0.05862802267074585
+Step 31: State = 618 Action=0, Reward=-0.0174369215965271
+Step 32: State = 1935 Action=0, Reward=-0.013821125030517578
+Step 33: State = 7478 Action=0, Reward=0.020166099071502686
+Step 34: State = 5200 Action=0, Reward=0.03459364175796509
+Step 35: State = 1902 Action=0, Reward=-0.04821956157684326
+Step 36: State = 9390 Action=0, Reward=-0.009192168712615967
+Step 37: State = 7991 Action=0, Reward=0.0
+Step 38: State = 2209 Action=0, Reward=-0.0601118803024292
+Step 39: State = 9993 Action=1, Reward=-0.002518951892852783
+Step 40: State = 518 Action=3, Reward=0.10622131824493408
+Step 41: State = 776 Action=0, Reward=-0.03439831733703613
+Step 42: State = 7542 Action=0, Reward=0.02848130464553833
+Step 43: State = 5027 Action=0, Reward=-0.013027191162109375
+Step 44: State = 6214 Action=0, Reward=0.0
+Step 45: State = 6103 Action=0, Reward=0.007640242576599121
+Step 46: State = 5145 Action=0, Reward=0.0
+Step 47: State = 7162 Action=0, Reward=0.0332983136177063
+Step 48: State = 9147 Action=0, Reward=-0.06558483839035034
+Step 49: State = 7991 Action=0, Reward=0.0
+Step 50: State = 9024 Action=0, Reward=-0.0174369215965271
+Step 51: State = 7991 Action=0, Reward=0.0174369215965271
+Step 52: State = 6639 Action=0, Reward=0.05741167068481445
+Step 53: State = 216 Action=0, Reward=-0.05741167068481445
+Step 54: State = 8963 Action=0, Reward=-0.10615211725234985
+Step 55: State = 1754 Action=1, Reward=0.09750008583068848
+Step 56: State = 9926 Action=0, Reward=0.0332983136177063
+Step 57: State = 4589 Action=0, Reward=-0.008173167705535889
+Step 58: State = 3483 Action=0, Reward=0.0
+Step 59: State = 264 Action=0, Reward=-0.04773116111755371
+Step 60: State = 4257 Action=0, Reward=0.00257110595703125
+Step 61: State = 6974 Action=0, Reward=-0.024717867374420166
+Step 62: State = 9729 Action=0, Reward=0.035967886447906494
+Step 63: State = 1199 Action=0, Reward=-0.13656175136566162
+Step 64: State = 2568 Action=1, Reward=0.17047178745269775
+Step 65: State = 3840 Action=0, Reward=0.0174369215965271
+Step 66: State = 1805 Action=0, Reward=-0.0174369215965271
+Step 67: State = 3840 Action=0, Reward=0.0174369215965271
+Step 68: State = 2794 Action=0, Reward=-0.05134695768356323
+Step 69: State = 4863 Action=0, Reward=-0.030056774616241455
+Step 70: State = 4388 Action=0, Reward=0.0013698339462280273
+Step 71: State = 4863 Action=0, Reward=-0.0013698339462280273
+Step 72: State = 3840 Action=0, Reward=0.08140373229980469
+Step 73: State = 5920 Action=0, Reward=-0.03125804662704468
+Step 74: State = 2895 Action=0, Reward=-0.005917072296142578
+Step 75: State = 3140 Action=0, Reward=-0.06384968757629395
+Step 76: State = 2305 Action=3, Reward=0.05353116989135742
+Step 77: State = 3456 Action=0, Reward=0.04749363660812378
+Step 78: State = 2159 Action=0, Reward=0.010620653629302979
+Step 79: State = 2179 Action=0, Reward=-0.0009402036666870117
+Step 80: State = 9103 Action=0, Reward=-0.027117371559143066
+Step 81: State = 6027 Action=0, Reward=-0.04967784881591797
+Step 82: State = 8039 Action=0, Reward=-0.07294738292694092
+Step 83: State = 3009 Action=3, Reward=0.0600283145904541
+Step 84: State = 5237 Action=0, Reward=-0.028770267963409424
+Step 85: State = 9563 Action=3, Reward=0.07754606008529663
+Step 86: State = 5930 Action=0, Reward=0.029634535312652588
+Step 87: State = 4516 Action=0, Reward=-0.04587012529373169
+Step 88: State = 2683 Action=0, Reward=0.0162355899810791
+Step 89: State = 2072 Action=0, Reward=-0.10351264476776123
+Step 90: State = 4730 Action=1, Reward=0.11733376979827881
+Step 91: State = 5209 Action=0, Reward=-0.02512514591217041
+Step 92: State = 6808 Action=0, Reward=0.06606370210647583
+Step 93: State = 4190 Action=0, Reward=-0.054759681224823
+Step 94: State = 7695 Action=0, Reward=0.06293284893035889
+Step 95: State = 6977 Action=0, Reward=-0.05639272928237915
+Step 96: State = 5791 Action=0, Reward=0.07627719640731812
+Inference complete!
+Starting inference for test11...
+Starting inference from state 8438...
+Step 1: State = 3163 Action=3, Reward=0.13189846277236938
+Step 2: State = 2996 Action=0, Reward=-0.029634535312652588
+Step 3: State = 4964 Action=0, Reward=0.040938496589660645
+Step 4: State = 1543 Action=0, Reward=-0.057174086570739746
+Step 5: State = 1217 Action=0, Reward=-0.004536867141723633
+Step 6: State = 148 Action=0, Reward=0.08370530605316162
+Step 7: State = 254 Action=0, Reward=-0.03167480230331421
+Step 8: State = 1915 Action=0, Reward=0.03167480230331421
+Step 9: State = 254 Action=0, Reward=-0.03167480230331421
+Step 10: State = 148 Action=0, Reward=0.03167480230331421
+Step 11: State = 5756 Action=0, Reward=-0.07484859228134155
+Step 12: State = 2811 Action=0, Reward=-0.12016576528549194
+Step 13: State = 3480 Action=3, Reward=0.037098586559295654
+Step 14: State = 9555 Action=1, Reward=0.06107288599014282
+Step 15: State = 1741 Action=0, Reward=0.006540119647979736
+Step 16: State = 585 Action=0, Reward=-0.0748940110206604
+Step 17: State = 6910 Action=3, Reward=0.09095984697341919
+Step 18: State = 1935 Action=0, Reward=0.011304080486297607
+Step 19: State = 2244 Action=0, Reward=0.0721966028213501
+Inference complete!
+Starting inference for test11...
+Starting inference from state 8293...
+Step 1: State = 5207 Action=3, Reward=-0.013875126838684082
+Step 2: State = 5152 Action=0, Reward=0.045214056968688965
+Step 3: State = 9526 Action=0, Reward=0.07219666242599487
+Inference complete!
+Starting inference for test11...
+Starting inference from state 6550...
+Step 1: State = 8032 Action=0, Reward=-0.03122037649154663
+Step 2: State = 3375 Action=1, Reward=-0.04229938983917236
+Step 3: State = 2851 Action=1, Reward=0.06697952747344971
+Step 4: State = 5454 Action=1, Reward=0.08276313543319702
+Step 5: State = 7817 Action=0, Reward=-0.006345033645629883
+Step 6: State = 2344 Action=0, Reward=-0.030056655406951904
+Step 7: State = 9317 Action=0, Reward=0.022775709629058838
+Step 8: State = 1468 Action=0, Reward=0.05639272928237915
+Step 9: State = 6068 Action=0, Reward=-0.08370530605316162
+Step 10: State = 7108 Action=0, Reward=0.05203050374984741
+Step 11: State = 3836 Action=0, Reward=-0.009263753890991211
+Step 12: State = 8562 Action=0, Reward=-0.08475816249847412
+Step 13: State = 9874 Action=1, Reward=0.08475816249847412
+Step 14: State = 9509 Action=0, Reward=0.01988440752029419
+Step 15: State = 1941 Action=0, Reward=-0.028057575225830078
+Step 16: State = 7241 Action=0, Reward=-0.045159995555877686
+Step 17: State = 4007 Action=0, Reward=-0.07092505693435669
+Step 18: State = 8945 Action=1, Reward=-0.08270430564880371
+Step 19: State = 3295 Action=3, Reward=0.13975417613983154
+Step 20: State = 3563 Action=0, Reward=-0.09388673305511475
+Step 21: State = 3922 Action=3, Reward=0.10519075393676758
+Step 22: State = 113 Action=3, Reward=-0.028687000274658203
+Step 23: State = 6426 Action=3, Reward=-0.18418383598327637
+Step 24: State = 8552 Action=3, Reward=0.16604387760162354
+Step 25: State = 5609 Action=3, Reward=0.046826958656311035
+Step 26: State = 6814 Action=0, Reward=-0.0741395354270935
+Step 27: State = 7812 Action=1, Reward=0.0741395354270935
+Step 28: State = 8013 Action=0, Reward=0.03125804662704468
+Step 29: State = 5841 Action=0, Reward=-0.018066227436065674
+Step 30: State = 7039 Action=0, Reward=-0.08508425951004028
+Step 31: State = 7324 Action=1, Reward=-0.0389137864112854
+Step 32: State = 96 Action=1, Reward=-0.016235649585723877
+Step 33: State = 1334 Action=1, Reward=0.2157115936279297
+Step 34: State = 825 Action=0, Reward=-0.013821065425872803
+Step 35: State = 5820 Action=0, Reward=-0.01894432306289673
+Step 36: State = 5108 Action=0, Reward=-0.03391003608703613
+Step 37: State = 9850 Action=0, Reward=-0.09034818410873413
+Step 38: State = 873 Action=1, Reward=0.1022639274597168
+Step 39: State = 6256 Action=0, Reward=0.021994292736053467
+Step 40: State = 2836 Action=0, Reward=0.009263753890991211
+Step 41: State = 5421 Action=0, Reward=-0.009263753890991211
+Step 42: State = 5692 Action=0, Reward=0.0
+Step 43: State = 9118 Action=0, Reward=-0.06720834970474243
+Step 44: State = 6882 Action=0, Reward=-0.003561735153198242
+Step 45: State = 4170 Action=3, Reward=0.04877579212188721
+Step 46: State = 1183 Action=0, Reward=0.03125804662704468
+Step 47: State = 1562 Action=0, Reward=0.03167480230331421
+Step 48: State = 968 Action=0, Reward=-0.07484865188598633
+Step 49: State = 7829 Action=0, Reward=-0.0748940110206604
+Step 50: State = 7784 Action=1, Reward=0.11644434928894043
+Step 51: State = 3017 Action=0, Reward=-0.04587012529373169
+Step 52: State = 3633 Action=0, Reward=0.04093855619430542
+Step 53: State = 4994 Action=0, Reward=0.0049315690994262695
+Step 54: State = 1903 Action=0, Reward=-0.07978016138076782
+Step 55: State = 2874 Action=0, Reward=0.11307847499847412
+Step 56: State = 9418 Action=0, Reward=-0.03167480230331421
+Step 57: State = 4651 Action=0, Reward=0.0
+Step 58: State = 5739 Action=0, Reward=-0.03391003608703613
+Step 59: State = 8436 Action=0, Reward=-0.06586205959320068
+Step 60: State = 4234 Action=0, Reward=0.003231227397918701
+Step 61: State = 4651 Action=0, Reward=0.09654086828231812
+Step 62: State = 9418 Action=0, Reward=0.0
+Step 63: State = 7340 Action=0, Reward=-0.04256206750869751
+Step 64: State = 4651 Action=0, Reward=0.04256206750869751
+Step 65: State = 8428 Action=0, Reward=-0.0016235113143920898
+Step 66: State = 6121 Action=0, Reward=-0.05700439214706421
+Step 67: State = 1560 Action=0, Reward=-0.013232827186584473
+Step 68: State = 9132 Action=3, Reward=0.02929866313934326
+Step 69: State = 6059 Action=0, Reward=0.008651971817016602
+Step 70: State = 9661 Action=0, Reward=-0.08462512493133545
+Step 71: State = 407 Action=3, Reward=0.013376176357269287
+Step 72: State = 5385 Action=3, Reward=0.01784414052963257
+Step 73: State = 9421 Action=0, Reward=0.023003339767456055
+Step 74: State = 2266 Action=0, Reward=0.01233530044555664
+Step 75: State = 3661 Action=0, Reward=-0.029427409172058105
+Step 76: State = 4451 Action=0, Reward=-0.023310303688049316
+Step 77: State = 4060 Action=1, Reward=-0.025125205516815186
+Step 78: State = 1867 Action=1, Reward=0.077808678150177
+Step 79: State = 5769 Action=0, Reward=0.0006835460662841797
+Step 80: State = 4432 Action=0, Reward=0.0
+Step 81: State = 1873 Action=0, Reward=0.0
+Step 82: State = 5267 Action=0, Reward=0.0174369215965271
+Step 83: State = 4941 Action=0, Reward=0.0435904860496521
+Step 84: State = 7340 Action=0, Reward=-0.05224251747131348
+Step 85: State = 1754 Action=0, Reward=0.0
+Step 86: State = 7340 Action=0, Reward=0.0
+Step 87: State = 9620 Action=0, Reward=-0.000611722469329834
+Step 88: State = 2151 Action=0, Reward=-0.021994292736053467
+Step 89: State = 9954 Action=0, Reward=-0.06835389137268066
+Step 90: State = 9367 Action=1, Reward=0.0860283374786377
+Step 91: State = 8296 Action=0, Reward=-0.039783477783203125
+Step 92: State = 9986 Action=3, Reward=-0.03125810623168945
+Step 93: State = 4549 Action=1, Reward=0.07597315311431885
+Step 94: State = 7936 Action=0, Reward=0.05224251747131348
+Step 95: State = 8386 Action=0, Reward=-0.03439831733703613
+Step 96: State = 438 Action=0, Reward=0.007280945777893066
+Step 97: State = 5512 Action=0, Reward=-0.10063087940216064
+Step 98: State = 3761 Action=1, Reward=0.08680975437164307
+Step 99: State = 2286 Action=0, Reward=-0.06638467311859131
+Step 100: State = 5032 Action=0, Reward=0.010365605354309082
+Inference complete!
+Starting inference for test11...
+Starting inference from state 9696...
+Step 1: State = 7754 Action=0, Reward=-0.05837547779083252
+Step 2: State = 3892 Action=0, Reward=-0.016473114490509033
+Step 3: State = 9706 Action=0, Reward=-0.0958017110824585
+Step 4: State = 7324 Action=3, Reward=-0.04626256227493286
+Step 5: State = 1777 Action=1, Reward=0.1743507981300354
+Step 6: State = 3390 Action=0, Reward=-0.004931509494781494
+Step 7: State = 7337 Action=0, Reward=0.006555020809173584
+Step 8: State = 7046 Action=0, Reward=-0.024717867374420166
+Step 9: State = 5209 Action=0, Reward=-0.017844200134277344
+Step 10: State = 1975 Action=0, Reward=0.06606370210647583
+Step 11: State = 1649 Action=0, Reward=-0.03276538848876953
+Step 12: State = 5354 Action=0, Reward=0.05020231008529663
+Inference complete!
+Starting inference for test11...
+Starting inference from state 7737...
+Step 1: State = 4764 Action=3, Reward=0.07489407062530518
+Step 2: State = 2996 Action=0, Reward=0.011915743350982666
+Step 3: State = 653 Action=0, Reward=0.013821125030517578
+Step 4: State = 4764 Action=0, Reward=-0.025736868381500244
+Step 5: State = 653 Action=0, Reward=0.025736868381500244
+Step 6: State = 6301 Action=0, Reward=-0.005852460861206055
+Step 7: State = 3292 Action=0, Reward=0.0
+Step 8: State = 1029 Action=0, Reward=-0.007968664169311523
+Step 9: State = 6840 Action=0, Reward=0.041878700256347656
+Step 10: State = 6173 Action=0, Reward=-0.07073253393173218
+Step 11: State = 8864 Action=0, Reward=0.026201844215393066
+Step 12: State = 358 Action=0, Reward=-0.026201844215393066
+Step 13: State = 1029 Action=0, Reward=0.02885383367538452
+Step 14: State = 6027 Action=0, Reward=-0.03585672378540039
+Step 15: State = 8864 Action=0, Reward=0.033204734325408936
+Step 16: State = 3296 Action=0, Reward=-0.07124894857406616
+Step 17: State = 4707 Action=3, Reward=-0.013376235961914062
+Step 18: State = 4393 Action=1, Reward=-0.035444796085357666
+Step 19: State = 7145 Action=3, Reward=0.05420792102813721
+Step 20: State = 3963 Action=3, Reward=0.018368422985076904
+Step 21: State = 5067 Action=0, Reward=0.06396675109863281
+Step 22: State = 3609 Action=0, Reward=-0.025736868381500244
+Step 23: State = 8110 Action=0, Reward=0.03391003608703613
+Step 24: State = 9971 Action=0, Reward=-0.1470339298248291
+Step 25: State = 1818 Action=1, Reward=0.003782987594604492
+Step 26: State = 7444 Action=1, Reward=0.07111102342605591
+Step 27: State = 2600 Action=3, Reward=0.0388416051864624
+Step 28: State = 8728 Action=0, Reward=-0.034094393253326416
+Step 29: State = 5282 Action=0, Reward=-0.003377377986907959
+Step 30: State = 2721 Action=0, Reward=0.008173108100891113
+Step 31: State = 8728 Action=0, Reward=-0.004795730113983154
+Step 32: State = 5282 Action=0, Reward=-0.003377377986907959
+Step 33: State = 2764 Action=0, Reward=0.008173167705535889
+Step 34: State = 2866 Action=0, Reward=-0.08443701267242432
+Step 35: State = 8540 Action=3, Reward=-0.014061152935028076
+Step 36: State = 8237 Action=3, Reward=0.05182361602783203
+Step 37: State = 1650 Action=1, Reward=0.11691170930862427
+Step 38: State = 3220 Action=0, Reward=-0.007640242576599121
+Step 39: State = 6628 Action=0, Reward=0.007640242576599121
+Step 40: State = 2722 Action=0, Reward=0.011303961277008057
+Step 41: State = 1964 Action=0, Reward=-0.05224251747131348
+Step 42: State = 9654 Action=0, Reward=-0.01606595516204834
+Step 43: State = 6931 Action=0, Reward=0.09956663846969604
+Inference complete!
+Starting inference for test11...
+Starting inference from state 3203...
+Step 1: State = 3539 Action=0, Reward=0.021994292736053467
+Step 2: State = 2682 Action=0, Reward=0.05285423994064331
+Step 3: State = 1892 Action=0, Reward=0.0065402984619140625
+Step 4: State = 988 Action=0, Reward=0.0
+Step 5: State = 1892 Action=0, Reward=0.0
+Step 6: State = 8429 Action=0, Reward=-0.04747879505157471
+Step 7: State = 8067 Action=0, Reward=0.05475974082946777
+Step 8: State = 6543 Action=0, Reward=-0.03276544809341431
+Step 9: State = 9914 Action=0, Reward=-0.11697721481323242
+Step 10: State = 4702 Action=1, Reward=0.06107288599014282
+Step 11: State = 2122 Action=0, Reward=0.0559043288230896
+Step 12: State = 9483 Action=0, Reward=-0.0721399188041687
+Step 13: State = 2122 Action=0, Reward=0.0721399188041687
+Step 14: State = 6369 Action=0, Reward=-0.027911365032196045
+Step 15: State = 474 Action=0, Reward=0.053395748138427734
+Step 16: State = 357 Action=0, Reward=-0.07633250951766968
+Step 17: State = 9460 Action=3, Reward=0.008764922618865967
+Step 18: State = 19 Action=0, Reward=-0.03005671501159668
+Step 19: State = 4687 Action=0, Reward=-0.0699625015258789
+Step 20: State = 8034 Action=1, Reward=0.0699625015258789
+Step 21: State = 4067 Action=1, Reward=0.001369774341583252
+Step 22: State = 9876 Action=3, Reward=-0.02713567018508911
+Step 23: State = 1515 Action=0, Reward=0.002455592155456543
+Step 24: State = 3050 Action=1, Reward=0.03954589366912842
+Step 25: State = 6318 Action=0, Reward=0.07578873634338379
+Step 26: State = 8448 Action=0, Reward=-0.03533858060836792
+Step 27: State = 9924 Action=0, Reward=0.05639272928237915
+Step 28: State = 3529 Action=0, Reward=-0.056392669677734375
+Step 29: State = 1252 Action=0, Reward=0.015454113483428955
+Step 30: State = 9811 Action=0, Reward=-0.05084812641143799
+Step 31: State = 3107 Action=0, Reward=0.0426749587059021
+Step 32: State = 1611 Action=0, Reward=-0.02512514591217041
+Step 33: State = 4375 Action=0, Reward=0.08350062370300293
+Inference complete!
+Agent action distribution for alfa = 0.75: [0.77419355 0.1085044  0.         0.11730205]
+Inference for alfa = 1...
+Starting inference for test11...
+Starting inference from state 5080...
+Step 1: State = 8537 Action=3, Reward=-0.08346259593963623
+Step 2: State = 6426 Action=3, Reward=-0.20710676908493042
+Step 3: State = 9213 Action=3, Reward=0.20710676908493042
+Step 4: State = 8821 Action=3, Reward=0.03824925422668457
+Step 5: State = 153 Action=3, Reward=-0.038249313831329346
+Step 6: State = 3873 Action=3, Reward=-0.03290683031082153
+Step 7: State = 5926 Action=3, Reward=0.11636948585510254
+Step 8: State = 1473 Action=3, Reward=0.0
+Step 9: State = 868 Action=3, Reward=-0.08346259593963623
+Step 10: State = 4443 Action=3, Reward=0.03824925422668457
+Step 11: State = 1714 Action=3, Reward=-0.09985876083374023
+Step 12: State = 6347 Action=3, Reward=0.09985876083374023
+Step 13: State = 9862 Action=3, Reward=-0.07115614414215088
+Step 14: State = 9470 Action=3, Reward=0.07115614414215088
+Step 15: State = 3027 Action=3, Reward=0.0
+Step 16: State = 4106 Action=3, Reward=0.04521334171295166
+Step 17: State = 3224 Action=3, Reward=-0.083462655544281
+Step 18: State = 1973 Action=3, Reward=0.0
+Step 19: State = 4306 Action=3, Reward=0.083462655544281
+Step 20: State = 1650 Action=3, Reward=0.05458474159240723
+Step 21: State = 3133 Action=3, Reward=-0.05458474159240723
+Step 22: State = 2506 Action=3, Reward=0.05458474159240723
+Step 23: State = 5215 Action=3, Reward=-0.13804739713668823
+Step 24: State = 3328 Action=3, Reward=0.0
+Step 25: State = 1392 Action=3, Reward=-0.03290683031082153
+Step 26: State = 4068 Action=3, Reward=-0.028702616691589355
+Step 27: State = 9525 Action=3, Reward=0.1450721025466919
+Step 28: State = 8227 Action=3, Reward=-5.960464477539063e-08
+Step 29: State = 5953 Action=3, Reward=-0.14507204294204712
+Step 30: State = 1476 Action=3, Reward=0.02870255708694458
+Step 31: State = 9132 Action=3, Reward=0.11636954545974731
+Step 32: State = 7798 Action=3, Reward=0.0
+Step 33: State = 5777 Action=3, Reward=-0.04521334171295166
+Step 34: State = 1884 Action=3, Reward=0.04521334171295166
+Step 35: State = 2036 Action=3, Reward=0.05458474159240723
+Step 36: State = 3465 Action=3, Reward=-0.13804739713668823
+Step 37: State = 2653 Action=3, Reward=-0.06160944700241089
+Step 38: State = 8948 Action=3, Reward=0.1450721025466919
+Step 39: State = 565 Action=3, Reward=-0.04521334171295166
+Step 40: State = 432 Action=3, Reward=-0.09985882043838501
+Step 41: State = 2665 Action=3, Reward=0.14507216215133667
+Step 42: State = 2647 Action=3, Reward=0.0
+Step 43: State = 2978 Action=3, Reward=-0.08346259593963623
+Step 44: State = 3393 Action=3, Reward=0.03824913501739502
+Step 45: State = 5387 Action=3, Reward=1.1920928955078125e-07
+Step 46: State = 4559 Action=3, Reward=-0.03824925422668457
+Step 47: State = 8039 Action=3, Reward=-0.061609506607055664
+Step 48: State = 2679 Action=3, Reward=-5.960464477539063e-08
+Step 49: State = 8181 Action=3, Reward=0.09985882043838501
+Step 50: State = 4694 Action=3, Reward=0.0
+Step 51: State = 9091 Action=3, Reward=-0.16800570487976074
+Step 52: State = 9485 Action=3, Reward=0.2132190465927124
+Step 53: State = 9024 Action=3, Reward=-0.04521334171295166
+Step 54: State = 3384 Action=3, Reward=0.04521334171295166
+Step 55: State = 9192 Action=3, Reward=0.0
+Step 56: State = 330 Action=3, Reward=0.12230151891708374
+Inference complete!
+Starting inference for test11...
+Starting inference from state 3571...
+Step 1: State = 885 Action=3, Reward=-0.04521334171295166
+Step 2: State = 4746 Action=3, Reward=0.0
+Step 3: State = 8324 Action=3, Reward=-1.1920928955078125e-07
+Step 4: State = 2221 Action=3, Reward=-0.09985864162445068
+Step 5: State = 5591 Action=3, Reward=0.09985864162445068
+Step 6: State = 8481 Action=3, Reward=1.1920928955078125e-07
+Step 7: State = 2805 Action=3, Reward=-0.09985876083374023
+Step 8: State = 4807 Action=3, Reward=0.061609506607055664
+Step 9: State = 692 Action=3, Reward=0.0
+Step 10: State = 1678 Action=3, Reward=-0.08693313598632812
+Step 11: State = 2353 Action=3, Reward=0.12518227100372314
+Step 12: State = 334 Action=3, Reward=1.1920928955078125e-07
+Step 13: State = 7657 Action=3, Reward=-0.07115614414215088
+Step 14: State = 812 Action=3, Reward=0.11636948585510254
+Step 15: State = 9252 Action=3, Reward=-0.083462655544281
+Step 16: State = 4637 Action=3, Reward=0.13804739713668823
+Step 17: State = 9155 Action=3, Reward=-0.13804739713668823
+Step 18: State = 140 Action=3, Reward=-0.06160944700241089
+Step 19: State = 8797 Action=3, Reward=-1.1920928955078125e-07
+Step 20: State = 3863 Action=3, Reward=0.19965696334838867
+Step 21: State = 2555 Action=3, Reward=-0.09979808330535889
+Step 22: State = 1904 Action=3, Reward=0.09979808330535889
+Step 23: State = 7448 Action=3, Reward=-0.13804733753204346
+Step 24: State = 4670 Action=3, Reward=0.03824925422668457
+Step 25: State = 2640 Action=3, Reward=0.0
+Step 26: State = 6915 Action=3, Reward=-0.09985876083374023
+Step 27: State = 2274 Action=3, Reward=0.09985876083374023
+Step 28: State = 6027 Action=3, Reward=0.04521334171295166
+Step 29: State = 4774 Action=3, Reward=0.05458474159240723
+Step 30: State = 1552 Action=3, Reward=-0.13804733753204346
+Step 31: State = 7585 Action=3, Reward=0.03824925422668457
+Step 32: State = 3793 Action=3, Reward=0.04521334171295166
+Step 33: State = 1059 Action=3, Reward=-0.04521346092224121
+Step 34: State = 5264 Action=3, Reward=-0.09985864162445068
+Step 35: State = 779 Action=3, Reward=0.028702616691589355
+Step 36: State = 7420 Action=3, Reward=0.07115614414215088
+Step 37: State = 3081 Action=3, Reward=0.0
+Step 38: State = 4143 Action=3, Reward=-0.20302987098693848
+Step 39: State = 5234 Action=3, Reward=0.24824315309524536
+Step 40: State = 3781 Action=3, Reward=0.054584801197052
+Step 41: State = 1392 Action=3, Reward=-0.17095422744750977
+Step 42: State = 9941 Action=3, Reward=0.03290683031082153
+Step 43: State = 9124 Action=3, Reward=-0.03290688991546631
+Step 44: State = 3238 Action=3, Reward=0.11636954545974731
+Step 45: State = 2719 Action=3, Reward=0.05458474159240723
+Step 46: State = 1064 Action=3, Reward=-0.09979808330535889
+Step 47: State = 581 Action=3, Reward=0.1675148606300354
+Inference complete!
+Starting inference for test11...
+Starting inference from state 4278...
+Step 1: State = 3507 Action=3, Reward=-0.1675148606300354
+Step 2: State = 390 Action=3, Reward=-0.09985882043838501
+Step 3: State = 9445 Action=3, Reward=0.1996569037437439
+Step 4: State = 1306 Action=3, Reward=-0.09979808330535889
+Step 5: State = 9273 Action=3, Reward=0.0
+Step 6: State = 2615 Action=3, Reward=0.0
+Step 7: State = 8676 Action=3, Reward=0.0
+Step 8: State = 5106 Action=3, Reward=-0.038249313831329346
+Step 9: State = 3103 Action=3, Reward=0.0
+Step 10: State = 8679 Action=3, Reward=0.038249194622039795
+Step 11: State = 8596 Action=3, Reward=0.09979820251464844
+Step 12: State = 8849 Action=3, Reward=-0.13804739713668823
+Step 13: State = 7548 Action=3, Reward=0.038249313831329346
+Step 14: State = 3200 Action=3, Reward=-0.03824925422668457
+Step 15: State = 6652 Action=3, Reward=0.03824925422668457
+Step 16: State = 7637 Action=3, Reward=-0.038249313831329346
+Step 17: State = 7487 Action=3, Reward=0.083462655544281
+Step 18: State = 4137 Action=3, Reward=-0.083462655544281
+Step 19: State = 3046 Action=3, Reward=0.13804739713668823
+Step 20: State = 2062 Action=3, Reward=-0.05458474159240723
+Step 21: State = 9479 Action=3, Reward=-0.04521334171295166
+Step 22: State = 2986 Action=3, Reward=0.0
+Step 23: State = 7733 Action=3, Reward=0.09979808330535889
+Step 24: State = 1978 Action=3, Reward=-0.17095428705215454
+Step 25: State = 7396 Action=3, Reward=5.960464477539063e-08
+Step 26: State = 9267 Action=3, Reward=0.11636948585510254
+Step 27: State = 9683 Action=3, Reward=-0.083462655544281
+Step 28: State = 7157 Action=3, Reward=0.13804739713668823
+Step 29: State = 6625 Action=3, Reward=-0.05458474159240723
+Step 30: State = 5368 Action=3, Reward=-0.17039573192596436
+Step 31: State = 685 Action=3, Reward=0.17039573192596436
+Step 32: State = 7032 Action=3, Reward=-0.083462655544281
+Step 33: State = 1543 Action=3, Reward=0.083462655544281
+Step 34: State = 4313 Action=3, Reward=0.05458474159240723
+Step 35: State = 4294 Action=3, Reward=-0.05458474159240723
+Step 36: State = 3629 Action=3, Reward=-0.04521334171295166
+Step 37: State = 3405 Action=3, Reward=0.0
+Step 38: State = 9662 Action=3, Reward=0.04521334171295166
+Step 39: State = 5987 Action=3, Reward=-0.04521334171295166
+Step 40: State = 9142 Action=3, Reward=0.09979808330535889
+Step 41: State = 6372 Action=3, Reward=0.0
+Step 42: State = 8959 Action=3, Reward=-0.13804739713668823
+Step 43: State = 2622 Action=3, Reward=0.038249313831329346
+Step 44: State = 4528 Action=3, Reward=0.0
+Step 45: State = 2342 Action=3, Reward=-0.038249313831329346
+Step 46: State = 1794 Action=3, Reward=0.038249313831329346
+Step 47: State = 8324 Action=3, Reward=-1.1920928955078125e-07
+Step 48: State = 8248 Action=3, Reward=0.04521346092224121
+Step 49: State = 3790 Action=3, Reward=0.0
+Step 50: State = 1153 Action=3, Reward=0.0
+Step 51: State = 7464 Action=3, Reward=-0.04521334171295166
+Step 52: State = 3796 Action=3, Reward=0.09979808330535889
+Step 53: State = 3211 Action=3, Reward=0.06771677732467651
+Inference complete!
+Starting inference for test11...
+Starting inference from state 7219...
+Step 1: State = 9769 Action=3, Reward=-0.04521334171295166
+Step 2: State = 7700 Action=3, Reward=-0.07115614414215088
+Step 3: State = 7244 Action=3, Reward=0.17095422744750977
+Step 4: State = 9561 Action=3, Reward=-0.13804733753204346
+Step 5: State = 9915 Action=3, Reward=0.08346259593963623
+Step 6: State = 4003 Action=3, Reward=-0.04521334171295166
+Step 7: State = 3411 Action=3, Reward=0.09979808330535889
+Step 8: State = 6348 Action=3, Reward=1.1920928955078125e-07
+Step 9: State = 6076 Action=3, Reward=-0.19965702295303345
+Step 10: State = 5634 Action=3, Reward=0.06160956621170044
+Step 11: State = 121 Action=3, Reward=-0.061609506607055664
+Step 12: State = 5589 Action=3, Reward=0.1450721025466919
+Step 13: State = 4562 Action=3, Reward=0.0
+Step 14: State = 6950 Action=3, Reward=-0.04521346092224121
+Step 15: State = 7654 Action=3, Reward=1.1920928955078125e-07
+Step 16: State = 5915 Action=3, Reward=-0.038249313831329346
+Step 17: State = 2819 Action=3, Reward=0.0
+Step 18: State = 6333 Action=3, Reward=-0.03290683031082153
+Step 19: State = 4344 Action=3, Reward=0.0
+Step 20: State = 8286 Action=3, Reward=0.17095422744750977
+Step 21: State = 7469 Action=3, Reward=-0.17095428705215454
+Step 22: State = 6145 Action=3, Reward=5.960464477539063e-08
+Step 23: State = 4 Action=3, Reward=0.11636948585510254
+Step 24: State = 2119 Action=3, Reward=-0.04521334171295166
+Step 25: State = 9095 Action=3, Reward=0.04521334171295166
+Step 26: State = 4299 Action=3, Reward=-0.17039573192596436
+Step 27: State = 8319 Action=3, Reward=0.22498047351837158
+Step 28: State = 9385 Action=3, Reward=-0.17095422744750977
+Step 29: State = 8016 Action=3, Reward=0.0
+Step 30: State = 5956 Action=3, Reward=0.03290688991546631
+Step 31: State = 5152 Action=3, Reward=0.08346259593963623
+Step 32: State = 9623 Action=3, Reward=0.05458474159240723
+Step 33: State = 8134 Action=3, Reward=-0.13804739713668823
+Step 34: State = 1122 Action=3, Reward=0.083462655544281
+Step 35: State = 5214 Action=3, Reward=-0.083462655544281
+Step 36: State = 7824 Action=3, Reward=0.13804739713668823
+Step 37: State = 5261 Action=3, Reward=-0.05458474159240723
+Step 38: State = 539 Action=3, Reward=0.05458474159240723
+Step 39: State = 6995 Action=3, Reward=-0.09979808330535889
+Step 40: State = 6264 Action=3, Reward=0.0
+Step 41: State = 8013 Action=3, Reward=0.0
+Step 42: State = 4043 Action=3, Reward=-0.09985882043838501
+Step 43: State = 7137 Action=3, Reward=0.09985882043838501
+Step 44: State = 9486 Action=3, Reward=-0.09985882043838501
+Step 45: State = 1511 Action=3, Reward=0.1996569037437439
+Step 46: State = 953 Action=3, Reward=-0.05458474159240723
+Step 47: State = 1829 Action=3, Reward=0.0
+Step 48: State = 3150 Action=3, Reward=-0.1450721025466919
+Step 49: State = 9087 Action=3, Reward=0.09985876083374023
+Step 50: State = 5087 Action=3, Reward=0.1675148606300354
+Inference complete!
+Starting inference for test11...
+Starting inference from state 2607...
+Step 1: State = 6974 Action=3, Reward=-0.03824925422668457
+Step 2: State = 9508 Action=3, Reward=0.0
+Step 3: State = 2286 Action=3, Reward=0.03824925422668457
+Step 4: State = 4010 Action=3, Reward=0.045213282108306885
+Step 5: State = 2715 Action=3, Reward=0.0
+Step 6: State = 4410 Action=3, Reward=5.960464477539063e-08
+Step 7: State = 3264 Action=3, Reward=0.05458474159240723
+Step 8: State = 5560 Action=3, Reward=-0.09979808330535889
+Step 9: State = 4064 Action=3, Reward=0.04521334171295166
+Step 10: State = 355 Action=3, Reward=0.0
+Step 11: State = 425 Action=3, Reward=-0.04521334171295166
+Step 12: State = 2255 Action=3, Reward=0.09979808330535889
+Step 13: State = 6828 Action=3, Reward=0.0
+Step 14: State = 9523 Action=3, Reward=1.1920928955078125e-07
+Step 15: State = 7107 Action=3, Reward=-0.05458486080169678
+Step 16: State = 8955 Action=3, Reward=-0.11636948585510254
+Step 17: State = 3786 Action=3, Reward=0.17095422744750977
+Step 18: State = 3841 Action=3, Reward=-0.05458474159240723
+Step 19: State = 6590 Action=3, Reward=-0.08346259593963623
+Step 20: State = 8978 Action=3, Reward=-0.032906949520111084
+Step 21: State = 611 Action=3, Reward=0.07115620374679565
+Step 22: State = 7504 Action=3, Reward=-0.07115614414215088
+Step 23: State = 2657 Action=3, Reward=0.07115614414215088
+Step 24: State = 8553 Action=3, Reward=0.0
+Step 25: State = 3555 Action=3, Reward=0.04521334171295166
+Step 26: State = 1419 Action=3, Reward=-0.14507216215133667
+Step 27: State = 5781 Action=3, Reward=5.960464477539063e-08
+Step 28: State = 6779 Action=3, Reward=0.06160944700241089
+Step 29: State = 9635 Action=3, Reward=-0.08693307638168335
+Step 30: State = 7104 Action=3, Reward=0.08693307638168335
+Step 31: State = 3603 Action=3, Reward=0.038249313831329346
+Step 32: State = 3517 Action=3, Reward=0.04521334171295166
+Step 33: State = 5486 Action=3, Reward=-0.04521334171295166
+Step 34: State = 504 Action=3, Reward=0.04521334171295166
+Step 35: State = 9719 Action=3, Reward=-0.083462655544281
+Step 36: State = 5902 Action=3, Reward=0.083462655544281
+Step 37: State = 939 Action=3, Reward=-0.083462655544281
+Step 38: State = 4250 Action=3, Reward=0.083462655544281
+Step 39: State = 4740 Action=3, Reward=-0.08346259593963623
+Step 40: State = 8845 Action=3, Reward=-5.960464477539063e-08
+Step 41: State = 2275 Action=3, Reward=5.960464477539063e-08
+Step 42: State = 9125 Action=3, Reward=0.03824925422668457
+Step 43: State = 6588 Action=3, Reward=0.04521334171295166
+Step 44: State = 8326 Action=3, Reward=-0.11636954545974731
+Step 45: State = 1322 Action=3, Reward=5.960464477539063e-08
+Step 46: State = 1384 Action=3, Reward=0.07115614414215088
+Step 47: State = 7410 Action=3, Reward=-0.038249313831329346
+Step 48: State = 5007 Action=3, Reward=-0.03290683031082153
+Step 49: State = 7084 Action=3, Reward=0.07115614414215088
+Step 50: State = 6146 Action=3, Reward=0.1675148606300354
+Inference complete!
+Starting inference for test11...
+Starting inference from state 4074...
+Step 1: State = 607 Action=3, Reward=0.07115614414215088
+Step 2: State = 100 Action=3, Reward=0.0
+Step 3: State = 9468 Action=3, Reward=-0.09985876083374023
+Step 4: State = 7082 Action=3, Reward=0.19965696334838867
+Step 5: State = 3042 Action=3, Reward=-0.09979820251464844
+Step 6: State = 1323 Action=3, Reward=0.04521334171295166
+Step 7: State = 6757 Action=3, Reward=-0.08346259593963623
+Step 8: State = 3346 Action=3, Reward=-0.06160956621170044
+Step 9: State = 1067 Action=3, Reward=0.06160956621170044
+Step 10: State = 9551 Action=3, Reward=-0.03290688991546631
+Step 11: State = 4801 Action=3, Reward=0.0
+Step 12: State = 7383 Action=3, Reward=0.11636948585510254
+Step 13: State = 3548 Action=3, Reward=-0.083462655544281
+Step 14: State = 1420 Action=3, Reward=5.960464477539063e-08
+Step 15: State = 4563 Action=3, Reward=-0.12975651025772095
+Step 16: State = 4701 Action=3, Reward=0.06814700365066528
+Step 17: State = 5967 Action=3, Reward=0.1450721025466919
+Step 18: State = 7252 Action=3, Reward=0.05458486080169678
+Step 19: State = 8107 Action=3, Reward=-0.09979820251464844
+Step 20: State = 7129 Action=3, Reward=0.0
+Step 21: State = 6911 Action=3, Reward=0.04521334171295166
+Step 22: State = 3038 Action=3, Reward=0.0
+Step 23: State = 584 Action=3, Reward=0.05458474159240723
+Step 24: State = 2101 Action=3, Reward=-0.13804739713668823
+Step 25: State = 2953 Action=3, Reward=0.038249313831329346
+Step 26: State = 4710 Action=3, Reward=-0.07115614414215088
+Step 27: State = 1671 Action=3, Reward=0.11636948585510254
+Step 28: State = 7369 Action=3, Reward=-0.04521334171295166
+Step 29: State = 7760 Action=3, Reward=-0.18633896112442017
+Step 30: State = 9004 Action=3, Reward=0.18633896112442017
+Step 31: State = 763 Action=3, Reward=-1.1920928955078125e-07
+Step 32: State = 8931 Action=3, Reward=-0.09985870122909546
+Step 33: State = 2491 Action=3, Reward=0.14507216215133667
+Step 34: State = 4855 Action=3, Reward=0.0
+Step 35: State = 9706 Action=3, Reward=-0.083462655544281
+Step 36: State = 1304 Action=3, Reward=0.038249313831329346
+Step 37: State = 4450 Action=3, Reward=0.09979808330535889
+Step 38: State = 2485 Action=3, Reward=-0.13804739713668823
+Step 39: State = 6271 Action=3, Reward=0.0
+Step 40: State = 5292 Action=3, Reward=-0.03290683031082153
+Step 41: State = 5224 Action=3, Reward=0.17095422744750977
+Step 42: State = 5654 Action=3, Reward=-0.05458474159240723
+Step 43: State = 5974 Action=3, Reward=0.0
+Step 44: State = 9612 Action=3, Reward=0.0
+Step 45: State = 5466 Action=3, Reward=0.0
+Step 46: State = 9815 Action=3, Reward=-0.08346259593963623
+Step 47: State = 7 Action=3, Reward=0.08346259593963623
+Step 48: State = 9333 Action=3, Reward=0.05458474159240723
+Step 49: State = 2901 Action=3, Reward=-0.09979808330535889
+Step 50: State = 3414 Action=3, Reward=0.04521334171295166
+Step 51: State = 4974 Action=3, Reward=-0.083462655544281
+Step 52: State = 9533 Action=3, Reward=0.13804739713668823
+Step 53: State = 1190 Action=3, Reward=-0.09979820251464844
+Step 54: State = 3355 Action=3, Reward=0.04521346092224121
+Step 55: State = 7790 Action=3, Reward=0.0
+Step 56: State = 1204 Action=3, Reward=0.0
+Step 57: State = 8328 Action=3, Reward=0.0
+Step 58: State = 5605 Action=3, Reward=-0.08346259593963623
+Step 59: State = 1903 Action=3, Reward=0.03824925422668457
+Step 60: State = 2905 Action=3, Reward=0.0
+Step 61: State = 9463 Action=3, Reward=0.04521334171295166
+Step 62: State = 6373 Action=3, Reward=-0.11636954545974731
+Step 63: State = 3273 Action=3, Reward=0.032906949520111084
+Step 64: State = 5760 Action=3, Reward=-5.960464477539063e-08
+Step 65: State = 9348 Action=3, Reward=-0.08693307638168335
+Step 66: State = 1332 Action=3, Reward=0.1251823902130127
+Step 67: State = 2811 Action=3, Reward=-0.07115614414215088
+Step 68: State = 8763 Action=3, Reward=0.17095422744750977
+Step 69: State = 8300 Action=3, Reward=-0.19965684413909912
+Step 70: State = 9323 Action=3, Reward=0.26737362146377563
+Inference complete!
+Starting inference for test11...
+Starting inference from state 3493...
+Step 1: State = 2621 Action=3, Reward=0.14507216215133667
+Step 2: State = 960 Action=3, Reward=-0.11636948585510254
+Step 3: State = 8843 Action=3, Reward=-5.960464477539063e-08
+Step 4: State = 7175 Action=3, Reward=0.11636954545974731
+Step 5: State = 8001 Action=3, Reward=-0.11636948585510254
+Step 6: State = 1481 Action=3, Reward=0.03290683031082153
+Step 7: State = 4048 Action=3, Reward=0.13804739713668823
+Step 8: State = 4542 Action=3, Reward=-0.05458474159240723
+Step 9: State = 8836 Action=3, Reward=-0.08346259593963623
+Step 10: State = 2342 Action=3, Reward=-5.960464477539063e-08
+Step 11: State = 8460 Action=3, Reward=0.0
+Step 12: State = 9653 Action=3, Reward=0.083462655544281
+Step 13: State = 1530 Action=3, Reward=-0.083462655544281
+Step 14: State = 2865 Action=3, Reward=0.038249313831329346
+Step 15: State = 2325 Action=3, Reward=0.0
+Step 16: State = 2222 Action=3, Reward=-1.1920928955078125e-07
+Step 17: State = 4052 Action=3, Reward=1.1920928955078125e-07
+Step 18: State = 5357 Action=3, Reward=-0.038249313831329346
+Step 19: State = 5369 Action=3, Reward=0.038249313831329346
+Step 20: State = 5265 Action=3, Reward=0.0
+Step 21: State = 4287 Action=3, Reward=0.09979808330535889
+Step 22: State = 1438 Action=3, Reward=-0.09979808330535889
+Step 23: State = 9811 Action=3, Reward=0.04521334171295166
+Step 24: State = 9886 Action=3, Reward=-0.08346259593963623
+Step 25: State = 1621 Action=3, Reward=0.20576411485671997
+Inference complete!
+Starting inference for test11...
+Starting inference from state 8269...
+Step 1: State = 6161 Action=3, Reward=-0.13804739713668823
+Step 2: State = 4612 Action=3, Reward=-0.08693307638168335
+Step 3: State = 1667 Action=3, Reward=0.02532362937927246
+Step 4: State = 3963 Action=3, Reward=0.09985876083374023
+Step 5: State = 1390 Action=3, Reward=-0.09985882043838501
+Step 6: State = 2174 Action=3, Reward=0.0
+Step 7: State = 8116 Action=3, Reward=0.09985882043838501
+Step 8: State = 2471 Action=3, Reward=-0.038249313831329346
+Step 9: State = 5649 Action=3, Reward=0.083462655544281
+Step 10: State = 2114 Action=3, Reward=0.0
+Step 11: State = 7566 Action=3, Reward=-0.17039573192596436
+Step 12: State = 3988 Action=3, Reward=0.054026246070861816
+Step 13: State = 4782 Action=3, Reward=0.07115614414215088
+Step 14: State = 897 Action=3, Reward=0.09979808330535889
+Step 15: State = 4548 Action=3, Reward=-0.09979820251464844
+Step 16: State = 6854 Action=3, Reward=-0.12518227100372314
+Step 17: State = 7214 Action=3, Reward=0.1251823902130127
+Step 18: State = 9183 Action=3, Reward=-0.03824925422668457
+Step 19: State = 6827 Action=3, Reward=-0.03290688991546631
+Step 20: State = 7317 Action=3, Reward=0.11636948585510254
+Step 21: State = 2602 Action=3, Reward=-0.17039573192596436
+Step 22: State = 3373 Action=3, Reward=0.08693307638168335
+Step 23: State = 5289 Action=3, Reward=0.13804739713668823
+Step 24: State = 385 Action=3, Reward=0.06771677732467651
+Inference complete!
+Starting inference for test11...
+Starting inference from state 3668...
+Step 1: State = 9348 Action=3, Reward=-0.08693307638168335
+Step 2: State = 5073 Action=3, Reward=0.17039573192596436
+Step 3: State = 3376 Action=3, Reward=-0.21321910619735718
+Step 4: State = 6961 Action=3, Reward=0.21321910619735718
+Step 5: State = 2424 Action=3, Reward=-0.21321910619735718
+Step 6: State = 5204 Action=3, Reward=0.21321910619735718
+Step 7: State = 931 Action=3, Reward=-0.04521334171295166
+Step 8: State = 1841 Action=3, Reward=-0.09985882043838501
+Step 9: State = 6545 Action=3, Reward=0.14507216215133667
+Step 10: State = 2855 Action=3, Reward=0.0
+Step 11: State = 4919 Action=3, Reward=-0.17039573192596436
+Step 12: State = 1864 Action=3, Reward=0.025323569774627686
+Step 13: State = 2511 Action=3, Reward=0.14507216215133667
+Step 14: State = 2668 Action=3, Reward=0.20943045616149902
+Inference complete!
+Starting inference for test11...
+Starting inference from state 2324...
+Step 1: State = 4132 Action=3, Reward=0.0
+Step 2: State = 7105 Action=3, Reward=-0.03824925422668457
+Step 3: State = 1571 Action=3, Reward=-5.960464477539063e-08
+Step 4: State = 6884 Action=3, Reward=-0.03290683031082153
+Step 5: State = 3042 Action=3, Reward=0.07115614414215088
+Step 6: State = 3458 Action=3, Reward=-0.07115614414215088
+Step 7: State = 2029 Action=3, Reward=0.03290688991546631
+Step 8: State = 7501 Action=3, Reward=-0.03290688991546631
+Step 9: State = 6651 Action=3, Reward=0.17095422744750977
+Step 10: State = 1605 Action=3, Reward=-0.13804739713668823
+Step 11: State = 4740 Action=3, Reward=5.960464477539063e-08
+Step 12: State = 1199 Action=3, Reward=-0.08693313598632812
+Step 13: State = 996 Action=3, Reward=0.02532362937927246
+Step 14: State = 2380 Action=3, Reward=0.028702616691589355
+Step 15: State = 6427 Action=3, Reward=0.03290683031082153
+Step 16: State = 766 Action=3, Reward=0.083462655544281
+Step 17: State = 2226 Action=3, Reward=-0.11636954545974731
+Step 18: State = 2759 Action=3, Reward=0.07115620374679565
+Step 19: State = 9300 Action=3, Reward=-0.14774179458618164
+Step 20: State = 7030 Action=3, Reward=0.1929551362991333
+Step 21: State = 4395 Action=3, Reward=-0.04521334171295166
+Step 22: State = 2632 Action=3, Reward=-0.03824925422668457
+Step 23: State = 7290 Action=3, Reward=-0.06160956621170044
+Step 24: State = 7818 Action=3, Reward=0.14507216215133667
+Step 25: State = 7760 Action=3, Reward=-0.23155230283737183
+Step 26: State = 904 Action=3, Reward=0.18633884191513062
+Step 27: State = 5243 Action=3, Reward=0.04521346092224121
+Step 28: State = 8802 Action=3, Reward=0.12230151891708374
+Inference complete!
+Agent action distribution for alfa = 1: [0. 0. 0. 1.]
+Avg number of iterations: 25
+Avg time per inference: 0.13
+Inference complete!
+10 inference runs for alfa 0: Average reward -> 0.883, BRUTEFORCE Reward -> 0.962, Std -> 0.019
+10 inference runs for alfa 0.25: Average reward -> 0.868, BRUTEFORCE Reward -> 0.950, Std -> 0.023
+10 inference runs for alfa 0.5: Average reward -> 0.860, BRUTEFORCE Reward -> 0.938, Std -> 0.015
+10 inference runs for alfa 0.75: Average reward -> 0.853, BRUTEFORCE Reward -> 0.968, Std -> 0.005
+10 inference runs for alfa 1: Average reward -> 0.922, BRUTEFORCE Reward -> 1.000, Std -> 0.026
