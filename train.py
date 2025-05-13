@@ -7,9 +7,10 @@ import argparse
 import numpy as np
 import pandas as pd
 from agents.dqn_agent import DQNAgent
+from agents.a2c_agent import A2CAgent
 from agents.a3c_agent import A3CAgent
 from agents.sarsa_agent import SARSAAgent
-from utils.plotting import plot_all_results
+from utils.plotting import plot_all_results, plot_all_results_a3c
 from environments.custom_env import CustomEnv
 from utils.logging import save_to_log, save_data, save_agent
 from utils.utilities import setup_directories, get_best_state
@@ -19,7 +20,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train RL agent with different configurations')
     
     # Agent type parameter
-    parser.add_argument('--agent_type', type=str, default='dqn', choices=['dqn', 'a3c', 'sarsa'],
+    parser.add_argument('--agent_type', type=str, default='dqn', choices=['dqn', 'a2c', 'a3c', 'sarsa'],
                        help='Type of agent to use: dqn, a3c, or sarsa')
     
     # Replay buffer type parameter
@@ -36,7 +37,7 @@ def parse_args():
     parser.add_argument('--test_num', type=str, default="test1", help='Test number for saving results')
     parser.add_argument('--reward_threshold', type=float, default=0.85, help='Reward threshold for episode completion')
     parser.add_argument('--max_iterations', type=int, default=100, help='Maximum iterations per episode')
-    
+    parser.add_argument('--num_workers', type=int, default=2, help='Number of worker threads')
     # Training parameters
     parser.add_argument('--max_episodes', type=int, default=5000, help='Maximum number of episodes')
     parser.add_argument('--gamma', type=float, default=0.95, help='Discount factor')
@@ -70,6 +71,23 @@ def train_agent(env, agent, max_episodes, test_num, args):
     """Train the agent for specified number of episodes"""
     all_visited_states = set()
     
+    # For A3C, start the workers and let them handle training
+    if isinstance(agent, A3CAgent):
+        #save_to_log(f"Starting A3C training with {agent.num_workers} workers...", f'../logs/{test_num}/training')
+        print(f"Starting A3C training with {agent.num_workers} workers...")
+        agent.training_data['max_episodes'] = max_episodes
+        agent.start_workers(env)
+        
+        # Wait for workers to complete their episodes
+        while any(worker.is_alive() for worker in agent.workers):
+            time.sleep(1)  # Check every second
+            
+        # Stop workers and clean up
+        agent.stop_workers()
+        #save_to_log(f'A3C training complete! Total Visited States: {len(agent.all_visited_states)}', f'../logs/{test_num}/training')
+        return
+    
+    # For other agents (DQN, SARSA), use single-agent training
     for ep in range(max_episodes):
         visited_states = set()
         done = False
@@ -191,16 +209,20 @@ def main():
         
         # Create environment and agent
         env = CustomEnv(universe=universe, target_dim1=targets[0], target_dim2=targets[1], 
-                       num_topics=num_topics, alfa=alfa, reward_threshold=args.reward_threshold)
+                       num_topics=num_topics, alfa=alfa, reward_threshold=args.reward_threshold, max_iterations=args.max_iterations)
         
         # Create agent based on specified type
         if args.agent_type == 'dqn':
             agent = DQNAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
                            lr=args.lr, gamma=args.gamma, target_sync_freq=args.target_sync_freq,
                            batch_size=args.batch_size, replay_buffer_type=args.replay_buffer)
+        elif args.agent_type == 'a2c':
+            agent = A2CAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
+                lr=args.lr, gamma=args.gamma, update_interval=5,
+                eps=args.eps, eps_decay=args.eps_decay, eps_min=args.eps_min)
         elif args.agent_type == 'a3c':
             agent = A3CAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
-                           lr=args.lr, gamma=args.gamma)
+                           lr=args.lr, gamma=args.gamma, entropy_beta=0.01, num_workers=args.num_workers, test_num=args.test_num, alfa=alfa)
         elif args.agent_type == 'sarsa':
             agent = SARSAAgent(state_dim=env.state_dim, action_dim=env.action_space.n, device=device,
                              lr=args.lr, gamma=args.gamma, eps=args.eps, eps_decay=args.eps_decay,
@@ -213,7 +235,8 @@ def main():
         
         # Save results
         save_agent(os.path.join(f"../saved_agents/{args.test_num}", f"agent_alfa_{alfa}_bias.pth"), agent)
-        save_data(agent.training_data, alfa, args.test_num)
+        if args.agent_type != 'a3c':
+            save_data(agent.training_data, alfa, args.test_num)
         
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -221,8 +244,16 @@ def main():
                    f"Time elapsed for agent with alfa = {alfa}: {elapsed_time:.4f} seconds\n{50 * '-'}",
                    f'../logs/{args.test_num}/training')
     
-    # Plot all results
-    plot_all_results(args.test_num, args.alfa_values)
+
+    # Plot results after training
+    if isinstance(agent, A3CAgent):
+        print("\nPlotting results...")
+        for worker_id in range(args.num_workers):
+            print(f"Plotting results for worker {worker_id}...")
+            plot_all_results_a3c(args.test_num, args.alfa_values, worker_id)
+        print("Plotting complete!")
+    else:
+        plot_all_results(args.test_num, args.alfa_values)
     
     # Log final information
     program_end_time = time.time()

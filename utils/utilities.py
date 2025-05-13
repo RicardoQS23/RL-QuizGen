@@ -26,6 +26,10 @@ def setup_directories(test_num):
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
 
+def create_worker_dir(log_path):
+    # Ensure the directory exists
+    os.makedirs(log_path, exist_ok=True)
+
 def compute_reward(alfa, state, targets):
     """Compute the reward for a given state and targets."""
     target_dim1 = targets[0]

@@ -49,6 +49,12 @@ def save_agent(save_path, agent):
         if hasattr(agent, 'model') and isinstance(agent.model, torch.nn.Module):
             torch.save(agent.model.state_dict(), save_path)
             print(f"Model saved at {save_path}")
+        elif hasattr(agent, 'actor_critic'):
+            # For A3C agent
+            agent.save(save_path)
+            print(f"A3C model saved at {save_path}")
+            training_data = agent.get_training_data()
+            save_data(training_data, agent.training_data.get('alfa', 0), agent.training_data.get('test_num', 'default'))
         else:
             with open(save_path.replace(".pth", ".pkl"), 'wb') as f:
                 pickle.dump(agent, f)

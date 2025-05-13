@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
 class CustomEnv(gym.Env):
-    def __init__(self, universe, target_dim1, target_dim2, num_topics, alfa=0.5, reward_threshold=0.85, state=None):
+    def __init__(self, universe, target_dim1, target_dim2, num_topics, alfa=0.5, reward_threshold=0.85, state=None, max_iterations=100):
         super(CustomEnv, self).__init__()
         self.alfa = alfa
         self.reward_threshold = reward_threshold
@@ -13,7 +13,7 @@ class CustomEnv(gym.Env):
         self.num_topics = num_topics
         self.universe = universe
         self.universe_size = self.universe.shape[0]
-
+        self.max_iterations = max_iterations
         self.state = state   #idx of the current state
         self.previous_state = state
         self.state_dim = self.universe.shape[1]
@@ -27,7 +27,7 @@ class CustomEnv(gym.Env):
         self.state = np.random.choice(self.universe_size, 1)[0]  # Pick 1 row index
         return self.state
 
-    def step(self, action, num_iterations, max_iterations=100):
+    def step(self, action, num_iterations):
         """Take a step in the environment given an action."""
         self.previous_state = self.state
         if action in [0, 1]:  # Similar actions
@@ -52,9 +52,9 @@ class CustomEnv(gym.Env):
         second_dim_metric_primitive = cosine_similarity(vec2.reshape(1, -1), self.target_dim2.reshape(1, -1))[0][0]
         reward_primitive = self.alfa * first_dim_metric_primitive + (1 - self.alfa) * second_dim_metric_primitive
 
-        done = num_iterations >= max_iterations or reward >= self.reward_threshold
+        done = num_iterations >= self.max_iterations or reward >= self.reward_threshold
         success = 1 if reward >= self.reward_threshold else 0
-        return self.state, reward - reward_primitive, done, success, first_dim_metric, second_dim_metric
+        return self.state, reward - reward_primitive, done, reward, first_dim_metric, second_dim_metric
 
     def choose_similar(self, mode):
         if mode == 0:
@@ -104,3 +104,19 @@ class CustomEnv(gym.Env):
             similarities_matrix = cosine_similarity(self.universe[:, self.num_topics:])
 
         return similarities_matrix 
+
+    def clone(self):
+            """Create a deep copy of the environment."""
+            if self.state is not None:
+                new_state = int(self.state)
+            else:
+                new_state = None
+            return CustomEnv(
+                universe=self.universe.copy(),
+                target_dim1=self.target_dim1.copy(),
+                target_dim2=self.target_dim2.copy(),
+                num_topics=int(self.num_topics),
+                alfa=float(self.alfa),
+                reward_threshold=float(self.reward_threshold),
+                state=new_state
+            ) 
