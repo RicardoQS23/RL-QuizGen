@@ -340,7 +340,9 @@ class A3CAgent(BaseAgent):
     def load(self, path):
         """Load the agent's model"""
         try:
-            checkpoint = torch.load(path, map_location=torch.device('cpu'))
+            #checkpoint = torch.load(path, map_location=torch.device('cpu'))
+            checkpoint = torch.load(path, map_location=torch.device('cpu'), weights_only=False)
+
             print("Model loaded successfully on CPU.")
     
             if isinstance(checkpoint, dict):
