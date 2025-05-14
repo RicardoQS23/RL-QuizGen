@@ -347,7 +347,8 @@ class A3CAgent(BaseAgent):
             # Method 1: Standard torch.load
             try:
                 #checkpoint = torch.load(path, map_location=self.device, weights_only=False)
-                checkpoint = torch.load(path, map_location=self.device, weights_only=False)
+                checkpoint = torch.load(path, map_location=torch.device('cpu'))
+
 
                 print("Successfully loaded using standard torch.load")
             except Exception as e:
