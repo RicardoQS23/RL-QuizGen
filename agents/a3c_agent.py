@@ -340,10 +340,7 @@ class A3CAgent(BaseAgent):
     def load(self, path):
         """Load the agent's model"""
         try:
-            #checkpoint = torch.load(path, map_location=torch.device('cpu'))
-            #checkpoint = torch.load(path, map_location=torch.device('cpu'), weights_only=False)
-            checkpoint = torch.load(path, map_location=lambda storage, loc: storage.cpu(),weights_only=False,)
-
+            checkpoint = torch.load(path, map_location=lambda storage, loc: storage.cpu(), weights_only=False)
             print("Model loaded successfully on CPU.")
     
             if isinstance(checkpoint, dict):
@@ -361,7 +358,6 @@ class A3CAgent(BaseAgent):
         except Exception as e:
             print(f"Failed to load model from {path}: {str(e)}")
             raise
-
 
     def update_episode_data(self, total_reward, total_reward_dim1, total_reward_dim2, 
                            exploration_count, exploitation_count, success,
