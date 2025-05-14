@@ -338,62 +338,19 @@ class A3CAgent(BaseAgent):
         torch.save(state_dict, path)
 
     def load(self, path):
-        """Load the agent's model"""
+        """Robust load that works on both CPU and GPU"""
         try:
-            # Try different loading methods
-            checkpoint = None
-            errors = []
-            
-            # Method 1: Standard torch.load
-            try:
-                checkpoint = torch.load(path, map_location=self.device, weights_only=False)
-                print("Successfully loaded using standard torch.load")
-            except Exception as e:
-                errors.append(f"Standard torch.load failed: {str(e)}")
-            
-            # Method 2: Try with pickle directly
-            if checkpoint is None:
-                try:
-                    import pickle
-                    with open(path, 'rb') as f:
-                        checkpoint = pickle.load(f)
-                    print("Successfully loaded using pickle")
-                except Exception as e:
-                    errors.append(f"Pickle load failed: {str(e)}")
-            
-            # Method 3: Try with different pickle protocol
-            if checkpoint is None:
-                try:
-                    import pickle
-                    with open(path, 'rb') as f:
-                        checkpoint = pickle.load(f, encoding='latin1')
-                    print("Successfully loaded using pickle with latin1 encoding")
-                except Exception as e:
-                    errors.append(f"Pickle load with latin1 encoding failed: {str(e)}")
-            
-            if checkpoint is None:
-                raise RuntimeError(f"All loading methods failed. Errors:\n" + "\n".join(errors))
-            
-            # Process the loaded checkpoint
-            if isinstance(checkpoint, A3CAgent):
-                print("Loading from A3CAgent instance")
-                # Check which attributes are available in the loaded agent
-                if hasattr(checkpoint, 'actor_critic'):
-                    self.actor_critic.load_state_dict(checkpoint.actor_critic.state_dict())
-                elif hasattr(checkpoint, 'model'):
-                    self.actor_critic.load_state_dict(checkpoint.model.state_dict())
-                
-                if hasattr(checkpoint, 'optimizer'):
-                    self.optimizer.load_state_dict(checkpoint.optimizer.state_dict())
-                
-                if hasattr(checkpoint, 'training_data'):
-                    for key, value in checkpoint.training_data.items():
-                        if key in self.training_data:
-                            self.training_data[key] = value
-            elif isinstance(checkpoint, dict):
-                print("Loading from dictionary")
-                if 'model_state_dict' in checkpoint:
-                    self.actor_critic.load_state_dict(checkpoint['model_state_dict'])
+            # Force map tensors properly depending on hardware
+            checkpoint = torch.load(
+                path,
+                map_location=lambda storage, loc: storage.cuda() if torch.cuda.is_available() else storage.cpu(),
+                weights_only=False  # important for PyTorch >=2.6
+            )
+            print(f"✅ Loaded checkpoint from {path}")
+    
+            if isinstance(checkpoint, dict):
+                if 'global_actor_critic_state_dict' in checkpoint:
+                    self.global_actor_critic.load_state_dict(checkpoint['global_actor_critic_state_dict'])
                 if 'optimizer_state_dict' in checkpoint:
                     self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
                 if 'training_data' in checkpoint:
@@ -401,14 +358,12 @@ class A3CAgent(BaseAgent):
                         if key in self.training_data:
                             self.training_data[key] = value
             else:
-                raise ValueError(f"Unexpected checkpoint type: {type(checkpoint)}")
-            
-            print(f"Successfully loaded model from {path}")
-            
+                raise ValueError(f"❌ Unexpected checkpoint format: {type(checkpoint)}")
+    
         except Exception as e:
-            print(f"Error loading model from {path}: {str(e)}")
-            print("Please ensure the model file exists and is in the correct format.")
+            print(f"❌ Error loading model from {path}: {e}")
             raise
+
 
     def update_episode_data(self, total_reward, total_reward_dim1, total_reward_dim2, 
                            exploration_count, exploitation_count, success,
