@@ -110,7 +110,7 @@ def main():
             else:
                 raise ValueError(f"Unknown agent type: {args.agent_type}")
             
-            agent.load(f"../saved_agents/{args.test_num}/agent_alfa_{alfa}_bias.pkl")
+            agent.load(f"../saved_agents/{args.test_num}/agent_alfa_{alfa}_bias_cpu_clean.pth")
             # Set eval mode based on agent type
             if args.agent_type == 'a3c':
                 agent.global_actor_critic.eval()
