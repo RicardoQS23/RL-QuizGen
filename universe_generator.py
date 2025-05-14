@@ -64,9 +64,13 @@ def generate_mcqs(test_num, csv_file, num_topics, topic_column='topic', difficul
     selected_topics = np.random.choice(unique_topics, num_topics, replace=False)
     save_to_log(f"Selected topics: {selected_topics}", f'../logs/{test_num}/training')
     
+    #filter mcqs with difficulty 6
+
     # Filter MCQs by selected topics
     mcqs = df[df['topic'].isin(selected_topics)]
-    mcqs.to_csv(f"../data/{test_num}/mcqs_{csv_file.split('/')[-1]}", index=False)
+
+    mcqs = mcqs[mcqs['difficulty'] != 6]
+    #mcqs.to_csv(f"../data/{test_num}/mcqs_{csv_file.split('/')[-1]}", index=False)
 
     save_to_log(f"Generated {len(mcqs)} unique MCQs", f'../logs/{test_num}/training')
     # Convert to list of dictionaries in the format required by RealDataGenerator

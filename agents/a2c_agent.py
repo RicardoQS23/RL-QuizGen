@@ -336,60 +336,15 @@ class A2CAgent(BaseAgent):
     def load(self, path):
         """Load the agent's model"""
         try:
-            # Try different loading methods
-            checkpoint = None
-            errors = []
-            
-            # Method 1: Standard torch.load
-            try:
-                checkpoint = torch.load(path, map_location=self.device, weights_only=False)
-                print("Successfully loaded using standard torch.load")
-            except Exception as e:
-                errors.append(f"Standard torch.load failed: {str(e)}")
-            
-            # Method 2: Try with pickle directly
-            if checkpoint is None:
-                try:
-                    import pickle
-                    with open(path, 'rb') as f:
-                        checkpoint = pickle.load(f)
-                    print("Successfully loaded using pickle")
-                except Exception as e:
-                    errors.append(f"Pickle load failed: {str(e)}")
-            
-            # Method 3: Try with different pickle protocol
-            if checkpoint is None:
-                try:
-                    import pickle
-                    with open(path, 'rb') as f:
-                        checkpoint = pickle.load(f, encoding='latin1')
-                    print("Successfully loaded using pickle with latin1 encoding")
-                except Exception as e:
-                    errors.append(f"Pickle load with latin1 encoding failed: {str(e)}")
-            
-            if checkpoint is None:
-                raise RuntimeError(f"All loading methods failed. Errors:\n" + "\n".join(errors))
+            # Load the checkpoint with map_location set to the device
+            checkpoint = torch.load(path, map_location=torch.device('cpu'), weights_only=False,
+                                     pickle_module=torch.serialization.pickle)
             
             # Process the loaded checkpoint
-            if isinstance(checkpoint, A2CAgent):
-                print("Loading from A3CAgent instance")
-                # Check which attributes are available in the loaded agent
-                if hasattr(checkpoint, 'actor_critic'):
-                    self.actor_critic.load_state_dict(checkpoint.actor_critic.state_dict())
-                elif hasattr(checkpoint, 'model'):
-                    self.actor_critic.load_state_dict(checkpoint.model.state_dict())
-                
-                if hasattr(checkpoint, 'optimizer'):
-                    self.optimizer.load_state_dict(checkpoint.optimizer.state_dict())
-                
-                if hasattr(checkpoint, 'training_data'):
-                    for key, value in checkpoint.training_data.items():
-                        if key in self.training_data:
-                            self.training_data[key] = value
-            elif isinstance(checkpoint, dict):
+            if isinstance(checkpoint, dict):
                 print("Loading from dictionary")
-                if 'model_state_dict' in checkpoint:
-                    self.actor_critic.load_state_dict(checkpoint['model_state_dict'])
+                if 'global_actor_critic_state_dict' in checkpoint:
+                    self.global_actor_critic.load_state_dict(checkpoint['global_actor_critic_state_dict'])
                 if 'optimizer_state_dict' in checkpoint:
                     self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
                 if 'training_data' in checkpoint:
