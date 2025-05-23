@@ -25,3 +25,7 @@ The script to train the Reinforcement Learning model has the options to control 
 - Random Seed: Ransom seed for reproducibility, 23 (default) -> --seed
 
 Example of a program call: `python3 train.py --agent_type sarsa --max_episodes 1000 --dataset math --universe_size 30000`
+
+When the program runs, it creates 5 folders on the outside directory: `data`, `jsons`, `logs`, `saved_agents`, `images`
+
+In order for the program to run correctly, the `medical.csv` and `math.csv` files should be inserted inside the `data` folder
